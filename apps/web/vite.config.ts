@@ -1,8 +1,21 @@
-import { defineConfig } from "vite";
+import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react";
+import { fileURLToPath } from "node:url";
+import { dirname, join } from "node:path";
+import { devApi } from "./dev-api-plugin";
 
-export default defineConfig({
-  plugins: [react()],
+const here = dirname(fileURLToPath(import.meta.url));
+
+export default defineConfig(({ mode }) => {
+  /*
+    Load the repo-root .env.local into process.env so the dev API routes see
+    CLAUDE_BRIDGE_URL. Vite only exposes VITE_ prefixed variables to the client, by
+    design, and these are server-only values that must never reach the bundle.
+  */
+  Object.assign(process.env, loadEnv(mode, join(here, "..", ".."), ""));
+
+  return {
+  plugins: [react(), devApi(join(here, "..", "..", "api"))],
   /*
     5273, not the Vite default 5173. Another project on this machine already holds 5173,
     and strictPort means a collision fails loudly instead of silently moving the app to a
@@ -41,4 +54,5 @@ export default defineConfig({
     sourcemap: true,
     rolldownOptions: {},
   },
+  };
 });

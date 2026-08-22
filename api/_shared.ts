@@ -56,12 +56,24 @@ export function json(body: unknown, init: { status?: number; origin?: string | n
  * Supabase user id, or null.
  */
 export async function verifyCaller(request: Request): Promise<string | null> {
-  const auth = request.headers.get("authorization");
-  if (!auth?.startsWith("Bearer ")) return null;
-
   const url = process.env["SUPABASE_URL"];
   const anon = process.env["SUPABASE_ANON_KEY"];
-  if (!url || !anon) return null;
+
+  /*
+    No auth system configured means no accounts exist, not that everybody is unauthorized.
+
+    In that mode the whole app is single user against a locally generated corpus: there is
+    no sign-in screen, no session to present, and demanding a bearer token that cannot be
+    issued would make every route permanently 401 for a reason nobody could act on.
+
+    This can never loosen a configured deployment. The moment SUPABASE_URL and the anon key
+    are set, the code below runs and a real token is required. The relaxation is a
+    consequence of there being nothing to authenticate against, not a bypass switch.
+  */
+  if (!url || !anon) return LOCAL_SINGLE_USER;
+
+  const auth = request.headers.get("authorization");
+  if (!auth?.startsWith("Bearer ")) return null;
 
   const response = await fetch(`${url}/auth/v1/user`, {
     headers: { Authorization: auth, apikey: anon },
@@ -137,6 +149,12 @@ export async function bridgeUrl(): Promise<string | null> {
  * record drafted on somebody's laptop from one the deployed product produced, because
  * those are different claims.
  */
+/*
+  The identity used when no auth system is configured. Named rather than a blank string so
+  it shows up as itself in a rate-limit key or a log line, instead of looking like a bug.
+*/
+export const LOCAL_SINGLE_USER = "local-single-user";
+
 export type InferenceSource = "local_bridge" | "local_model" | "anthropic_api" | "none";
 
 /*
