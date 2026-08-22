@@ -1,0 +1,86 @@
+.wrap {
+  position: relative;
+  width: 100%;
+  overflow-x: auto;
+}
+
+/*
+  Fixed height, width follows the container, and preserveAspectRatio centres the viewBox
+  inside it. Letting height follow the aspect ratio instead makes the graph as tall as
+  the pane is wide, which on a 1440 screen is roughly 900px of mostly empty canvas.
+*/
+.svg {
+  display: block;
+  width: 100%;
+  height: 440px;
+  min-width: 520px;
+}
+
+.edge {
+  stroke: var(--border-strong);
+  fill: none;
+}
+
+.edgeSupersedes {
+  stroke: var(--text-chrome);
+}
+
+.node {
+  cursor: pointer;
+}
+
+.nodeBody {
+  stroke: var(--border-medium);
+  stroke-width: 1;
+  fill: var(--surface-solid);
+}
+
+.nodeSelected .nodeBody {
+  stroke: var(--accent);
+  stroke-width: 1.6;
+}
+
+/*
+  The amber ring. Reserved for knowledge risk, and here it is doing exactly that: a ring
+  around a decision that carries a risk flag. It is a ring rather than a fill so the ring
+  itself is a shape cue, not just a colour change.
+*/
+.riskRing {
+  fill: none;
+  stroke: var(--accent-risk);
+  stroke-width: 1.4;
+}
+
+.dimmed {
+  opacity: 0.22;
+}
+
+.label {
+  font-family: var(--font-sans);
+  font-size: 10px;
+  fill: var(--text-tertiary);
+  pointer-events: none;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  padding-top: 12px;
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.swatch {
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  border: 1px solid var(--border-medium);
+  background: var(--surface-recessed);
+}

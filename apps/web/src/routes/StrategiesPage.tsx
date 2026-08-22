@@ -1,16 +1,160 @@
-import { Pane } from "../components/Pane";
-import { EmptyState } from "../components/EmptyState";
+import { useMemo, useState } from "react";
+import { scoreStrategy } from "@continuity/core";
+import styles from "./StrategiesPage.module.css";
+import { GenealogyGraph } from "../components/GenealogyGraph";
+import { StatusChip } from "../components/StatusChip";
+import { corpus, memberName, TYPE_LABEL } from "../data/source";
 
 export function StrategiesPage() {
+  const c = corpus();
+  const [activeId, setActiveId] = useState(c.strategies[0]!.id);
+  const [selectedDecision, setSelectedDecision] = useState<string | null>(null);
+
+  const authors = useMemo(
+    () => new Map(c.decisions.map((d) => [d.id, d.authorMemberId])),
+    [c.decisions],
+  );
+
+  const scores = useMemo(
+    () =>
+      new Map(
+        c.strategies.map((s) => [
+          s.id,
+          scoreStrategy({
+            strategyId: s.id,
+            items: c.decisions
+              .filter((d) => d.strategyId === s.id)
+              .map((d) => ({
+                strategyId: s.id,
+                authorMemberId: d.authorMemberId,
+                /* A risk flagged decision is worth more to a successor, so it weighs
+                   more in the concentration maths. */
+                weight: d.riskFlag ? 2 : 1,
+              })),
+            openQuestions: c.questions.filter((q) => q.strategyId === s.id),
+            decisionAuthors: authors,
+          }),
+        ]),
+      ),
+    [c, authors],
+  );
+
+  const active = c.strategies.find((s) => s.id === activeId)!;
+
+  const graph = useMemo(() => {
+    const decisions = c.decisions.filter((d) => d.strategyId === activeId);
+    const ids = new Set(decisions.map((d) => d.id));
+    return {
+      nodes: decisions.map((d) => ({
+        id: d.id,
+        title: d.title,
+        decisionType: d.decisionType,
+        riskFlag: d.riskFlag,
+        authorMemberId: d.authorMemberId,
+      })),
+      edges: c.links
+        .filter((l) => ids.has(l.parent) && ids.has(l.child))
+        .map((l) => ({ source: l.parent, target: l.child, relation: l.relation })),
+    };
+  }, [c, activeId]);
+
+  const decision = selectedDecision
+    ? c.decisions.find((d) => d.id === selectedDecision)
+    : null;
+
   return (
-    <Pane title="Strategies" subtitle="Meridian Basis Partners">
-      <p>Every strategy carries its decision genealogy: what changed, why, and what was rejected along the way.</p>
-      <EmptyState
-        title="No strategies yet"
-        body="Strategies arrive with the seed, or you can file the first decision from quick capture."
-        hint="Capture is ambient. Nothing here is filled by hand unless you want it to be."
-        shortcut="Cmd Shift Space"
-      />
-    </Pane>
+    <div className={styles.page}>
+      <div className={styles.grid}>
+        {c.strategies.map((s) => {
+          const score = scores.get(s.id)!;
+          return (
+            <button
+              key={s.id}
+              type="button"
+              className={styles.card}
+              data-active={s.id === activeId}
+              onClick={() => {
+                setActiveId(s.id);
+                setSelectedDecision(null);
+              }}
+            >
+              <span className={styles.cardHead}>
+                <span className={styles.name}>{s.name}</span>
+                <StatusChip variant={s.status === "live" ? "verified" : "neutral"}>
+                  {s.status}
+                </StatusChip>
+              </span>
+              <span className={styles.desc}>{s.description}</span>
+              <span className={styles.metrics}>
+                <span className={styles.metric}>
+                  <span
+                    className={`${styles.metricValue} ${score.busFactor <= 1 ? styles.atRisk : ""}`}
+                  >
+                    {score.busFactor}
+                  </span>
+                  <span className={styles.metricLabel}>bus factor</span>
+                </span>
+                <span className={styles.metric}>
+                  <span className={styles.metricValue}>
+                    {score.concentration.toFixed(2)}
+                  </span>
+                  <span className={styles.metricLabel}>concentration</span>
+                </span>
+                <span className={styles.metric}>
+                  <span className={styles.metricValue}>
+                    {c.decisions.filter((d) => d.strategyId === s.id).length}
+                  </span>
+                  <span className={styles.metricLabel}>decisions</span>
+                </span>
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
+      <section className={styles.detail}>
+        <header className={styles.detailHead}>
+          <h2 className={styles.detailTitle}>{active.name}</h2>
+          <span className={styles.chips}>
+            <StatusChip>{`${graph.nodes.length} decisions`}</StatusChip>
+            <StatusChip>{`${graph.edges.length} links`}</StatusChip>
+            <StatusChip>{`owner ${memberName(scores.get(activeId)!.topHolderMemberId)}`}</StatusChip>
+          </span>
+        </header>
+
+        <GenealogyGraph
+          nodes={graph.nodes}
+          edges={graph.edges}
+          selectedId={selectedDecision}
+          onSelect={setSelectedDecision}
+        />
+
+        {decision ? (
+          <div className={styles.selected}>
+            <div className={styles.selectedTitle}>{decision.title}</div>
+            <div className={styles.chips}>
+              {decision.riskFlag ? <StatusChip variant="risk">Risk</StatusChip> : null}
+              <StatusChip>{TYPE_LABEL[decision.decisionType] ?? decision.decisionType}</StatusChip>
+              <StatusChip>{memberName(decision.authorMemberId)}</StatusChip>
+              {decision.draftedBy === "model" ? (
+                <StatusChip variant="draft">Drafted by model</StatusChip>
+              ) : null}
+            </div>
+            <p className={styles.selectedWhy}>{decision.why}</p>
+            {decision.alternatives.length ? (
+              <ul className={styles.alts}>
+                {decision.alternatives.map((a) => (
+                  <li key={a}>{a}</li>
+                ))}
+              </ul>
+            ) : null}
+          </div>
+        ) : (
+          <p className={styles.hint}>
+            Select a node to read the decision behind it, including what was rejected.
+          </p>
+        )}
+      </section>
+    </div>
   );
 }

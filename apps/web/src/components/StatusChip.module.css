@@ -1,0 +1,44 @@
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  font-size: 12px;
+  font-weight: 520;
+  line-height: 1.5;
+  white-space: nowrap;
+  color: var(--text-secondary);
+  background: var(--surface-solid);
+}
+
+.dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 999px;
+  background: currentColor;
+  flex: 0 0 5px;
+}
+
+.verified { color: var(--accent-verified); border-color: var(--border-medium); }
+.anchored { color: var(--accent-verified); border-color: var(--border-medium); }
+
+/*
+  The one amber surface in the component library. Amber means knowledge risk and nothing
+  else, anywhere, ever. The moment it decorates something, the signal is gone.
+
+  It also never travels alone: the glyph is what carries the meaning for anyone who
+  cannot separate it from the danger red, and relying on colour by itself to say
+  something essential is a defect rather than a style.
+*/
+.risk { color: var(--accent-risk); border-color: var(--accent-risk); }
+
+.draft {
+  color: var(--accent);
+  border-style: dashed;
+  border-color: var(--draft);
+}
+
+.neutral { color: var(--text-tertiary); }
+.glyph { display: inline-grid; place-items: center; }

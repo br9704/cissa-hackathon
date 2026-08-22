@@ -1,0 +1,22 @@
+.rail {
+  display: flex;
+  flex-direction: column;
+}
+
+.groupLabel {
+  position: sticky;
+  top: 0;
+  padding: 10px 12px 6px;
+  font-size: 12px;
+  font-weight: 560;
+  color: var(--text-tertiary);
+  background: var(--surface-solid);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.footer {
+  padding: 12px;
+  font-size: 12px;
+  color: var(--text-tertiary);
+  text-align: center;
+}
