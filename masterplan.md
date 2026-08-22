@@ -387,7 +387,7 @@ The arc is the meal; this list is garnish. The build model may not reorder it.
 
 ## S7 — Proof layer (budget 2h)
 
-- [ ] Merkle root over ledger ranges; OpenTimestamps anchor of the head
+- [x] Merkle root over ledger ranges; OpenTimestamps anchor of the head
       (`anchor_receipts`); CLI `continuity anchor` + scheduled function stub. Recipes
       in docs/scoping.md §D. STAMP THE FIRST HEAD ON SATURDAY so an upgraded
       Bitcoin-attested receipt exists by demo time (attestation takes 1-6+ hours);
@@ -399,6 +399,32 @@ The arc is the meal; this list is garnish. The build model may not reorder it.
   exact row; receipt renders.
 - **Sprint log:**
 
+
+- **Sprint log (second entry):** Logged: 2026-08-22T21:08+10:00 · status: done · actual: ~2.0h
+  cumulative (budget 1h, overrun) · by: Claude Opus 5 (Claude Code) · note: a real receipt
+  exists. 770 bytes, submitted to the live OpenTimestamps calendars over a Merkle root of
+  184 events, stored in docs/anchors.json and rendered on the Verify page as pending,
+  which is the honest word. `pnpm --filter @continuity/core anchor upgrade` asks the
+  calendars whether Bitcoin has confirmed it; that takes hours and cannot be hurried.
+
+  The Merkle construction is RFC 6962 and it got there by being wrong first. The initial
+  version padded an odd level by duplicating the last node, with a comment confidently
+  explaining that duplication AVOIDED the second preimage problem. It causes it: a seven
+  leaf tree whose last leaf repeats produces the same root as an eight leaf tree, which is
+  CVE-2012-2459 in miniature. The test caught the comment. The fix is domain separated
+  leaves and internal nodes (0x00 and 0x01 prefixes) and splitting at the largest power of
+  two rather than padding. 13 tests, including both attacks.
+
+  Every one of the Stage 1.5 OpenTimestamps findings earned its place. The CJS import trap
+  (named imports typecheck and then throw at runtime) is handled with a comment saying
+  why. `ignoreBitcoinNode: true` is passed everywhere. `upgrade()` returning false is
+  treated as nothing changed rather than as an error. And the one that would have produced
+  a false claim on stage: `verify()` on a pending receipt RESOLVES WITH AN EMPTY OBJECT
+  rather than rejecting, so an empty result means pending and never success.
+
+  Overran the one hour budget by an hour. The Merkle rewrite is where it went, and it was
+  worth it: shipping a root construction with a known collision would have been a real
+  defect in the one part of this product whose entire job is being trustworthy.
 ## S8 — Deploy (budget 2h)
 
 - [ ] Web build to Vercel: env, auth redirect URLs, seeded demo firm, registration →
