@@ -22,3 +22,8 @@ __pycache__/
 *.py[cod]
 .venv/
 venv/
+
+# Owner rule 2026-08-22: these two never get committed
+CLAUDE.md
+ENGINEERPROMPT.md
+engineerprompt.md
