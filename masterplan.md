@@ -338,22 +338,52 @@ The arc is the meal; this list is garnish. The build model may not reorder it.
 
 ## S6 — The on-prem tagger (parallel, owner's machine, budget 4h wall-clock)
 
-- [ ] `ml/`: mirror distillation `src` layout; `df -h` check FIRST; base LOCKED
+- [x] `ml/`: mirror distillation `src` layout; `df -h` check FIRST; base LOCKED
       `mlx-community/Qwen3.5-2B-MLX-bf16` (0.8B-bf16 if disk-tight); pin revision SHA;
       exact commands + parse rules in docs/scoping.md §D.
-- [ ] Train LoRA r=16 bf16 on the S1-exported 2,200 labelled decisions (7-class
+- [x] Train LoRA r=16 bf16 on the S1-exported 2,200 labelled decisions (7-class
       decision_type + risk_flag as text label); held-out 300 split BEFORE training;
       eval macro-F1 + accuracy; write `ml/results/summary.json` with provenance
       (base SHA, adapter sha256, data hashes) exactly like distillation.
-- [ ] Serve: tiny local endpoint (`ml/serve.py`, mlx-lm) the app calls when
+- [x] Serve: tiny local endpoint (`ml/serve.py`, mlx-lm) the app calls when
       `TAGGER_URL` is set; cloud demo falls back to few-shot route (labelled in UI as
       "remote fallback").
-- [ ] FALLBACK (pre-agreed, D6): few-shot with base model; quote distillation shipped
+- [x] FALLBACK (pre-agreed, D6): few-shot with base model; quote distillation shipped
       numbers instead, clearly attributed to the prior project.
 - **Acceptance:** every seeded + new decision gets decision_type/risk_flag; the quoted
   accuracy number in the UI tooltip matches `ml/results/summary.json` or the fallback
   wording is used. No invented numbers (D9).
-- **Sprint log:**
+- **Sprint log:** Logged: 2026-08-22T20:54+10:00 · status: done · actual: ~1.6h (budget 3h) ·
+  by: Claude Opus 5 (Claude Code) · note: trained, evaluated, and the fallback arm run as
+  a comparison rather than kept in reserve. Fine-tuned adapter: macro F1 1.0000 on 300
+  held-out rows, 0 unparseable, 462ms p50. Few-shot on the same base with the same parser
+  and the same split: 0.6155. Both in ml/results/summary.json with adapter and data
+  hashes, and that file is committed because it is what D9 points at.
+
+  The 38.5 point gap is the reportable number, not the 1.0. A perfect score is equally
+  consistent with a good model and a trivial benchmark, and the few-shot arm is the only
+  thing that tells them apart. The corpus is template generated and the held-out split
+  comes from the same generator, so the 1.0 measures template learning and cannot measure
+  performance on text a person wrote. That caveat is written into ml/README.md, into
+  summary.json, and into the product README next to the table.
+
+  Three of the four Stage 1.5 corrections earned their place. A3 (omit `keys`, num_layers
+  0) gave 16.8M trainable parameters instead of the 917K the previous project got from
+  accidentally adapting four layers of twenty four. A4 (enable_thinking=False) is in every
+  inference path and there were zero unparseable outputs across 450 generations, which is
+  what its absence would have destroyed. A5 (checkpoint selection) did NOT pay this time:
+  iteration 200 tied the final iteration, where last time selecting was worth eight
+  points. Recorded, because reporting only the times a technique worked is how a recipe
+  becomes folklore.
+
+  One new correction for anyone repeating this: the config as written OOMs. Eighteen times
+  the trainable parameters is eighteen times the optimiser state, and a batch of 8 at
+  seq 256 does not fit. Batch 2 with 4 accumulation steps, gradient checkpointing, and a
+  sequence length of 224 measured from the data rather than guessed brings peak memory to
+  7.4 GB. See AMENDMENTS A22.
+
+  Training stopped at 300 of 1000 iterations, deliberately: validation loss was 0.002 at
+  iteration 200 and that checkpoint already scored a perfect validation macro F1.
 
 ## S7 — Proof layer (budget 2h)
 
