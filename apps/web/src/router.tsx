@@ -9,6 +9,7 @@ import {
 } from "@tanstack/react-router";
 import { AppShell } from "./components/AppShell";
 import { QuickCapture } from "./components/QuickCapture";
+import { MyRecordPage } from "./routes/MyRecordPage";
 import { LedgerPage } from "./routes/LedgerPage";
 import { StrategiesPage } from "./routes/StrategiesPage";
 import { RiskPage } from "./routes/RiskPage";
@@ -43,6 +44,7 @@ const riskRoute = createRoute({ getParentRoute: () => rootRoute, path: "/risk", 
 const debriefsRoute = createRoute({ getParentRoute: () => rootRoute, path: "/debriefs", component: DebriefsPage });
 const complianceRoute = createRoute({ getParentRoute: () => rootRoute, path: "/compliance", component: CompliancePage });
 const verifyRoute = createRoute({ getParentRoute: () => rootRoute, path: "/verify", component: VerifyPage });
+const myRecordRoute = createRoute({ getParentRoute: () => rootRoute, path: "/my-record", component: MyRecordPage });
 const quickCaptureRoute = createRoute({ getParentRoute: () => rootRoute, path: "/quick-capture", component: QuickCapture });
 
 const routeTree = rootRoute.addChildren([
@@ -52,6 +54,7 @@ const routeTree = rootRoute.addChildren([
   debriefsRoute,
   complianceRoute,
   verifyRoute,
+  myRecordRoute,
   quickCaptureRoute,
 ]);
 

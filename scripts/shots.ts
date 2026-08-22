@@ -126,6 +126,26 @@ const SCENES: {
     },
   },
   {
+    name: "transcript-import",
+    path: "/",
+    viewportOnly: true,
+    act: async (page) => {
+      await page.getByRole("button", { name: "Use a sample" }).click();
+      await page.getByText(/turns, \d+ speakers?/).waitFor();
+      await page.getByText("Import a meeting transcript").scrollIntoViewIfNeeded();
+      await page.waitForTimeout(400);
+    },
+  },
+  {
+    name: "my-record",
+    path: "/my-record",
+    viewportOnly: true,
+    act: async (page) => {
+      await page.getByText("My record").first().waitFor();
+      await page.waitForTimeout(300);
+    },
+  },
+  {
     name: "compliance-checkpoint",
     path: "/compliance",
     act: async (page) => {

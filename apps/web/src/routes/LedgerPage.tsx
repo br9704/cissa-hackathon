@@ -3,6 +3,7 @@ import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import styles from "./LedgerPage.module.css";
 import { LedgerRail } from "../components/LedgerRail";
 import { DecisionCard } from "../components/DecisionCard";
+import { TranscriptImporter } from "../components/TranscriptImporter";
 import { corpus, type LedgerEntry } from "../data/source";
 import { useLiveLedger } from "../data/live";
 
@@ -133,6 +134,8 @@ export function LedgerPage() {
           </AnimatePresence>
         </div>
       </div>
+
+      <TranscriptImporter />
 
       <section className={styles.railPane}>
         <header className={styles.railHeader}>

@@ -207,16 +207,27 @@ The arc is the meal; this list is garnish. The build model may not reorder it.
 - [ ] Server routes (LOCKED: Vercel functions per docs/scoping.md §B6): `draft-decision`
       (diff in, structured draft out, Anthropic API), `ask` (S4), JWT-verified, rate
       limited (in-memory per-instance is acceptable; note it in README).
-- [ ] Draft queue UI: DecisionCard draft variant (dashed hairline + drafted chip),
+- [x] Draft queue UI: DecisionCard draft variant (dashed hairline + drafted chip),
       approve = one keystroke (A), edit-then-approve, reject.
-- [ ] Desktop quick capture: global hotkey window per design.md §3.4, files a manual
+- [x] Desktop quick capture: global hotkey window per design.md §3.4, files a manual
       decision in <10s, keyboard only. FALLBACK: in-window Cmd+K capture mode.
-- [ ] Transcript importer (D11): paste or drop a speaker-tagged transcript in the app,
+- [x] Transcript importer (D11): paste or drop a speaker-tagged transcript in the app,
       pick strategy + attendees, files as a `meeting_transcript` artifact through the
       normal event path. Small surface, big pitch line ("meetings feed the ledger").
 - **Acceptance:** commit in demo repo lands as approved decision in <60s end to end on
   stage-quality path; quick capture files in <10s; all writes appear as ledger events.
-- **Sprint log:**
+- **Sprint log:** Logged: 2026-08-22T19:51+10:00 · status: partial · actual: ~1.4h (budget 3h) ·
+  by: Claude Opus 5 (Claude Code) · note: draft queue with the one keystroke approve and
+  the capture-to-ledger handoff, the transcript importer, and the desktop quick capture
+  window from S0. NOT done and honestly blocked: the server routes (S2.0 to S2.6) need an
+  Anthropic key, which is in MANUAL TASKS. The route SHAPES are settled and written into
+  the sprint expansion, including the structured-output versus citations split that the
+  API forces, so wiring them is mechanical once a key exists. The CLI is next.
+
+  The transcript parser has eight tests, and the one worth naming is that a sentence
+  containing a colon is not a speaker line. "The rule is simple: cut size" would
+  otherwise be attributed to a person called "The rule is simple", which is the sort of
+  quiet misattribution that makes a provenance product worthless.
 
 ## S3 — Reading surfaces: ledger, strategy, graph (budget 5h)
 
@@ -235,7 +246,7 @@ The arc is the meal; this list is garnish. The build model may not reorder it.
       ledger to time T; graph nodes/edges appear in event order (layout is already
       deterministic, so precompute final positions and reveal progressively); scrubbing
       past a departure inks that member's decisions amber in dependency order.
-- [ ] Access events + checkpoint + My Record (D13): strategy opens and exports append
+- [x] Access events + checkpoint + My Record (D13): strategy opens and exports append
       `access_read` / `access_export` events; export modal takes a one-line
       justification onto the event payload; My Record view filters the ledger to the
       signed-in member's captured contributions and the access events touching them.

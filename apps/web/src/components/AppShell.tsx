@@ -80,9 +80,14 @@ export function AppShell() {
             <kbd className={styles.kbd}>Cmd K</kbd>
           </button>
           <span className={styles.spacer} />
-          <span className={styles.member} aria-label="Signed in">
+          {/*
+            My Record lives behind the avatar rather than in the rail. It is the screen
+            about YOU, and putting it where a profile menu would be is where people look
+            for that.
+          */}
+          <Link to="/my-record" className={styles.member} aria-label="My record">
             MB
-          </span>
+          </Link>
         </header>
 
         <div className={styles.scrollEdge} aria-hidden="true" />
