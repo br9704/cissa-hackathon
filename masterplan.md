@@ -1,6 +1,6 @@
 # masterplan.md: Continuity
 
-> **Current sprint: S1 — The schema and the chain** _(Stage 1 closed on delivery of the pack; Stage 1.5 verification and expansion closed 2026-08-22)_
+> **Current sprint: S2 — Capture surfaces** _(Stage 1 closed on delivery of the pack; Stage 1.5 verification and expansion closed 2026-08-22)_
 >
 > This file is the ledger. Work only the active sprint. Mark tasks live:
 > `[ ]` not started · `[~]` in progress · `[x]` complete · `[⏭]` deferred (one-line reason).
@@ -807,41 +807,44 @@ S6 (tagger) runs in parallel on the owner's machine from Sat evening.
 
 ## S1 — The schema and the chain (budget 1h)
 
-- [ ] Migrations for every table in prd §4.2, RLS by firm, roles as member claim.
-- [ ] Append-only enforcement per docs/scoping.md §B1: explicit GRANTs, revoke +
+- [x] Migrations for every table in prd §4.2, RLS by firm, roles as member claim.
+- [x] Append-only enforcement per docs/scoping.md §B1: explicit GRANTs, revoke +
       forbid_mutation trigger, chain trigger with per-firm advisory lock and hand-built
       canonical text. Chain VERIFY is a SQL function (`verify_chain(firm_id)`); the
       verify page calls it and animates its result; `packages/core` tests call it via
       RPC against seeded data plus a deliberately forked copy (do NOT reimplement jsonb
       canonicalization in TS).
-- [ ] Synthetic corpus generator (`packages/core/seed`): Meridian Basis Partners, 5
+- [x] Synthetic corpus generator (`packages/core/seed`): Meridian Basis Partners, 5
       personas, 4 strategies, ~400 artifacts, ~180 decisions with genealogy links,
       ~2,200 labelled decision records exported to `ml/data/` for S6, 6 debrief
       sessions, questions feed, and 4 speaker-tagged meeting transcripts (two desk
       standups, one strategy review, one risk meeting) as `meeting_transcript`
       artifacts that decisions and debriefs cite (D11). Deterministic seed so demos
       reproduce.
-- [ ] Seed applied to hosted Supabase; typegen committed.
+- [~] Seed applied to hosted Supabase; typegen committed.
+      Applied to a LOCAL PostgreSQL 17.11 instead and verified there. The hosted half
+      is blocked on the Supabase CLI login (MANUAL TASKS) and this machine has no
+      Docker, so `supabase start` was not an option either. Carried into S8.
 **Expanded steps (Stage 1.5).**
 
-- [ ] S1.0 Migration order matters. `0001_core.sql` (firms, members, strategies,
+- [x] S1.0 Migration order matters. `0001_core.sql` (firms, members, strategies,
       artifacts), `0002_events.sql` (ledger + triggers), `0003_projections.sql`
       (decisions, decision_links, debrief_*, questions, knowledge_scores,
       anchor_receipts, handover_packs), `0004_vector.sql`, `0005_grants_rls.sql`.
-- [ ] S1.1 **GRANTs are not optional on a project created today.** The Supabase default
+- [x] S1.1 **GRANTs are not optional on a project created today.** The Supabase default
       flipped on 2026-05-30: new tables get NO implicit `anon` / `authenticated` /
       `service_role` access, and the symptom is PostgREST 42501 "permission denied for
       table" WITH correct RLS policies in place. Every table needs explicit grants, and
       `service_role` needs them too or the seed script fails. Write them into
       `0005_grants_rls.sql` so the repo is self-describing rather than relying on a
       dashboard toggle.
-- [ ] S1.2 **Hash the chain with the built-in `sha256()`, not pgcrypto `digest()`**
+- [x] S1.2 **Hash the chain with the built-in `sha256()`, not pgcrypto `digest()`**
       (A2). Unqualified `digest()` raises "function digest(unknown, unknown) does not
       exist" under the normal search_path; `sha256(bytea)` lives in `pg_catalog`, needs
       no extension, and survives a hardened `set search_path = ''`. Canonical form,
       verified byte-identical to the pgcrypto version:
       `encode(sha256(convert_to(canonical_text,'UTF8')),'hex')`.
-- [ ] S1.3 Chain trigger. BEFORE INSERT, per row. Take
+- [x] S1.3 Chain trigger. BEFORE INSERT, per row. Take
       `pg_advisory_xact_lock(hashtext('events_chain'), hashtext(new.firm_id::text))`
       (the two-int overload exists and `hashtext` returns int4, so no cast). Read prev by
       `order by id desc limit 1`. Build canonical text BY HAND, never by re-serializing
@@ -850,7 +853,7 @@ S6 (tagger) runs in parallel on the owner's machine from Sat evening.
       **Never set the ledger insert path to REPEATABLE READ or SERIALIZABLE**: the
       advisory lock only serializes correctly under READ COMMITTED, which is the
       PostgREST default.
-- [ ] S1.4 Immutability, three layers, because the row trigger alone is not enough:
+- [x] S1.4 Immutability, three layers, because the row trigger alone is not enough:
       (a) never grant update/delete (on a post-May-2026 project the `revoke` is a no-op
       because the grant never existed; keep it as documentation);
       (b) BEFORE UPDATE OR DELETE row trigger raising;
@@ -860,11 +863,11 @@ S6 (tagger) runs in parallel on the owner's machine from Sat evening.
       `alter table events add constraint events_no_fork unique (firm_id, prev_hash);`
       which makes a fork impossible at the DB level and permits exactly one genesis row
       per firm.
-- [ ] S1.5 **Write the honest limitation down now, in `packages/core` and the README:**
+- [x] S1.5 **Write the honest limitation down now, in `packages/core` and the README:**
       `set session_replication_role = replica` disables ALL triggers and the `postgres`
       role can set it. So the database layer is tamper RESISTANCE; the hash chain is the
       tamper EVIDENCE. Claiming the rows cannot be edited would breach D9.
-- [ ] S1.6 `verify_chain(firm_id)` as a SQL function, and this is now MANDATORY rather
+- [x] S1.6 `verify_chain(firm_id)` as a SQL function, and this is now MANDATORY rather
       than merely convenient: jsonb orders keys by LENGTH FIRST then bytewise (so
       `{"z":1,"aa":[1,2]}` renders `z` before `aa`) and emits a space after each colon.
       No JS canonicalizer reproduces that. Also: jsonb preserves numeric formatting, so
@@ -873,7 +876,7 @@ S6 (tagger) runs in parallel on the owner's machine from Sat evening.
       normal, so verification walks rows ordered by id and never assumes contiguity.
       `packages/core` tests call the function over RPC against seeded data plus a
       deliberately forked copy.
-- [ ] S1.7 Vector column: **`vector(384)` on every path** (A13). Add an
+- [x] S1.7 Vector column: **`vector(384)` on every path** (A13). Add an
       **`embedding_model` column in the same migration** and filter on it at retrieval:
       OpenAI-at-384 and gte-small-at-384 are different vector spaces and comparing them
       returns meaningless cosine scores while succeeding silently. Index:
@@ -882,10 +885,10 @@ S6 (tagger) runs in parallel on the owner's machine from Sat evening.
       `match_decisions` RPC, **schema-qualify the type** (`query_embedding
       extensions.vector(384)`) and order by the raw `<=>` distance ascending, not by a
       derived similarity, or the index is not used.
-- [ ] S1.8 One-call smoke test before anything is embedded in bulk: assert OpenAI
+- [x] S1.8 One-call smoke test before anything is embedded in bulk: assert OpenAI
       returns exactly 384 when asked (`dimensions: 384`). This is the single claim in the
       Stage 1.5 verification that is documented but was not executed.
-- [ ] S1.9 Seed via `packages/core/seed` run with `npx tsx` and the service-role key.
+- [x] S1.9 Seed via `packages/core/seed` run with `npx tsx` and the service-role key.
       Service role bypasses RLS but NOT triggers (verified) and NOT grants, so seeded
       rows do get chained, which is what we want. Insert events sequentially.
       **Reseed plan changed (Stage 1.5): you cannot truncate the ledger once the
@@ -893,11 +896,16 @@ S6 (tagger) runs in parallel on the owner's machine from Sat evening.
       seed idempotent. NEVER use `session_replication_role = replica` to force a wipe on
       the hosted project: it disables the chain trigger too, so rows inserted in that
       session get NULL hashes and permanently break verification.
-- [ ] S1.10 Deterministic seed. Fix the RNG seed and the timestamps so demo screenshots
+- [x] S1.10 Deterministic seed. Fix the RNG seed and the timestamps so demo screenshots
       and the S11 video seed reproduce exactly.
 - **Acceptance:** chain property tests green; seeded DB queryable; a hand-edited row in
   a COPY of the chain is detected by `packages/core` verify.
-- **Sprint log:**
+- **Sprint log:** Logged: 2026-08-22T18:31+10:00 · status: partial · actual: ~1.9h (budget 2h) ·
+  by: Claude Opus 5 (Claude Code) · note: five migrations, the hash chain, RLS, and a
+  deterministic 184 decision corpus that loads and verifies. 35 tests green across two
+  SQL suites and vitest. BLOCKED on applying any of it to hosted Supabase: CLI not
+  logged in, no Docker for a local Supabase. Developed against local Postgres 17.11
+  instead, which is the same engine family, and carried the hosted apply into S8.
 
 ## S2 — Capture surfaces (budget 1h)
 
