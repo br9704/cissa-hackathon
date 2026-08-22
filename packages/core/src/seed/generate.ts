@@ -14,10 +14,16 @@ import {
 export const DEFAULT_SEED = 20260822;
 
 export type Member = {
-  id: string; userId: string; key: PersonaKey; role: string; displayName: string; desk: string;
+  id: string; userId: string; key: PersonaKey; role: string; displayName: string;
+  desk: string;
+  /* ISO date, present only for someone who has resigned. */
+  resignedOn: string | null;
 };
 export type Strategy = {
-  id: string; key: string; name: string; status: string; description: string; createdBy: string;
+  id: string; key: string; name: string; status: string; description: string;
+  createdBy: string;
+  /* Synthetic, and labelled as such everywhere it is shown. See vocabulary.ts. */
+  revenueUsdM: number;
 };
 export type Artifact = {
   id: string; strategyId: string | null; kind: string; externalRef: string | null;
@@ -82,6 +88,16 @@ function makeVars(rng: Rng, dayIndex: number): Vars {
   };
 }
 
+/*
+  Lowercases only the first character, leaving the rest alone.
+
+  toLowerCase() on the whole string would turn NSE into nse and vol_filter into a word
+  nobody on the desk writes.
+*/
+function lowerFirst(text: string): string {
+  return text.charAt(0).toLowerCase() + text.slice(1);
+}
+
 /* A content hash that is stable for the same text, so a reseed does not churn every row. */
 function stableHash(text: string): string {
   let h = 0x811c9dc5;
@@ -103,6 +119,10 @@ export function generate(seed: number = DEFAULT_SEED): Corpus {
     role: p.role,
     displayName: p.displayName,
     desk: p.desk,
+    resignedOn:
+      "resignedDaysAgo" in p && typeof p.resignedDaysAgo === "number"
+        ? daysAgo(p.resignedDaysAgo)
+        : null,
   }));
   const byKey = new Map(members.map((m) => [m.key, m]));
   const member = (k: PersonaKey) => byKey.get(k)!;
@@ -114,6 +134,7 @@ export function generate(seed: number = DEFAULT_SEED): Corpus {
     status: s.status,
     description: s.description,
     createdBy: member(s.primary).id,
+    revenueUsdM: s.revenueUsdM,
   }));
   const strategyByKey = new Map(strategies.map((s) => [s.key, s]));
 
@@ -330,8 +351,19 @@ export function generate(seed: number = DEFAULT_SEED): Corpus {
         sessionId: session.id,
         seq: seq++,
         role: "human",
+        /*
+          The alternative is quoted as its own clause rather than spliced into the middle
+          of a sentence. The first version wrote "I did look at left it and monitored",
+          because the alternatives are written as verb phrases and lowercasing the first
+          word does not make one grammatical inside "I did look at ...".
+        */
         text: subject
-          ? `${subject.why} ${subject.alternatives.length ? `I did look at ${subject.alternatives[0]!.toLowerCase()}, and it did not hold up once the flag was in the sample.` : "There was not really a second option worth writing down."}`
+          ? [
+              subject.why,
+              subject.alternatives.length
+                ? `The other option was to ${lowerFirst(subject.alternatives[0]!)}. It did not hold up once the flag was in the sample.`
+                : "There was not really a second option worth writing down.",
+            ].join(" ")
           : `The filter looks like it is about vol and it is really about liquidity. On a quiet expiry it reads fine and the book still cannot get out. Nobody has written that down because it has never cost us enough to notice.`,
         groundedArtifactIds: [],
       });

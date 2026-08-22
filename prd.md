@@ -176,12 +176,35 @@ schedule, not by heroics.
 
 ### 4.4 The reading surfaces
 
+The three hero surfaces (the pizzazz layer; these open every demo, and each must be
+legible in ten seconds with zero context):
+
+- Ask the firm, including the people who left (THE hero). The ask bar answers any
+  question with citations; in persona mode, a question about a departed member's work
+  is answered in their register, reconstructed strictly from their recorded decisions
+  and debriefs, with every sentence cited and a permanent honest banner:
+  "Reconstructed from Daniel's ledger. He left in March." Implementation: a prompt
+  variant over the same retrieval; no fine-tuning, no fakery, and the banner is
+  non-removable.
+- The Time Machine. A timeline scrubber on the strategy page: drag it and the
+  genealogy graph assembles decision by decision through time, meetings and debriefs
+  flowing in beneath it; scrub past a departure and the orphaned knowledge inks amber
+  in dependency order. Implementation: replay of the append-only ledger up to time T;
+  the events are already ordered, the layout already deterministic.
+- The departure bomb. Departure simulation with stakes in dollars: every strategy
+  carries synthetic attributed-revenue figures (labelled synthetic in the UI), so
+  simulating a departure lands a number: "$412M of attributed revenue now depends on
+  knowledge with no second owner." The graph dims, the orphan list cascades, the
+  number counts up.
+
+Supporting surfaces:
+
 - Strategy page: header (status, owners, health), the decision genealogy graph (nodes =
   decisions, edges = links, color by decision_type, amber ring = risk_flag), the ledger
-  timeline beneath it.
+  timeline beneath it, the Time Machine scrubber above it.
 - Ask bar (Cmd+K): natural-language question over the corpus, answered with citations to
   decisions/artifacts (retrieval over pgvector embeddings; every answer shows its
-  sources; no source, no claim).
+  sources; no source, no claim). Persona mode as above.
 - Knowledge risk board: per-strategy bus factor, concentration, vacation-readiness score,
   firm heat map, departure simulation (pick a member, watch the map redden, see the
   orphaned-decision list).
@@ -270,20 +293,28 @@ Windows/Linux builds, no real-time collaboration cursors, no GraphRAG (the ask b
 retrieval + citations, not a graph index), no twin persona in-product (the twin is a
 video/pitch beat using the debrief corpus, honestly labelled a prototype).
 
-## 6. Demo arc (what judges see, in order)
+## 6. Demo arc (what judges see, in order): magic first, mechanism second, proof third
 
-1. Priya commits a parameter change; the draft decision record appears; she approves in
-   one keystroke; the ledger advances live on screen.
-2. The tagger labels it `parameter_change` on-prem; the genealogy graph grows a node.
-3. Daniel resigns (staged). Departure simulation: his knowledge map redders across two
-   strategies; orphaned decisions list; vacation-readiness score was already amber.
-4. Exit debrief: the agent interviews Daniel with artifact-grounded questions; the
-   handover pack generates; Tom asks the ask-bar "why is the expiry window capped" and
-   gets Daniel's recorded answer, cited.
-5. Compliance beat: Elena exports the RTS 6 change log; the verify page proves the chain;
-   the OTS receipt shows the anchor.
-6. Close on the research: the Jane Street filing, the numbers, "this is the system that
-   makes that lawsuit winnable, and that month survivable."
+1. THE IMPOSSIBLE ACT. Tom asks the ask bar "why is the expiry window capped?" The
+   answer comes back in Daniel's register, cited to his decisions and debriefs, under
+   the banner: reconstructed from Daniel's ledger. He left in March. Ten seconds in,
+   the room understands the product.
+2. THE TIME MACHINE. Scrub the strategy back two years: watch its knowledge assemble
+   decision by decision; scrub past February and watch Daniel's contributions ink
+   amber. The firm has a memory you can rewind.
+3. THE DEPARTURE BOMB. Simulate Priya leaving next: the graph dims, the orphan list
+   cascades, and the number lands: $412M of attributed revenue, no second owner
+   (synthetic, and labelled as such on screen). Vacation-readiness was already amber.
+4. THE MECHANISM (now they want to know how). Priya commits a parameter change; the
+   machine-drafted record appears; one keystroke approves it; the card flies into the
+   ledger; the on-prem tagger labels it. This is why the firm remembers: capture is
+   ambient, 24/7, work-not-worker.
+5. THE PROOF. Verify sweep recomputes the chain live and catches a staged tamper on
+   the exact row; access events show who read what and why; the OTS anchor receipt
+   lands it: this record is evidence, not notes.
+6. THE STAKES. The Jane Street cards: a $1B strategy, two resignations, profits halved
+   in a month, per the firm's own court filing. "This is the system that makes that
+   month survivable, and that lawsuit winnable."
 
 ## 7. Success criteria
 

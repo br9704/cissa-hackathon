@@ -152,3 +152,79 @@
   border-top: 1px solid var(--border-subtle);
   padding-top: 12px;
 }
+
+/*
+  The exposure banner.
+
+  Deliberately the loudest thing on the page when it appears, and deliberately absent
+  until somebody asks. A dollar figure sitting on screen permanently becomes wallpaper;
+  one that lands when you select a name is an answer to a question you just asked.
+*/
+.exposure {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 22px 24px;
+  border: 1px solid var(--accent-risk);
+  border-radius: var(--radius-l);
+  background: var(--surface-solid);
+}
+
+.exposureFigure {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.exposureNumber {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: clamp(34px, 5vw, 52px);
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--accent-risk);
+}
+
+.exposureUnit {
+  font-size: 15px;
+  color: var(--text-secondary);
+}
+
+.exposureLead {
+  font-size: 15px;
+  color: var(--text);
+  max-width: 62ch;
+}
+
+.exposureBreakdown {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-top: 4px;
+}
+
+.exposureItem {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-s);
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.exposureItemValue {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+}
+
+.synthetic {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  border-top: 1px solid var(--border-subtle);
+  padding-top: 10px;
+  max-width: 78ch;
+}

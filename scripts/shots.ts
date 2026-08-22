@@ -99,6 +99,49 @@ const SCENES: {
     },
   },
   {
+    name: "ask-the-departed",
+    path: "/debriefs",
+    act: async (page) => {
+      await page.getByRole("button", { name: "why is the expiry window capped" }).click();
+      await page.getByText(/own words, retrieved from the ledger|never wrote anything/).waitFor({
+        timeout: 180_000,
+      });
+      await page.waitForTimeout(400);
+    },
+  },
+  {
+    name: "time-machine-mid",
+    path: "/strategies",
+    act: async (page) => {
+      /*
+        Drive the range input by keyboard rather than by clicking a coordinate. A click
+        on a native range lands wherever the browser decides, so the earlier version
+        silently left the scrubber at the end and the shot showed the finished graph
+        while claiming to show a replay.
+      */
+      const slider = page.getByLabel("Replay the ledger over time");
+      await slider.focus();
+      await page.keyboard.press("Home");
+      /* focus() scrolls the control into view, so put the page back at the top or the
+         shot is of a half scrolled screen. */
+      await page.evaluate(() => window.scrollTo(0, 0));
+      for (let i = 0; i < 130; i++) await page.keyboard.press("ArrowRight");
+      await page.waitForTimeout(600);
+    },
+  },
+  {
+    name: "time-machine-after",
+    path: "/strategies",
+    act: async (page) => {
+      /* All the way to today, which is after the resignation, so the orphaned work is
+         the only thing still lit. */
+      const slider = page.getByLabel("Replay the ledger over time");
+      await slider.focus();
+      await page.keyboard.press("End");
+      await page.waitForTimeout(600);
+    },
+  },
+  {
     name: "ask-bar",
     path: "/",
     act: async (page) => {

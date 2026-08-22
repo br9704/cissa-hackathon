@@ -1,0 +1,115 @@
+/*
+  The replay scrubber.
+
+  An append-only ledger makes this nearly free: there is no history to reconstruct,
+  because rendering the state at a moment is just rendering the events up to it.
+*/
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.date {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 15px;
+}
+
+.counts {
+  display: flex;
+  gap: 16px;
+  font-size: 13px;
+  color: var(--text-tertiary);
+}
+
+.count {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.countValue {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+}
+
+.countRisk { color: var(--accent-risk); }
+
+.trackRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.play {
+  flex: 0 0 auto;
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  border: 1px solid var(--border-medium);
+  background: var(--surface-solid);
+  cursor: pointer;
+  color: var(--text);
+}
+
+.play:hover { border-color: var(--border-strong); }
+
+/*
+  Padding at the ends so the resignation marker and its label are never clipped. The
+  resignation is three days before the corpus ends, so without it the single most
+  important mark on the track sits under the slider thumb at the far right.
+*/
+.trackWrap {
+  position: relative;
+  flex: 1;
+  padding: 22px 0 4px;
+}
+
+.slider {
+  width: 100%;
+  margin: 0;
+  accent-color: var(--accent);
+}
+
+/*
+  The resignation marker. Amber, because the thing it marks is a knowledge risk event and
+  not merely a date, and it is the only mark on the track so it cannot be confused with
+  anything else.
+*/
+.marker {
+  position: absolute;
+  top: 16px;
+  bottom: 0;
+  width: 2px;
+  margin-left: -1px;
+  background: var(--accent-risk);
+  pointer-events: none;
+}
+
+.markerLabel {
+  position: absolute;
+  top: 0;
+  white-space: nowrap;
+  font-size: 11px;
+  font-weight: 540;
+  color: var(--accent-risk);
+  pointer-events: none;
+}
+
+.legend {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  max-width: 78ch;
+}

@@ -113,3 +113,27 @@ describe("decision titles", () => {
     expect(withSuffix).toHaveLength(0);
   });
 });
+
+describe("debrief answer prose", () => {
+  const corpus = generate(DEFAULT_SEED);
+
+  it("quotes a rejected alternative as its own clause, not spliced mid sentence", () => {
+    /* The first version produced "I did look at left it and monitored", because the
+       alternatives are verb phrases and lowercasing the first word does not make one fit
+       inside that frame. */
+    const answers = corpus.turns.filter((t) => t.role === "human").map((t) => t.text);
+    expect(answers.some((a) => a.includes("The other option was to"))).toBe(true);
+    expect(answers.some((a) => a.includes("I did look at"))).toBe(false);
+  });
+
+  it("does not lowercase acronyms or parameter names when quoting one", () => {
+    const answers = corpus.turns.filter((t) => t.role === "human").map((t) => t.text);
+    /* toLowerCase on the whole phrase would turn NSE into nse and vol_filter into
+       something nobody on the desk writes. */
+    const spliced = answers.filter((a) => a.includes("The other option was to"));
+    expect(spliced.length).toBeGreaterThan(0);
+    for (const a of spliced) {
+      expect(a).not.toMatch(/option was to .*\bnse\b/);
+    }
+  });
+});

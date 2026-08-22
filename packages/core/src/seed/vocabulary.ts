@@ -45,6 +45,12 @@ export const PERSONAS = [
     role: "researcher",
     desk: "India options",
     voice: "conversational, reasons out loud, assumes context",
+    /*
+      Days before the corpus end date. Daniel is the resignation the demo turns on, and
+      the date is here rather than hardcoded in a component so the replay, the exit
+      debrief and the risk board all read the same day from one place.
+    */
+    resignedDaysAgo: 3,
   },
   {
     key: "tom",
@@ -57,6 +63,18 @@ export const PERSONAS = [
 
 export type PersonaKey = (typeof PERSONAS)[number]["key"];
 
+/*
+  Attributed revenue, in millions of US dollars a year.
+
+  Invented, like everything else about this firm, and the product says so wherever it is
+  shown. It exists because a bus factor of 1 is a number a quant understands and a number
+  nobody else does. Revenue attribution is how a desk head already thinks about the same
+  fact, and it is the difference between "this book is concentrated" and "this much of
+  what we earn depends on one person having written things down".
+
+  Sized to be plausible for a mid size multi manager pod rather than to be impressive:
+  the point lands harder when the numbers are ordinary.
+*/
 export const STRATEGIES = [
   {
     key: "india_carry",
@@ -69,6 +87,7 @@ export const STRATEGIES = [
     primary: "daniel" as PersonaKey,
     secondary: ["marcus"] as PersonaKey[],
     dominance: 0.88,
+    revenueUsdM: 214,
   },
   {
     key: "expiry_effects",
@@ -79,6 +98,7 @@ export const STRATEGIES = [
     primary: "daniel" as PersonaKey,
     secondary: ["priya"] as PersonaKey[],
     dominance: 0.84,
+    revenueUsdM: 148,
   },
   {
     key: "vol_filter",
@@ -91,6 +111,7 @@ export const STRATEGIES = [
     primary: "priya" as PersonaKey,
     secondary: ["tom", "daniel"] as PersonaKey[],
     dominance: 0.5,
+    revenueUsdM: 96,
   },
   {
     key: "basis_roll",
@@ -101,6 +122,9 @@ export const STRATEGIES = [
     primary: "marcus" as PersonaKey,
     secondary: ["priya", "tom"] as PersonaKey[],
     dominance: 0.45,
+    /* In paper, so it earns nothing yet. A zero here is a useful case: it stops the
+       exposure maths quietly assuming every strategy has revenue. */
+    revenueUsdM: 0,
   },
 ] as const;
 

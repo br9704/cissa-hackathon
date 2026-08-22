@@ -1,7 +1,8 @@
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { scoreStrategy } from "@continuity/core";
 import styles from "./StrategiesPage.module.css";
 import { GenealogyGraph } from "../components/GenealogyGraph";
+import { TimeMachine, type ReplayItem } from "../components/TimeMachine";
 import { StatusChip } from "../components/StatusChip";
 import { corpus, memberName, TYPE_LABEL } from "../data/source";
 
@@ -9,6 +10,15 @@ export function StrategiesPage() {
   const c = corpus();
   const [activeId, setActiveId] = useState(c.strategies[0]!.id);
   const [selectedDecision, setSelectedDecision] = useState<string | null>(null);
+  const [replay, setReplay] = useState<{ visible: Set<string>; atRisk: Set<string> } | null>(null);
+
+  /* Stable identity, or TimeMachine's effect fires on every parent render. */
+  const onReplay = useCallback(
+    (state: { visible: Set<string>; atRisk: Set<string> }) => setReplay(state),
+    [],
+  );
+
+  const resigned = c.members.find((m) => m.resignedOn);
 
   const authors = useMemo(
     () => new Map(c.decisions.map((d) => [d.id, d.authorMemberId])),
@@ -125,8 +135,31 @@ export function StrategiesPage() {
         <GenealogyGraph
           nodes={graph.nodes}
           edges={graph.edges}
+          visible={replay?.visible ?? null}
+          /* Once the replay passes the resignation, only the orphaned work stays lit.
+             Before it, nothing is highlighted and the whole graph reads normally. */
+          highlighted={replay && replay.atRisk.size > 0 ? replay.atRisk : null}
           selectedId={selectedDecision}
           onSelect={setSelectedDecision}
+        />
+
+        <TimeMachine
+          items={
+            c.decisions
+              .filter((d) => d.strategyId === activeId)
+              .map((d) => ({
+                id: d.id,
+                occurredAt: d.occurredAt,
+                authorMemberId: d.authorMemberId,
+                riskFlag: d.riskFlag,
+              })) satisfies ReplayItem[]
+          }
+          resignation={
+            resigned
+              ? { memberId: resigned.id, on: resigned.resignedOn!, name: resigned.displayName }
+              : null
+          }
+          onChange={onReplay}
         />
 
         {decision ? (

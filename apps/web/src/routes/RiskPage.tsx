@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
-import { scoreStrategy, simulateDeparture } from "@continuity/core";
+import { scoreStrategy, simulateDeparture, departureExposure } from "@continuity/core";
+import { motion, useReducedMotion } from "motion/react";
 import styles from "./RiskPage.module.css";
 import { RiskDial } from "../components/RiskDial";
 import { HeatStrip, type HeatRow } from "../components/HeatStrip";
@@ -12,6 +13,7 @@ const CONCENTRATION_RISK = 0.5;
 
 export function RiskPage() {
   const c = corpus();
+  const reduced = useReducedMotion();
   const [maskedId, setMaskedId] = useState<string | null>(null);
 
   const authors = useMemo(
@@ -42,6 +44,18 @@ export function RiskPage() {
   const departure = useMemo(
     () => (maskedId ? simulateDeparture(maskedId, c.decisions) : null),
     [maskedId, c.decisions],
+  );
+
+  const exposure = useMemo(
+    () =>
+      maskedId
+        ? departureExposure(
+            maskedId,
+            c.strategies.map((s) => ({ id: s.id, name: s.name, revenueUsdM: s.revenueUsdM })),
+            new Map(scores.map(({ strategy, score }) => [strategy.id, score])),
+          )
+        : null,
+    [maskedId, c.strategies, scores],
   );
 
   /* Firm level readings. Worst case rather than average: a desk is as exposed as its
@@ -151,6 +165,50 @@ export function RiskPage() {
             </button>
           ))}
         </div>
+
+        {exposure && exposure.exposedUsdM > 0 ? (
+          <motion.div
+            className={styles.exposure}
+            initial={reduced ? { opacity: 0 } : { opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: reduced ? 0.12 : 0.42, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <div className={styles.exposureFigure}>
+              <span className={styles.exposureNumber}>
+                ${exposure.exposedUsdM.toLocaleString("en-US")}M
+              </span>
+              <span className={styles.exposureUnit}>
+                of attributed annual revenue, with no second author
+              </span>
+            </div>
+            <p className={styles.exposureLead}>
+              {memberName(maskedId)} holds the majority of the recorded reasoning on{" "}
+              {exposure.exposed.map((s) => s.name).join(" and ")}, and on{" "}
+              {exposure.exposed.length === 1 ? "it" : "both"} the bus factor is one. If the
+              reasoning is not captured before the last day, it is not captured.
+            </p>
+            <div className={styles.exposureBreakdown}>
+              {exposure.exposed.map((s) => (
+                <span key={s.id} className={styles.exposureItem}>
+                  {s.name}
+                  <span className={styles.exposureItemValue}>${s.revenueUsdM}M</span>
+                </span>
+              ))}
+              {exposure.partialUsdM > 0 ? (
+                <span className={styles.exposureItem}>
+                  covered elsewhere
+                  <span className={styles.exposureItemValue}>${exposure.partialUsdM}M</span>
+                </span>
+              ) : null}
+            </div>
+            <p className={styles.synthetic}>
+              Synthetic figures for a synthetic firm. The arithmetic is the honest part:
+              this sums the attributed revenue of the books where this person is the top
+              holder AND the bus factor is one. A book somebody else has also written
+              about is listed as covered and is not counted, however much they wrote.
+            </p>
+          </motion.div>
+        ) : null}
 
         <div className={styles.split}>
           <div>

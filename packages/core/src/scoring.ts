@@ -213,3 +213,60 @@ export function simulateDeparture(
 
   return { orphanedIds, byStrategy };
 }
+
+/**
+ * What a departure puts at risk, in revenue rather than in decision counts.
+ *
+ * A bus factor of 1 is a number a quant understands immediately and almost nobody else
+ * does. Revenue attribution is how the same fact already sits in a desk head's mind, so
+ * this converts one into the other without inventing anything: it sums the attributed
+ * revenue of the strategies where this person is the top holder AND the recorded
+ * reasoning has no second author.
+ *
+ * The definition is narrow on purpose, because a wide one would be more dramatic and
+ * less true:
+ *
+ *   Exposed means the strategy has revenue, this person holds the majority of its
+ *   recorded reasoning, and its bus factor is 1. A strategy where somebody else has also
+ *   written things down is not exposed by this person leaving, however much they wrote.
+ *
+ *   Partial means they are top holder but the bus factor is above 1. Counted separately
+ *   rather than folded in, because rolling it into the headline would let a book with a
+ *   real second author inflate the number.
+ *
+ * Everything here is synthetic and the UI says so. Under the honest claims rule a dollar
+ * figure is the single easiest thing to be caught overstating, so the arithmetic is
+ * stated in full and the inputs are visible.
+ */
+export function departureExposure(
+  memberId: string,
+  strategies: { id: string; name: string; revenueUsdM: number }[],
+  scores: Map<string, StrategyScore>,
+): {
+  exposedUsdM: number;
+  partialUsdM: number;
+  totalUsdM: number;
+  exposed: { id: string; name: string; revenueUsdM: number }[];
+  partial: { id: string; name: string; revenueUsdM: number }[];
+} {
+  const exposed: { id: string; name: string; revenueUsdM: number }[] = [];
+  const partial: { id: string; name: string; revenueUsdM: number }[] = [];
+
+  for (const s of strategies) {
+    if (s.revenueUsdM <= 0) continue;
+    const score = scores.get(s.id);
+    if (!score || score.topHolderMemberId !== memberId) continue;
+    if (score.busFactor <= 1) exposed.push(s);
+    else partial.push(s);
+  }
+
+  const sum = (xs: { revenueUsdM: number }[]) => xs.reduce((a, b) => a + b.revenueUsdM, 0);
+
+  return {
+    exposedUsdM: sum(exposed),
+    partialUsdM: sum(partial),
+    totalUsdM: sum(strategies),
+    exposed,
+    partial,
+  };
+}

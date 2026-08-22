@@ -26,12 +26,23 @@ export function GenealogyGraph({
      simulation: it does not recolour the graph, it removes emphasis from everything that
      is not at risk, which reads as loss rather than as decoration. */
   highlighted,
+  /*
+    Which nodes exist yet.
+
+    The replay needs the graph to ASSEMBLE, not to relayout: a force simulation rerun at
+    every scrubber position would have nodes swimming around as their neighbours appear,
+    which reads as chaos rather than as memory accumulating. So the layout is computed
+    once over the full graph and this filters what is drawn. Every node lands in its
+    final position the moment it appears and never moves again.
+  */
+  visible,
   selectedId,
   onSelect,
 }: {
   nodes: Omit<GraphNode, "x" | "y">[];
   edges: GraphEdge[];
   highlighted?: Set<string> | null;
+  visible?: Set<string> | null;
   selectedId?: string | null;
   onSelect?: (id: string) => void;
 }) {
@@ -53,6 +64,7 @@ export function GenealogyGraph({
   );
 
   const isDim = (id: string) => Boolean(highlighted) && !highlighted!.has(id);
+  const isVisible = (id: string) => !visible || visible.has(id);
   const R = radiusFor(layout.nodes.length);
 
   return (
@@ -69,6 +81,7 @@ export function GenealogyGraph({
             const a = positions.get(e.source);
             const b = positions.get(e.target);
             if (!a || !b) return null;
+            if (!isVisible(e.source) || !isVisible(e.target)) return null;
             const dim = isDim(e.source) || isDim(e.target);
             return (
               <motion.line
@@ -90,6 +103,7 @@ export function GenealogyGraph({
 
         <g>
           {layout.nodes.map((n, i) => {
+            if (!isVisible(n.id)) return null;
             const dim = isDim(n.id);
             return (
               /*

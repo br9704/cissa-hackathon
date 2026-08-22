@@ -1,144 +1,125 @@
-# videoscript.md: "The Month After" (Continuity demo film)
+# videoscript.md: "The Month After" (Continuity demo film, v2: magic first)
 
-> Target 3:00 to 3:30. Acted, three performers plus a narrator (can double). Two
-> locations: a desk setup (the "trading floor") and a plain wall for the cold open.
+> Target 3:00 to 3:30. Acted, three performers plus a narrator (can double). Structure
+> per prd §6: the impossible act first, mechanism second, proof third, stakes last.
 > Every product beat is screen-captured from the FROZEN video seed (masterplan S11);
-> record 1440p, UI at 125% zoom, pointer hidden, keyboard-driven. Tone: dry, confident,
-> a little cinematic; never jokey. No em dashes on any title card.
+> 1440p, UI at 125% zoom, pointer hidden, keyboard-driven. Tone: dry, confident,
+> cinematic; never jokey. No em dashes on any title card.
 
 ## Cast
 
+- TOM, new graduate (performer 1, doubles as Priya with re-dress or insert shots)
 - PRIYA, quant researcher (performer 1)
-- DANIEL, senior trader, resigning (performer 2)
+- DANIEL, senior trader, already gone (voice/photo only; performer 2 for the flashback)
 - MARCUS, desk head (performer 3)
-- NARRATOR (voice over; performer 3 can double)
+- NARRATOR (V.O.; performer 3 can double)
 
-## Cold open (0:00-0:25): the problem, in their own words
+## Cold open (0:00-0:30): the impossible act
 
-BLACK. White type, one line at a time, timed to a low pulse:
+INT. DESK, EARLY MORNING. TOM alone, stuck, staring at a parameter he does not
+understand. He opens the ask bar and types, hunt-and-peck, slightly desperate:
 
-  TITLE 1: "In March 2024, a strategy earning about $1B a year lost more than half
-  its profits in a single month."
-  TITLE 2: "The month after two traders resigned."
-  TITLE 3: "That number is from the firm's own court filing."
+  "why is the expiry window capped?"
 
-NARRATOR (V.O.): Every quant firm has a version of this story. The code stays. The
-strategy leaves. Non-competes delay it. Garden leave pays for it. Nothing keeps it.
+SCREEN: the answer types itself out, first person, precise, a little dry, exactly how
+a senior trader explains things. Citation chips accumulate under each sentence. Tom
+relaxes, then frowns at the banner above the answer. PUSH IN on it:
 
-SMASH CUT to white. The wordmark types on, letter by letter:
+  RECONSTRUCTED FROM DANIEL'S LEDGER. HE LEFT IN MARCH.
 
-  TITLE: CONTINUITY. The strategy stays.
+Beat of silence.
 
-## Scene 1 (0:25-1:00): capture is invisible
+NARRATOR (V.O.): The person who knew is gone. The firm still answers.
 
-INT. DESK. PRIYA typing. Over-shoulder shot, then screen capture takes over.
+SMASH TO WHITE. Wordmark types on: CONTINUITY. The strategy stays.
 
-PRIYA (to camera, working): I changed one parameter today. Vol filter, 0.65 to 0.7.
-In six months, someone will ask why. Normally the answer lives in my head.
+## Scene 1 (0:30-1:00): the time machine
 
-SCREEN: she commits in the demo repo. The Continuity draft card slides in: "Raised
-vol_filter to 0.7 after the Aug 12 drawdown flag; 0.68 tested and rejected, too slow
-to re-enter." She edits one word, hits A. THE SIGNATURE SHOT: the card contracts and
-flies into the ledger rail; the row lands with the green verified sweep; the tag
-"parameter_change" appears.
+SCREEN TAKE. The strategy page. MARCUS drags the timeline scrubber from two years ago
+toward today: the genealogy graph assembles itself decision by decision, meetings and
+debriefs streaming in beneath, the strategy visibly learning. He scrubs past February;
+Daniel's contributions ink amber, radiating outward.
 
-PRIYA: Ten seconds. And that answer now outlives me.
+MARCUS (V.O.): Every firm says its strategies are institutional. Scrub the timeline
+and you find out whose head they actually lived in.
 
-NARRATOR (V.O.): Every meeting, every merge, every parameter, every debrief, drafted
-by the machine, approved by the human, filed forever in an append-only ledger. Tagged
-on-prem by a model we fine-tuned ourselves. Maximum context, all the time, and nothing
-leaves the building. It watches the work, never the worker.
+## Scene 2 (1:00-1:35): the departure bomb
 
-QUICK INSERT SHOT: the transcript importer: a morning standup transcript drops in,
-speaker turns resolve to Priya and Marcus, and it files into the ledger as an artifact
-a later decision will cite.
+QUICK FLASHBACK INSERT (2 seconds): February. A folded letter placed on a keyboard.
 
-## Scene 2 (1:00-1:40): the resignation
+BACK TO SCREEN: Risk board. MARCUS, calm, deliberate: "Show me Priya." He clicks
+SIMULATE DEPARTURE. The graph desaturates; amber cascades; the orphaned-decisions
+list fills; and the number counts up and lands:
 
-INT. DESK. DANIEL places a folded letter on MARCUS's keyboard. Beat. MARCUS looks at
-it, then opens Continuity.
+  $412M OF ATTRIBUTED REVENUE. NO SECOND OWNER. (synthetic data, labelled on screen)
 
-MARCUS (calm): Okay. Show me what walks out the door.
+MARCUS: Last quarter this was a feeling. Now it is a number, and numbers get budgets.
 
-SCREEN: Risk board. THE MONEY SHOT: departure simulation. Daniel selected; the
-genealogy graph desaturates; his decisions re-ink in amber, radiating outward across
-two strategies; the orphaned-decisions list fills; vacation-readiness on the India
-book was already amber at 50.
+## Scene 3 (1:35-2:15): the mechanism (now you want to know how)
 
-MARCUS: Two strategies, fifty-three decisions only he can explain. Last month this
-number was a guess. Now it is a work order.
+INT. DESK. PRIYA working, normal speed.
 
-  NUMBERS NOTE (added 22 Aug 2026). This script is a working draft and its figures
-  are illustrative. The rule is the narrow one: read the numbers off the screen before
-  the take and say those. Do not say a number the screen is not showing, and do not
-  bend the data to fit a line that was written before there was any data.
-  As of seed 20260822 the risk board reads: Daniel top holder on two strategies, both
-  at bus factor 1; departure simulation orphans 53 decisions, 29 on India options
-  carry and 24 on Expiry window effects; vacation readiness 50 on India options carry.
-  The healthy books sit at bus factor 2, which is the contrast the scene needs.
-  Re-run `pnpm --filter @continuity/core seed` and re-read if the seed changes.
+PRIYA (to camera): I changed one parameter this morning. Watch what the firm does.
 
-## Scene 3 (1:40-2:20): the exit debrief and the handover
+SCREEN: she commits; the machine-drafted decision record slides in ("raised vol_filter
+to 0.7 after the Aug 12 drawdown flag; 0.68 tested and rejected"); she edits one word,
+hits A; THE SIGNATURE SHOT: the card contracts and flies into the ledger rail, lands
+with the green verified sweep, and the on-prem tag "parameter_change" stamps on.
 
-SCREEN: The debrief agent interviews DANIEL. On screen, a grounded question: "You
-capped position size in the expiry window on May 3, two days after the India flag.
-Walk me through the alternatives you rejected." DANIEL answers in one take, natural.
+QUICK INSERT: the transcript importer: the morning standup drops in, speaker turns
+resolving to names, filed as an artifact.
 
-DANIEL (leaning back, half-smiling): It is a strange feeling. Being interviewed by
-the ledger. Better than being deposed by it.
+NARRATOR (V.O.): Every meeting, every merge, every parameter, every debrief. Drafted
+by the machine, approved by the human, filed forever in an append-only ledger, tagged
+on-prem by a model we fine-tuned ourselves. Maximum context, all the time. It watches
+the work, never the worker. That is why the firm remembers.
 
-SCREEN: the answer files; one is promoted to a decision; the handover pack generates,
-print-styled, SYSC-shaped. Quick cut: TOM (can be performer 1 re-dressed, or an
-insert shot) types into the ask bar: "why is the expiry window capped". The recorded
-answer returns, cited to Daniel's debrief, source chips visible.
+## Scene 4 (2:15-2:45): the proof
 
-NARRATOR (V.O.): The regulator's words for a proper handover are "judgement and
-opinion, not just facts and figures." That is now a button.
+SCREEN: Verify page. The scanline sweeps; rows flip green; the staged tamper halts it,
+flaring red on the exact row. Then the access ledger and the anchor receipt.
 
-## Scene 4 (2:20-2:50): proof
+MARCUS (V.O.): Hash-chained, anchored to Bitcoin, and access is on the ledger too:
+who read what, and why they said they needed it. When someone claims a strategy was
+just their experience and expertise, this is what our lawyers hand the court.
 
-SCREEN: Verify page. The scanline sweeps the ledger; every row flips green. Then the
-staged tamper: one row edited in a copy; the sweep halts, flares red on the exact row.
+## Close (2:45-3:20): the stakes
 
-MARCUS (V.O. over the sweep): Every record is hash-chained and anchored to Bitcoin
-through OpenTimestamps. And access is on the ledger too: who read what, and why they
-said they needed it. When someone claims it was "just their experience and expertise,"
-this is what our lawyers hand the court.
+Wide shot, the team at the desk. Then white cards, timed to a low pulse:
 
-SCREEN: the anchor receipt, one upgraded attestation visible.
+  CARD 1: "In March 2024, a strategy earning about $1B a year lost more than half its
+  profits in a single month. The month after two traders resigned."
+  CARD 2: "That number is from the firm's own court filing."
+  CARD 3: "Courts dismiss trade-secret cases the firm cannot document. Continuity is
+  the reasonable measure."
+  CARD 4: wordmark + "Built in 48 hours on research from 190+ primary sources. The
+  dossier is in the repo." + demo URL.
 
-## Close (2:50-3:20): the ask
-
-Wide shot, the three at the desk. Then white card sequence:
-
-  CARD 1: "Courts dismiss trade-secret cases the firm cannot document. About 11
-  percent die on 'reasonable measures' alone."
-  CARD 2: "Continuity is the reasonable measure."
-  CARD 3: the wordmark + "Built in 48 hours on research from 190+ primary sources.
-  The dossier is in the repo." + demo URL.
-
-NARRATOR (V.O.): Firms built world-class platforms for research data. Nobody built
-one for research reasoning. So we did.
+NARRATOR (V.O.): Firms built world-class platforms for research data. Nobody built one
+for research reasoning. So we did.
 
 HARD CUT TO BLACK.
 
 ## Shot checklist (for the edit)
 
-- [ ] Cold open title cards (3)
+- [ ] Cold open: Tom acting take + ask-bar screen take with the banner push-in
 - [ ] Wordmark type-on card
-- [ ] Priya over-shoulder + capture-to-ledger screen take (2 takes minimum)
-- [ ] Resignation letter beat (no dialogue over it; let it breathe)
-- [ ] Departure simulation screen take (rehearse; this is the money shot)
-- [ ] Debrief Q&A take + promotion + pack generation
-- [ ] Ask-bar answer with citation chips
+- [ ] Time Machine scrub (rehearse the drag speed; one continuous take)
+- [ ] February letter flashback insert (2 seconds, no dialogue)
+- [ ] Departure bomb take: click, cascade, counting number (two takes minimum)
+- [ ] Priya over-shoulder + capture-to-ledger signature shot (two takes minimum)
+- [ ] Transcript importer insert
 - [ ] Verify sweep clean pass + tamper halt (two takes)
+- [ ] Access ledger + anchor receipt insert
 - [ ] Wide closing shot + card sequence
 - [ ] All screen takes from the FROZEN seed; re-seed between takes if data mutated
 
 ## Rules
 
-Product claims in V.O. must match masterplan D9 (honest claims): the court-filing
-number is attributed ("the firm's own court filing"), the 11 percent line is cited on
-the card (dossier codes T1, L1, L2, I17), and no invented metrics appear anywhere.
-If the tagger fallback shipped instead of the trained model, change the Scene 1 line
-to "tagged by a small model running on our own machine" and drop "we fine-tuned".
+Honest-claims (D9) applies to every beat: the persona answer renders its
+reconstruction banner at all times and every sentence stays cited; the $412M figure is
+labelled synthetic on screen and never spoken as if real; the court-filing number is
+attributed ("the firm's own court filing"); the 11 percent line stays on its card with
+dossier codes (T1, L1, L2). If the tagger fallback shipped, Scene 3's line becomes
+"tagged by a small model running on our own machine" and "we fine-tuned ourselves" is
+dropped.

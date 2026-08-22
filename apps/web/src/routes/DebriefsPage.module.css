@@ -1,0 +1,210 @@
+.page { display: flex; flex-direction: column; gap: 24px; }
+
+.pane {
+  background: var(--surface-solid);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-l);
+  box-shadow: var(--shadow-pane);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.title { font-size: 17px; }
+.note { font-size: 13px; color: var(--text-tertiary); max-width: 66ch; }
+
+/* ---- Talk to someone who left ---- */
+
+.recallHeader {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.avatarLarge {
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  font-size: 15px;
+  font-weight: 560;
+  background: var(--surface-recessed);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+
+.who { display: flex; flex-direction: column; gap: 2px; }
+.whoName { font-size: 16px; font-weight: 560; }
+
+/*
+  The departure line. Amber, because a colleague being gone IS the knowledge risk this
+  product exists for, and this is the moment the whole idea lands.
+*/
+.whoGone { font-size: 13px; color: var(--accent-risk); }
+
+.askRow { display: flex; gap: 10px; flex-wrap: wrap; }
+
+.askInput {
+  flex: 1;
+  min-width: 260px;
+  padding: 10px 14px;
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-s);
+  background: var(--surface-solid);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  color: var(--text);
+}
+
+.askInput:focus { outline: none; border-color: var(--accent); }
+
+.askButton {
+  padding: 10px 16px;
+  border-radius: var(--radius-s);
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: var(--surface-solid);
+  font-size: 14px;
+  font-weight: 520;
+  cursor: pointer;
+}
+
+.askButton:disabled { opacity: 0.55; cursor: default; }
+
+.suggestions { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.suggestion {
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface-solid);
+  font-size: 12px;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.suggestion:hover { border-color: var(--border-medium); color: var(--text); }
+
+.answer {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 18px 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-m);
+  background: var(--surface-recessed);
+}
+
+.line { display: flex; flex-direction: column; gap: 6px; }
+
+.quote {
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--text);
+  border-left: 2px solid var(--border-strong);
+  padding-left: 14px;
+  max-width: 68ch;
+}
+
+.cite {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  padding-left: 16px;
+  font-size: 11px;
+  color: var(--text-tertiary);
+}
+
+.citeChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 8px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface-solid);
+}
+
+.provenance {
+  border-top: 1px solid var(--border-subtle);
+  padding-top: 12px;
+  font-size: 12px;
+  color: var(--text-tertiary);
+  max-width: 78ch;
+}
+
+.silent {
+  padding: 18px 20px;
+  border: 1px dashed var(--border-medium);
+  border-radius: var(--radius-m);
+  font-size: 14px;
+  color: var(--text-secondary);
+  max-width: 68ch;
+}
+
+/* ---- sessions ---- */
+
+.sessions { display: flex; flex-direction: column; gap: 10px; }
+
+.session {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-m);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sessionHead {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.sessionName { font-weight: 560; color: var(--text); }
+
+.turns { display: flex; flex-direction: column; gap: 10px; }
+
+.turn { display: flex; flex-direction: column; gap: 4px; }
+
+.turnAgent {
+  font-size: 14px;
+  color: var(--text);
+  font-weight: 520;
+}
+
+.turnHuman {
+  font-size: 14px;
+  color: var(--text-secondary);
+  padding-left: 14px;
+  border-left: 2px solid var(--border);
+  max-width: 72ch;
+}
+
+.grounding {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  align-self: flex-start;
+  padding: 2px 8px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 11px;
+  color: var(--text-tertiary);
+  background: var(--surface-solid);
+}

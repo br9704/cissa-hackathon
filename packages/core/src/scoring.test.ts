@@ -1,5 +1,8 @@
 import { describe, it, expect } from "vitest";
-import { busFactor, herfindahl, vacationReadiness, scoreStrategy, simulateDeparture } from "./scoring";
+import {
+  busFactor, herfindahl, vacationReadiness, scoreStrategy, simulateDeparture,
+  departureExposure, type StrategyScore,
+} from "./scoring";
 
 const item = (author: string, weight = 1) => ({ strategyId: "s", authorMemberId: author, weight });
 
@@ -113,5 +116,63 @@ describe("departure simulation", () => {
       { id: "2", strategyId: "s2", authorMemberId: "priya", tags: ["vol_filter"], title: "b", riskFlag: false },
     ];
     expect(simulateDeparture("daniel", crossed).orphanedIds).toEqual(["1"]);
+  });
+});
+
+describe("departure exposure", () => {
+  const strategies = [
+    { id: "s1", name: "India options carry", revenueUsdM: 214 },
+    { id: "s2", name: "Expiry window effects", revenueUsdM: 148 },
+    { id: "s3", name: "Cross asset vol filter", revenueUsdM: 96 },
+    { id: "s4", name: "Futures basis roll", revenueUsdM: 0 },
+  ];
+
+  const score = (top: string | null, bus: number): StrategyScore => ({
+    strategyId: "x",
+    busFactor: bus,
+    concentration: 0.8,
+    vacationReadiness: 50,
+    topHolderMemberId: top,
+    breakdown: { totalItems: 0, contributors: 0, shares: [], openQuestions: 0, answerableWithoutTopHolder: 0 },
+  });
+
+  const scores = new Map([
+    ["s1", score("daniel", 1)],
+    ["s2", score("daniel", 1)],
+    ["s3", score("priya", 2)],
+    ["s4", score("marcus", 2)],
+  ]);
+
+  it("sums only the books where one person holds it alone", () => {
+    const out = departureExposure("daniel", strategies, scores);
+    expect(out.exposedUsdM).toBe(214 + 148);
+    expect(out.exposed.map((s) => s.id)).toEqual(["s1", "s2"]);
+  });
+
+  it("counts a book with a real second author separately rather than folding it in", () => {
+    /* Rolling partial into the headline would let a book that is genuinely covered
+       inflate the number, which is the easiest way to overstate a dollar figure. */
+    const out = departureExposure("priya", strategies, scores);
+    expect(out.exposedUsdM).toBe(0);
+    expect(out.partialUsdM).toBe(96);
+  });
+
+  it("ignores a strategy earning nothing", () => {
+    /* The paper book. A zero here is what stops the maths assuming every strategy has
+       revenue attached. */
+    const out = departureExposure("marcus", strategies, scores);
+    expect(out.exposedUsdM).toBe(0);
+    expect(out.partialUsdM).toBe(0);
+  });
+
+  it("exposes nothing for somebody who holds nothing", () => {
+    expect(departureExposure("elena", strategies, scores).exposedUsdM).toBe(0);
+  });
+
+  it("never exceeds the firm total", () => {
+    for (const who of ["daniel", "priya", "marcus", "elena"]) {
+      const out = departureExposure(who, strategies, scores);
+      expect(out.exposedUsdM + out.partialUsdM).toBeLessThanOrEqual(out.totalUsdM);
+    }
   });
 });
