@@ -93,7 +93,7 @@
   height: 100%;
   background: var(--accent-verified);
   transform-origin: left;
-  transition: transform 90ms linear;
+  transition: transform var(--dur-live) linear;
 }
 
 /* ---- the consent gate ---- */
@@ -165,7 +165,7 @@
 .progressFill {
   height: 100%;
   background: var(--accent);
-  transition: width 200ms linear;
+  transition: width var(--dur-fast) linear;
 }
 
 .failure {

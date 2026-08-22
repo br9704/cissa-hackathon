@@ -107,7 +107,16 @@
   --font-sans: "Geist Variable", -apple-system, "Helvetica Neue", sans-serif;
   --font-mono: "Geist Mono Variable", ui-monospace, monospace;
 
-  /* MOTION: three durations, two curves. */
+  /*
+    MOTION: four durations, two curves.
+
+    --dur-live is for readouts that track something happening in the real world right now:
+    an audio level meter, a download percentage. It is deliberately shorter than
+    --dur-fast, because a meter that lags 140ms behind the voice it is measuring reads as
+    broken rather than as smooth, and it is deliberately still a token rather than a
+    literal so reduced motion can reach it.
+  */
+  --dur-live: 90ms;
   --dur-fast: 140ms;
   --dur-med: 240ms;
   --dur-slow: 420ms;
@@ -151,6 +160,9 @@
 */
 @media (prefers-reduced-motion: reduce) {
   :root {
+    /* The live readouts stay live. Collapsing a level meter to a step makes it useless
+       rather than calmer, and it is not the kind of motion the setting is about. */
+    --dur-live: 90ms;
     --dur-fast: 100ms;
     --dur-med: 120ms;
     --dur-slow: 140ms;
