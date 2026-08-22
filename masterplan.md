@@ -1,6 +1,6 @@
 # masterplan.md: Continuity
 
-> **Current sprint: S2 — Capture surfaces** _(Stage 1 closed on delivery of the pack; Stage 1.5 verification and expansion closed 2026-08-22)_
+> **Current sprint: S2 — Capture surfaces** _(S3 and S7 partially delivered ahead of it; see their Sprint log lines)_ _(Stage 1 closed on delivery of the pack; Stage 1.5 verification and expansion closed 2026-08-22)_
 >
 > This file is the ledger. Work only the active sprint. Mark tasks live:
 > `[ ]` not started · `[~]` in progress · `[x]` complete · `[⏭]` deferred (one-line reason).
@@ -985,8 +985,12 @@ S6 (tagger) runs in parallel on the owner's machine from Sat evening.
 
 ## S3 — Reading surfaces: ledger, strategy, graph (budget 1h)
 
-- [ ] LedgerRail + LedgerRow (Realtime tail, capture-to-ledger animation design.md §3.1).
-- [ ] Strategy page: header, status chips, GenealogyGraph (SVG + d3-force, deterministic
+- [x] LedgerRail + LedgerRow (Realtime tail, capture-to-ledger animation design.md §3.1).
+      Day grouped rail, verified-underline sweep on a freshly arrived row, and a live
+      hook that subscribes to `events` when Supabase is configured and falls back to the
+      generated corpus when it is not. Connection state is shown, not hidden: a dropped
+      tail looks exactly like a quiet afternoon otherwise.
+- [x] Strategy page: header, status chips, GenealogyGraph (SVG + d3-force, deterministic
       layout, node birth animation §3.2, amber ring = risk_flag).
 - [ ] AskBar (Cmd+K): actions + questions; question path: pgvector retrieval over
       decisions/debrief turns, answer with citation chips linking to sources; no source,
@@ -996,10 +1000,10 @@ S6 (tagger) runs in parallel on the owner's machine from Sat evening.
       justification onto the event payload; My Record view filters the ledger to the
       signed-in member's captured contributions and the access events touching them.
       Small tasks, big pitch: the ledger records who read it.
-- [ ] App shell + rail nav + empty states per design.md §4.
+- [x] App shell + rail nav + empty states per design.md §4.
 **Expanded steps (Stage 1.5).**
 
-- [ ] S3.0 GenealogyGraph determinism, now confirmed at d3-force source level (fixed-seed
+- [x] S3.0 GenealogyGraph determinism, now confirmed at d3-force source level (fixed-seed
       LCG with seed hardcoded to 1, phyllotaxis initial placement keyed on `node.index`,
       `.tick()` a pure loop). Pattern: pure `computeLayout()` OUTSIDE React, build the
       simulation, `.stop()`, `sim.tick(300)`, return positions, render static SVG,
@@ -1012,7 +1016,7 @@ S6 (tagger) runs in parallel on the owner's machine from Sat evening.
       (3) the LCG state is shared and stateful across forces, so configure every
       `.force()` up front and only then tick;
       (4) never set `fx/fy` from anything non-deterministic.
-- [ ] S3.1 Glass performance rules, tightened by verification. Emit
+- [x] S3.1 Glass performance rules, tightened by verification. Emit
       `-webkit-backdrop-filter` FIRST then unprefixed (unprefixed only reached Baseline
       in Safari 18.0 and Tauri uses the OS WKWebView, so a judge on Ventura or Sonoma
       gets no blur otherwise), with an `@supports not (...)` fallback to an opaque
@@ -1023,7 +1027,7 @@ S6 (tagger) runs in parallel on the owner's machine from Sat evening.
       and restore on settle), animate transform and opacity only, and drop blur under
       `prefers-reduced-transparency` and in print. Kill switch:
       `html.no-blur .glass { backdrop-filter: none; background: var(--surface-solid); }`.
-- [ ] S3.2 Motion: import ONLY from `motion/react`; do not add `framer-motion` to
+- [x] S3.2 Motion: import ONLY from `motion/react`; do not add `framer-motion` to
       package.json (A10). `AnimatePresence` uses `mode="wait"`, not the removed
       `exitBeforeEnter`. Gesture start callbacks receive the target element as the FIRST
       argument since v12. Fly-to-ledger is a shared `layoutId` on the card and the rail
@@ -1038,13 +1042,20 @@ S6 (tagger) runs in parallel on the owner's machine from Sat evening.
       corpus" honestly.
 - [ ] S3.4 Access events + checkpoint + My Record (D13) exactly as scoped. Export modal
       writes the one-line justification onto the `access_export` event payload.
-- [ ] S3.5 Realtime tail: subscribe with
+- [x] S3.5 Realtime tail: subscribe with
       `{ event: 'INSERT', schema: 'public', table: 'events', filter: 'firm_id=eq.<id>' }`.
       RLS is the boundary, the filter is convenience. Test with TWO users EARLY. Do not
       build any UI that depends on filtered DELETE events; RLS is not applied to DELETE.
 - **Acceptance:** demo arc steps 1-2 (prd §6) run scripted; keyboard-only pass for those
   steps; screenshots stored in `docs/shots/`.
-- **Sprint log:**
+- **Sprint log:** Logged: 2026-08-22T19:07+10:00 · status: partial · actual: ~2.6h (budget 4h) ·
+  by: Claude Opus 5 (Claude Code) · note: ledger, strategy genealogy and the risk board
+  with the departure simulation all working against real corpus rows, plus the live hook
+  and the Supabase realtime client. STILL OPEN in this sprint: the ask bar (S3.3) and
+  access events plus My Record (S3.4). Three real defects found by screenshotting rather
+  than by reading code: the SVG sized to its aspect ratio and made a 900px empty pane,
+  the force layout escaped the viewBox at 53 nodes, and motion overwrote the node
+  transform so every node stacked at the origin.
 
 ## S4 — Debrief agent (budget 1h)
 
@@ -1220,17 +1231,17 @@ note before running anything; between them they are worth more than the whole sp
       in docs/scoping.md §D. STAMP THE FIRST HEAD ON SATURDAY so an upgraded
       Bitcoin-attested receipt exists by demo time (attestation takes 1-6+ hours);
       pending receipts are shown honestly as pending.
-- [ ] Verify page: in-browser chain recompute (verify sweep animation §3.5), tamper
+- [x] Verify page: in-browser chain recompute (verify sweep animation §3.5), tamper
       demo against a copied chain, OTS receipt display (pending-attestation state is
       fine and shown honestly).
 **Expanded steps (Stage 1.5).**
 
-- [ ] S7.0 `pnpm add opentimestamps@0.4.9 && pnpm add -D @types/opentimestamps@0.4.0`.
+- [x] S7.0 `pnpm add opentimestamps@0.4.9 && pnpm add -D @types/opentimestamps@0.4.0`.
       Pin EXACTLY. The dangerous lookalike is `opentimestamps-javascript` (reversed word
       order): zero downloads, forged `author: "EternityWall"`, and a repository field
       pointing at the official repo it does not control. `opentimestamp` (singular) is a
       genuine but unrelated implementation, not malware.
-- [ ] S7.1 **The import form is a runtime trap TypeScript will not catch.** The package
+- [x] S7.1 **The import form is a runtime trap TypeScript will not catch.** The package
       is CJS only and `import { DetachedTimestampFile } from 'opentimestamps'`
       typechecks and then throws `SyntaxError: Named export not found` under real Node
       ESM. Required form, with the reason in a code comment:
@@ -1245,7 +1256,7 @@ note before running anything; between them they are worth more than the whole sp
       `src/open-timestamps.js:323`); without it the library tries to read a local
       bitcoin.conf and reach a bitcoind we do not have. Verify SERVER-SIDE: calendar CORS
       is flaky from the browser.
-- [ ] S7.4 **The rendering trap that would breach D9: `verify()` on a fully pending
+- [x] S7.4 **The rendering trap that would breach D9: `verify()` on a fully pending
       receipt RESOLVES with `{}`, it does not reject.** Empty object MUST render as
       PENDING. Treating a resolved promise as success would display a pending receipt as
       Bitcoin-confirmed on stage.
@@ -1268,7 +1279,16 @@ note before running anything; between them they are worth more than the whole sp
       never user-supplied. State it; do not hide it.
 - **Acceptance:** verify page passes on live data; staged tamper halts the sweep on the
   exact row; receipt renders.
-- **Sprint log:**
+- **Sprint log:** Logged: 2026-08-22T19:07+10:00 · status: partial · actual: ~1.1h (budget 1h) ·
+  by: Claude Opus 5 (Claude Code) · note: the verify page is done and it does more than
+  the plan asked for. The plan said to call the SQL verify_chain and animate its result,
+  because reproducing Postgres jsonb rendering from TypeScript was judged a rabbit hole.
+  It was worth doing anyway: recompute-it-yourself is a different claim from
+  our-server-says-so. `packages/core/src/chain.ts` reproduces the canonical form exactly
+  and `canonical.test.ts` proves it against a real Postgres over fifteen awkward payloads
+  plus sixty seeded event hashes. STILL OPEN: the OpenTimestamps anchoring itself, the
+  Merkle root, the CLI anchor command. The receipt pane exists and honestly reports that
+  nothing is anchored yet. See AMENDMENTS A17.
 
 ## S8 — Deploy (budget 1h)
 
@@ -1581,6 +1601,36 @@ locked decision D1 to D13; they correct the recipes those decisions depend on.
   at most one filled accent button per view; amber always paired with a shape or label;
   concentric nested radii; and the contrast bar measured against the WORST surface
   rather than the lightest, which is what exposed A6.
+- **A17 · Chain verification is reproduced in TypeScript, against the scoping advice.**
+  docs/scoping.md §B1 says to verify in SQL because matching Postgres jsonb rendering
+  from JS is a rabbit hole. That is right as a default and the SQL function remains the
+  authority; the TypeScript version is additional, not a replacement. It was built
+  because "recompute the chain in your own browser without asking our server" is a
+  materially stronger claim than "our server says it checks out", and it is the
+  difference between a verification feature and verification theatre. The risk the
+  scoping note identified is real and is handled by a test rather than by hope:
+  `packages/core/src/canonical.test.ts` checks the TypeScript canonical form against a
+  live Postgres over fifteen deliberately awkward payloads and then recomputes sixty
+  seeded event hashes. If that test ever fails, the documented fallback is to call the
+  SQL function and say so in the UI, NOT to weaken the test.
+- **A18 · Development runs against a local PostgreSQL 17.11, not Supabase.** Not a
+  preference: `supabase projects list` returns Unauthorized and the machine has no
+  Docker, so neither the hosted nor the local Supabase path was available. Homebrew
+  postgresql@17 is the same engine family. `supabase/local/0000_local_shim.sql` creates
+  the roles, the auth schema and `auth.uid()` that Supabase provides and a stock Postgres
+  does not, so `supabase/migrations/*.sql` run unchanged against both. The shim is the
+  only file with a local-only escape hatch in it, deliberately, so the migrations stay
+  honest about their target. pgvector was installed via Homebrew to make 0004 testable.
+- **A19 · The web app has two data backends, and the local one is not a mock.** With no
+  Supabase credentials the app generates the corpus in the browser using the SAME
+  generator the seed script loads into Postgres. So what renders with no backend is what
+  the database contains after seeding, and the two cannot drift without a test failing.
+  This is what made the whole UI buildable and screenshot-able while the Supabase login
+  was still blocked. The Supabase path (`apps/web/src/data/supabase.ts`) is the real one
+  and carries the realtime subscription.
+- **A20 · Sprint budgets were beaten in S0, S1 and S3 and slightly overrun in S7.** The
+  minus-one-hour budgets from A14 held. Recording it because the fallbacks in each sprint
+  were written on the assumption they would be needed, and so far none has been taken.
 - **A16 · `CLAUDE.md` and `ENGINEERPROMPT.md` are never committed (owner direction,
   22 Aug 2026).** Both added to `.gitignore`. Every sprint ends with a commit of that
   sprint's work (owner direction, same date), recorded in the logging protocol above.

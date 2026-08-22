@@ -1,10 +1,21 @@
-import { useMemo } from "react";
 import styles from "./LedgerPage.module.css";
 import { LedgerRail } from "../components/LedgerRail";
-import { corpus, ledger, backend } from "../data/source";
+import { corpus } from "../data/source";
+import { useLiveLedger } from "../data/live";
+
+/*
+  The connection state is shown, not hidden. A tail that has silently dropped looks
+  exactly like a quiet afternoon, and those are very different things.
+*/
+const CONNECTION_LABEL: Record<string, string> = {
+  local: "Local corpus, the same one the seed loads",
+  connecting: "Connecting to the live tail",
+  live: "Live tail, pushed from the ledger",
+  dropped: "Live tail dropped, showing the last load",
+};
 
 export function LedgerPage() {
-  const entries = useMemo(() => ledger(), []);
+  const { entries, connection, freshId } = useLiveLedger();
   const c = corpus();
 
   const drafts = entries.filter((e) => e.draft).length;
@@ -34,13 +45,9 @@ export function LedgerPage() {
       <section className={styles.railPane}>
         <header className={styles.railHeader}>
           <h2 className={styles.railTitle}>Ledger</h2>
-          <span className={styles.railNote}>
-            {backend === "local"
-              ? "Local corpus, the same one the seed loads"
-              : "Live tail"}
-          </span>
+          <span className={styles.railNote}>{CONNECTION_LABEL[connection]}</span>
         </header>
-        <LedgerRail entries={entries} />
+        <LedgerRail entries={entries} freshId={freshId} />
       </section>
     </div>
   );
