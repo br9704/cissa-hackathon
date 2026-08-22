@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState } from "react";
 import { scoreStrategy } from "@continuity/core";
 import styles from "./StrategiesPage.module.css";
+import { PageHeader } from "../components/PageHeader";
 import { GenealogyGraph } from "../components/GenealogyGraph";
 import { TimeMachine, type ReplayItem } from "../components/TimeMachine";
 import { StatusChip } from "../components/StatusChip";
@@ -103,6 +104,16 @@ export function StrategiesPage() {
 
   return (
     <div className={styles.page}>
+      <PageHeader
+        title="Strategies"
+        lead={
+          "The four books this desk runs, and how the thinking behind each one developed. Every dot" +
+          " is a decision somebody recorded; the lines show which decisions replaced or informed wh" +
+          "ich. Bus factor is how many people would have to leave before a book loses the reasoning" +
+          " behind it."
+        }
+      />
+
       <div className={styles.grid}>
         {c.strategies.map((s) => {
           const score = scores.get(s.id)!;

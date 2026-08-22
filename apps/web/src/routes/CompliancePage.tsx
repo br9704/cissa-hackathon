@@ -3,6 +3,7 @@ import {
   scoreStrategy, handoverPack, rts6ChangeLog, sr117Documentation,
 } from "@continuity/core";
 import styles from "./CompliancePage.module.css";
+import { PageHeader } from "../components/PageHeader";
 import { Markdown } from "../components/Markdown";
 import { corpus, memberName, ago } from "../data/source";
 import { accessLog, recordAccess, subscribeToAccessLog } from "../data/access";
@@ -142,9 +143,18 @@ export function CompliancePage() {
 
   return (
     <div className={styles.page}>
+      <PageHeader
+        title="Reports"
+        lead={
+          "Handover packs and regulator-shaped documents, generated from the record rather than wri" +
+          "tten from memory. Nobody assembles these by hand, and every figure in them traces back t" +
+          "o a decision somebody filed."
+        }
+      />
+
       <section className={styles.pane}>
         <header className={styles.head}>
-          <h2 className={styles.title}>Compliance artifacts</h2>
+          <h2 className={styles.title}>Pick a document</h2>
           <span className={styles.note}>
             Generated from the ledger, labelled DRAFT, traceable to an event
           </span>

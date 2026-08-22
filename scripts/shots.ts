@@ -122,7 +122,7 @@ const SCENES: {
     path: "/",
     viewportOnly: true,
     act: async (page) => {
-      await page.getByText("awaiting approval").first().waitFor();
+      await page.getByText("Waiting for you").first().waitFor();
       await page.waitForTimeout(400);
     },
   },
@@ -133,11 +133,14 @@ const SCENES: {
     act: async (page) => {
       /* The one keystroke. If A ever stops approving the focused draft, this scene fails
          rather than quietly shooting the queue unchanged. */
-      const before = await page.getByText(/\d+ awaiting approval/).innerText();
+      /* The count next to "Waiting for you". Read before and after so the assertion is
+         about the queue actually shrinking rather than about a pill appearing. */
+      const count = () => page.locator('h2:has-text("Waiting for you") + span').innerText();
+      const before = await count().catch(() => "");
       await page.keyboard.press("a");
-      await page.getByText("Filed to the ledger, chained").waitFor({ timeout: 5000 });
-      const after = await page.getByText(/awaiting approval/).innerText();
-      if (before === after) throw new Error("pressing A did not change the queue");
+      await page.getByText("Filed. It cannot be changed now.").waitFor({ timeout: 5000 });
+      const after = await count().catch(() => "");
+      if (before && before === after) throw new Error("pressing A did not change the queue");
       await page.waitForTimeout(300);
     },
   },

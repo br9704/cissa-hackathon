@@ -1,5 +1,6 @@
 import { useMemo, useState, useSyncExternalStore } from "react";
 import styles from "./MyRecordPage.module.css";
+import { PageHeader } from "../components/PageHeader";
 import { StatusChip } from "../components/StatusChip";
 import { corpus, memberInitials, memberName, strategyName, ago } from "../data/source";
 import { accessLog, subscribeToAccessLog } from "../data/access";
@@ -39,9 +40,18 @@ export function MyRecordPage() {
 
   return (
     <div className={styles.page}>
+      <PageHeader
+        title="My record"
+        lead={
+          "Everything this system has captured from you, and everyone who has looked at it. You do " +
+          "not have to ask anybody for this page. That is the condition on which capturing anything" +
+          " at all is reasonable."
+        }
+      />
+
       <section className={styles.pane}>
         <header className={styles.head}>
-          <h2 className={styles.title}>My record</h2>
+          <h2 className={styles.title}>You</h2>
           <span className={styles.note}>
             Everything captured from you, and everyone who has looked at it
           </span>

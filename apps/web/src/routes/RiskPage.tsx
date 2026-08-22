@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { scoreStrategy, simulateDeparture, departureExposure } from "@continuity/core";
 import { motion, useReducedMotion } from "motion/react";
 import styles from "./RiskPage.module.css";
+import { PageHeader } from "../components/PageHeader";
 import { RiskDial } from "../components/RiskDial";
 import { HeatStrip, type HeatRow } from "../components/HeatStrip";
 import { GenealogyGraph } from "../components/GenealogyGraph";
@@ -96,9 +97,18 @@ export function RiskPage() {
 
   return (
     <div className={styles.page}>
+      <PageHeader
+        title="Knowledge risk"
+        lead={
+          "Which strategies depend on one person understanding them, and what would leave with that" +
+          " person. Finance already runs this fire drill: two weeks of mandatory leave with system " +
+          "access cut. Nobody scores whether the desk would pass it."
+        }
+      />
+
       <section className={styles.pane}>
         <header className={styles.head}>
-          <h2 className={styles.title}>Firm knowledge risk</h2>
+          <h2 className={styles.title}>Where the desk stands today</h2>
           <span className={styles.note}>
             Scored per strategy, never per person
           </span>
@@ -108,29 +118,29 @@ export function RiskPage() {
           <RiskDial
             value={worstBus}
             max={5}
-            label="Lowest bus factor"
-            caption="people before a book loses its reasoning"
+            label="Bus factor, worst book"
+            caption="one person could take a book with them"
             atRisk={worstBus <= 1}
           />
           <RiskDial
             value={worstReadiness}
             max={100}
-            label="Vacation readiness"
-            caption="open questions answerable without the top holder"
+            label="Could cover a leave"
+            caption="of open questions somebody else could answer"
             atRisk={worstReadiness < 70}
           />
           <RiskDial
             value={flagged}
             max={c.strategies.length}
-            label="Concentrated books"
-            caption={`of ${c.strategies.length} strategies`}
+            label="Concentrated"
+            caption={`of ${c.strategies.length} books rest mostly on one person`}
             atRisk={flagged > 0}
           />
           <RiskDial
             value={c.questions.filter((q) => !q.answeredByDecisionId).length}
             max={c.questions.length}
-            label="Unanswered questions"
-            caption="nobody has written the answer down"
+            label="Unanswered"
+            caption="questions with no recorded answer"
             atRisk={c.questions.some((q) => !q.answeredByDecisionId)}
           />
         </div>
@@ -145,9 +155,9 @@ export function RiskPage() {
 
       <section className={styles.pane}>
         <header className={styles.head}>
-          <h2 className={styles.title}>Departure simulation</h2>
+          <h2 className={styles.title}>If somebody resigned tomorrow</h2>
           <span className={styles.note}>
-            Pick someone to see what leaves with them
+            Pick a name. Nothing is sent anywhere, this is a calculation.
           </span>
         </header>
 

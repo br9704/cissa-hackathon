@@ -1,0 +1,43 @@
+/*
+  A labelled block within a page.
+
+  Sections carry a name and, where it is not obvious, a line saying why the block is
+  there. The previous version of these screens opened straight into panes with no
+  hierarchy, so everything read as equally important, which is the same as nothing reading
+  as important.
+*/
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.title { font-size: 17px; font-weight: 560; }
+
+.count {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 13px;
+  color: var(--text-tertiary);
+}
+
+.aside {
+  margin-left: auto;
+  font-size: 13px;
+  color: var(--text-tertiary);
+}
+
+.lead {
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--text-secondary);
+  max-width: 74ch;
+  margin-top: -4px;
+}

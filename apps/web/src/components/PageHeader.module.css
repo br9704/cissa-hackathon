@@ -1,0 +1,45 @@
+/*
+  Every screen says what it is, in words somebody who does not work here can read.
+
+  This exists because of the most useful piece of feedback this build got: the person who
+  commissioned it opened the finished app and could not tell what he was looking at. That
+  is not a polish problem. Dense information with no framing is unreadable however well it
+  is set, and a screen that assumes you already know what it does is a screen for people
+  who already know what it does.
+*/
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-bottom: 4px;
+}
+
+.top {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.title {
+  font-size: 26px;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+.aside {
+  font-size: 13px;
+  color: var(--text-tertiary);
+  margin-left: auto;
+}
+
+/*
+  One sentence. Not a tagline and not a description of the feature list: what this screen
+  is for, and why somebody would look at it.
+*/
+.lead {
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--text-secondary);
+  max-width: 76ch;
+}

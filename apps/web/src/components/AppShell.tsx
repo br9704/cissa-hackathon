@@ -11,13 +11,20 @@ import {
   VerifyIcon,
 } from "./icons";
 
+/*
+  The navigation carries a word of explanation under each label.
+
+  Six section names are most of what a stranger needs to understand a product, but only if
+  the names mean something to somebody who does not already work here. "Debriefs" is
+  jargon; "Debriefs / short interviews" is not.
+*/
 const NAV = [
-  { to: "/", label: "Ledger", Icon: LedgerIcon },
-  { to: "/strategies", label: "Strategies", Icon: StrategyIcon },
-  { to: "/risk", label: "Risk", Icon: RiskIcon },
-  { to: "/debriefs", label: "Debriefs", Icon: DebriefIcon },
-  { to: "/compliance", label: "Compliance", Icon: ComplianceIcon },
-  { to: "/verify", label: "Verify", Icon: VerifyIcon },
+  { to: "/", label: "The record", hint: "every decision, locked", Icon: LedgerIcon },
+  { to: "/strategies", label: "Strategies", hint: "how the thinking developed", Icon: StrategyIcon },
+  { to: "/risk", label: "Knowledge risk", hint: "who holds a book alone", Icon: RiskIcon },
+  { to: "/debriefs", label: "Debriefs", hint: "capture reasoning, ask leavers", Icon: DebriefIcon },
+  { to: "/compliance", label: "Reports", hint: "handover and regulator packs", Icon: ComplianceIcon },
+  { to: "/verify", label: "Verify", hint: "check nothing was altered", Icon: VerifyIcon },
 ] as const;
 
 export function AppShell() {
@@ -51,7 +58,7 @@ export function AppShell() {
             </span>
             <span className={styles.label}>Continuity</span>
           </div>
-          {NAV.map(({ to, label, Icon }) => (
+          {NAV.map(({ to, label, hint, Icon }) => (
             <Link
               key={to}
               to={to}
@@ -62,7 +69,10 @@ export function AppShell() {
               <span className={styles.glyph}>
                 <Icon />
               </span>
-              <span className={styles.label}>{label}</span>
+              <span className={styles.label}>
+                {label}
+                <span className={styles.navHint}>{hint}</span>
+              </span>
             </Link>
           ))}
         </nav>

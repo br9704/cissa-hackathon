@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useReducedMotion } from "motion/react";
 import { verifyChain, type VerifiedRow } from "@continuity/core";
 import styles from "./VerifyPage.module.css";
+import { PageHeader } from "../components/PageHeader";
 import { chainedLedger, backend, type ChainedEvent } from "../data/source";
 import { latestAnchor, receiptBytes } from "../data/anchors";
 
@@ -96,9 +97,18 @@ export function VerifyPage() {
 
   return (
     <div className={styles.page}>
+      <PageHeader
+        title="Verify"
+        lead={
+          "Check that nothing in the record has been altered since it was written. Your browser doe" +
+          "s the checking, independently, rather than asking this system whether it is telling the " +
+          "truth about itself."
+        }
+      />
+
       <section className={styles.pane}>
         <header className={styles.head}>
-          <h2 className={styles.title}>Verify the chain</h2>
+          <h2 className={styles.title}>Recompute every record</h2>
           <span className={styles.note}>
             {backend === "local"
               ? "Recomputed in this browser, from the events themselves"

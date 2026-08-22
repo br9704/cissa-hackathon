@@ -1,6 +1,7 @@
 import { useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "motion/react";
 import styles from "./DebriefsPage.module.css";
+import { PageHeader } from "../components/PageHeader";
 import { StatusChip } from "../components/StatusChip";
 import { corpus, memberInitials, memberName, strategyName } from "../data/source";
 import { recall, type Recall } from "../search/recall";
@@ -71,6 +72,15 @@ export function DebriefsPage() {
 
   return (
     <div className={styles.page}>
+      <PageHeader
+        title="Debriefs"
+        lead={
+          "Short interviews that capture reasoning while the person is still here, each question gr" +
+          "ounded in something they actually did. And, for anyone who has already gone, their recor" +
+          "ded answers are still searchable in their own words."
+        }
+      />
+
       {departed ? (
         <section className={styles.pane}>
           <header className={styles.head}>

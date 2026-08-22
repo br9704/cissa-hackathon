@@ -5,6 +5,8 @@ import { LedgerRail } from "../components/LedgerRail";
 import { DecisionCard } from "../components/DecisionCard";
 import { TranscriptImporter } from "../components/TranscriptImporter";
 import { TaggerBadge } from "../components/TaggerBadge";
+import { PageHeader } from "../components/PageHeader";
+import { Section } from "../components/Section";
 import { corpus, type LedgerEntry } from "../data/source";
 import { useLiveLedger } from "../data/live";
 
@@ -13,10 +15,10 @@ import { useLiveLedger } from "../data/live";
   exactly like a quiet afternoon, and those are very different things.
 */
 const CONNECTION_LABEL: Record<string, string> = {
-  local: "Local corpus, the same one the seed loads",
-  connecting: "Connecting to the live tail",
-  live: "Live tail, pushed from the ledger",
-  dropped: "Live tail dropped, showing the last load",
+  local: "Reading the local record",
+  connecting: "Connecting",
+  live: "Live, updating as decisions are filed",
+  dropped: "Connection dropped, showing the last load",
 };
 
 export function LedgerPage() {
@@ -54,44 +56,37 @@ export function LedgerPage() {
   }, [entries, resolved, justApproved]);
 
   const drafts = queue.length;
-  const risk = entries.filter((e) => e.riskFlag).length;
 
   return (
     <div className={styles.page}>
-      <div className={styles.stats}>
-        <div className={styles.stat}>
-          <span className={styles.statValue}>{entries.length}</span>
-          <span className={styles.statLabel}>Events on the chain</span>
-        </div>
-        <div className={styles.stat}>
-          <span className={styles.statValue}>{c.artifacts.length}</span>
-          <span className={styles.statLabel}>Captured artifacts</span>
-        </div>
-        <div className={styles.stat}>
-          <span className={styles.statValue}>{risk}</span>
-          <span className={styles.statLabel}>Risk flagged decisions</span>
-        </div>
-        <div className={styles.stat}>
-          <span className={styles.statValue}>{drafts}</span>
-          <span className={styles.statLabel}>Awaiting approval</span>
-        </div>
-      </div>
+      <PageHeader
+        title="The record"
+        lead={
+          "Every decision this desk has made about how its strategies work, and the reasoning " +
+          "behind it. Records are written automatically when someone commits code or files a " +
+          "note, and nothing here can be edited or deleted once it is filed."
+        }
+        aside={CONNECTION_LABEL[connection]}
+      />
 
-      <div className={styles.queue}>
-        <div className={styles.queueHead}>
-          <span className={styles.queueTitle}>
-            {drafts > 0 ? `${drafts} awaiting approval` : "Nothing awaiting approval"}
-          </span>
-          <span className={styles.queueNote}>
-            A model wrote the record. A person decides whether it is true.
-          </span>
-        </div>
+      {/*
+        What needs a person comes first.
 
-        {/*
-          One AnimatePresence around the queue AND the landing slot below the rail header.
-          The approve transition is a shared layoutId handing the card off to the pill it
-          becomes, and that only works if both ends are inside the same presence tree.
-        */}
+        The previous version opened with four statistics, which is a summary of work
+        already done, and buried the one thing on the page that was waiting on the reader.
+        A screen should lead with what it is asking of you.
+      */}
+      <Section
+        title={drafts > 0 ? "Waiting for you" : "Nothing waiting for you"}
+        count={drafts > 0 ? drafts : undefined}
+        lead={
+          drafts > 0
+            ? "A model wrote these from what actually changed. Read one, and press A if it is " +
+              "right. That keystroke is the whole job: it takes about ten seconds and it is what " +
+              "separates a record you can rely on from text a machine generated."
+            : "Everything filed has been approved by a person."
+        }
+      >
         <AnimatePresence mode="popLayout" initial={false}>
           {queue.length === 0 ? (
             <motion.div
@@ -101,8 +96,8 @@ export function LedgerPage() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
             >
-              The queue is empty. It fills itself: a commit that touches strategy code
-              files an artifact, and a decision record is drafted against it for approval.
+              Nothing to approve. New records appear here on their own: a commit that touches
+              strategy code files one automatically.
             </motion.div>
           ) : (
             queue.slice(0, 1).map((d) => (
@@ -129,24 +124,41 @@ export function LedgerPage() {
                 exit={{ opacity: 0 }}
                 transition={{ duration: reduced ? 0.1 : 0.24, ease: [0.22, 1, 0.36, 1] }}
               >
-                Filed to the ledger, chained
+                Filed. It cannot be changed now.
               </motion.span>
             ) : null}
           </AnimatePresence>
         </div>
-      </div>
+      </Section>
 
-      <TaggerBadge />
+      <Section
+        title="Everything filed"
+        count={`${entries.length} records`}
+        lead={
+          "Newest first. Each one is locked to the one before it, so if any of them were " +
+          "altered later the Verify page would find it."
+        }
+      >
+        <div className={styles.railPane}>
+          <LedgerRail entries={shown} freshId={justApproved ?? freshId} />
+        </div>
+      </Section>
 
-      <TranscriptImporter />
-
-      <section className={styles.railPane}>
-        <header className={styles.railHeader}>
-          <h2 className={styles.railTitle}>Ledger</h2>
-          <span className={styles.railNote}>{CONNECTION_LABEL[connection]}</span>
-        </header>
-        <LedgerRail entries={shown} freshId={justApproved ?? freshId} />
-      </section>
+      {/*
+        Secondary. These are things the desk sets up once, not things a reader acts on, so
+        they sit below the record rather than between the reader and it.
+      */}
+      <Section
+        title="How records get here"
+        lead={
+          "Nobody types these in. A commit that touches strategy code files one by itself, a " +
+          "meeting transcript can be dropped in, and the category on each record is applied by " +
+          "a model running on this machine."
+        }
+      >
+        <TranscriptImporter />
+        <TaggerBadge />
+      </Section>
     </div>
   );
 }
