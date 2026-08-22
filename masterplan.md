@@ -1,6 +1,13 @@
 # masterplan.md: Continuity
 
-> **Current sprint: S0 — Foundation** _(Stage 1 research/setup closed on delivery of this pack)_
+> **Current sprint: S8 — deploy.** Everything else in Stage 2 is delivered or explicitly
+> deferred with a reason. S0, S1, S6, S7, S9 and S10 are done. S2, S3, S4 and S5 are
+> substantially delivered with their gaps named in their own Sprint log lines. S8 is
+> written and waiting on one human action, the Supabase login. S11 is the video and needs
+> a person with a camera.
+>
+> Read the Sprint log line at the end of each sprint below for what actually happened,
+> including the things that went wrong, which are the more useful half.
 >
 > This file is the ledger. Work only the active sprint. Mark tasks live:
 > `[ ]` not started · `[~]` in progress · `[x]` complete · `[⏭]` deferred (one-line reason).
