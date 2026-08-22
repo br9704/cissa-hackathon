@@ -22,5 +22,5 @@
     "noEmit": true,
     "types": ["vite/client", "vitest/globals"]
   },
-  "include": ["src", "vite.config.ts", "../../ml/results/summary.json"]
+  "include": ["src", "vite.config.ts", "../../ml/results/summary.json", "../../docs/anchors.json"]
 }

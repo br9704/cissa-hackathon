@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import { useReducedMotion } from "motion/react";
 import { verifyChain, type VerifiedRow } from "@continuity/core";
 import styles from "./VerifyPage.module.css";
-import { chainedLedger, backend, strategyName, type ChainedEvent } from "../data/source";
+import { chainedLedger, backend, type ChainedEvent } from "../data/source";
+import { latestAnchor, receiptBytes } from "../data/anchors";
 
 type Mode = "honest" | "tampered";
 type Phase = "idle" | "running" | "done";
@@ -91,6 +92,7 @@ export function VerifyPage() {
 
   const rows = events ?? [];
   const shown = rows.slice(0, 60);
+  const anchor = latestAnchor();
 
   return (
     <div className={styles.page}>
@@ -210,26 +212,58 @@ export function VerifyPage() {
           the receipt shows the block. Confirmation takes hours, so a fresh receipt is
           honestly pending and says so rather than implying otherwise.
         </p>
-        <div className={styles.receipt}>
-          <div className={styles.field}>
-            <span className={styles.fieldLabel}>Status</span>
-            <span className={styles.fieldValue}>
-              {backend === "local" ? "not anchored in local mode" : "pending"}
-            </span>
+        {anchor ? (
+          <>
+            <div className={styles.receipt}>
+              <div className={styles.field}>
+                <span className={styles.fieldLabel}>Status</span>
+                <span className={styles.fieldValue}>
+                  {anchor.status === "attested"
+                    ? `confirmed in ${anchor.attestation?.chain} block ${anchor.attestation?.blockHeight}`
+                    : "submitted to the calendars, Bitcoin confirmation pending"}
+                </span>
+              </div>
+              <div className={styles.field}>
+                <span className={styles.fieldLabel}>Merkle root, {anchor.event_count} events</span>
+                <span className={styles.fieldValue}>{anchor.merkle_root}</span>
+              </div>
+              <div className={styles.field}>
+                <span className={styles.fieldLabel}>Submitted</span>
+                <span className={styles.fieldValue}>
+                  {new Date(anchor.anchored_at).toLocaleString("en-AU")}
+                </span>
+              </div>
+              <div className={styles.field}>
+                <span className={styles.fieldLabel}>Receipt</span>
+                <span className={styles.fieldValue}>{receiptBytes(anchor)} bytes</span>
+              </div>
+            </div>
+            <p className={styles.note}>
+              {anchor.status === "attested"
+                ? "A Bitcoin block confirms this digest existed when it was mined."
+                : "Pending is the honest word. The digest is with the calendar servers and " +
+                  "will be included in their next Bitcoin transaction, which takes hours. " +
+                  "Anything describing a fresh receipt as anchored is describing something " +
+                  "that has not happened yet."}
+              {" "}The receipt is over a Merkle root of {anchor.event_count} events rather
+              than over each event, so one stamp covers the range and any single event can
+              still be proved to be inside it later, without the rest of the ledger.
+            </p>
+          </>
+        ) : (
+          <div className={styles.receipt}>
+            <div className={styles.field}>
+              <span className={styles.fieldLabel}>Status</span>
+              <span className={styles.fieldValue}>nothing anchored yet</span>
+            </div>
+            <div className={styles.field}>
+              <span className={styles.fieldLabel}>Head</span>
+              <span className={styles.fieldValue}>
+                {rows.length ? rows[rows.length - 1]!.thisHash.slice(0, 32) : "no events"}
+              </span>
+            </div>
           </div>
-          <div className={styles.field}>
-            <span className={styles.fieldLabel}>Head</span>
-            <span className={styles.fieldValue}>
-              {rows.length ? rows[rows.length - 1]!.thisHash.slice(0, 32) : "no events"}
-            </span>
-          </div>
-          <div className={styles.field}>
-            <span className={styles.fieldLabel}>Through event</span>
-            <span className={styles.fieldValue}>
-              {rows.length ? `${rows.length}, ${strategyName(rows[rows.length - 1]!.strategyId)}` : "none"}
-            </span>
-          </div>
-        </div>
+        )}
       </section>
     </div>
   );

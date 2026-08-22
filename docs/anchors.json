@@ -1,0 +1,11 @@
+[
+  {
+    "firm_id": "8a3bd9cd-a8f0-4ca2-83f6-52674e2c3255",
+    "through_event_id": 184,
+    "event_count": 184,
+    "merkle_root": "a2bc9ed8e498d147de208e933e25a44d4311e59dcd8bef09a1ef3be5ca269da4",
+    "receipt_base64": "AE9wZW5UaW1lc3RhbXBzAABQcm9vZgC/ieLohOiSlAEIorye2OSY0UfeII6TPiWkTUMR5Z3Ni+8Joe875comnaTwECc/YDSfkg9qkvqqOBiKjsAI//AIahKEHNkwL/YI8CCMlI9hhxjNR9d6aE0P/NYs9S9zAcirDS0v9djvRfvNqQjxIL8gXLxcRSjIDzT6Gezr5KQDjHMnDRiyJ+AUM6EYlmy+CPAQZPs6e0+76I0bzwgagDWf1wjxIObGSzJ8KeGGV8CST1uPn27yaTQ5ZOfr3wp3obxfXQ63CPEEaomCO/AIwEq+/2G5Sb0Ag9/jDS75DI4uLWh0dHBzOi8vYWxpY2UuYnRjLmNhbGVuZGFyLm9wZW50aW1lc3RhbXBzLm9yZ//wCIfwals40VZ+CPAQCbgrCzKr51iZ79VU25vKkQjxIIoaTvgVGdD2ykxNq0t6rCuHwsBPGI0vgjT7ODGxefaMCPAg9+5wyUixMTeiLLeiwsXpYtG7gy6ig04OxjIPepF1890I8QRqiYI78Ahn0MZXk1Rd5QCD3+MNLvkMjiwraHR0cHM6Ly9ib2IuYnRjLmNhbGVuZGFyLm9wZW50aW1lc3RhbXBzLm9yZ//wEL3N/1a2YcOfgg/Gh/MqnVII8CAMVluesLGhMSfJY0Rob0Z+r+FTYSqwAbWzvUp8EqclyQjxIEsZ6CXPAbFt8WZAKq7CqZMOo/YDGiMiz9JbaCzPpEQlCPAgH3Cyc0fuE6/swCVflLPhRsbuStqexyg0jXPuaMS345MI8QRqiYI78AgRp8jmEDDROwCD3+MNLvkMjikoaHR0cHM6Ly9maW5uZXkuY2FsZW5kYXIuZXRlcm5pdHl3YWxsLmNvbfAQcFY3igv1snVCp1hrbYsWigjxIAyc+un0zGJSagkTJhzxVjKAb3h4J5eCsH0XFddH/neDCPEEaomCOvAIUvc5+0od4VMAg9/jDS75DI4jImh0dHBzOi8vYnRjLmNhbGVuZGFyLmNhdGFsbGF4eS5jb20=",
+    "status": "pending",
+    "anchored_at": "2026-08-22T11:04:27.891Z"
+  }
+]

@@ -7,16 +7,19 @@
   "scripts": {
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "seed": "tsx src/seed/run.ts"
+    "seed": "tsx src/seed/run.ts",
+    "anchor": "tsx src/anchor.ts"
   },
   "devDependencies": {
     "@types/node": "^26.2.0",
+    "@types/opentimestamps": "0.4.0",
     "@types/pg": "^8.23.1",
     "tsx": "^4.23.12",
     "typescript": "5.9.3",
     "vitest": "^4.1.11"
   },
   "dependencies": {
+    "opentimestamps": "0.4.9",
     "pg": "^8.23.0"
   }
 }
