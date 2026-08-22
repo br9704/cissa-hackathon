@@ -1,0 +1,36 @@
+# What Vercel does NOT need.
+#
+# Without this the CLI uploads the Rust target directory and every node_modules in the
+# workspace, which was 667 MB and several minutes of upload for a web build that needs
+# none of it. Vercel installs dependencies itself from the lockfile.
+
+node_modules
+**/node_modules
+
+# The Tauri build. Hundreds of megabytes of compiled Rust that has nothing to do with the
+# web deploy.
+apps/desktop/src-tauri/target
+apps/desktop/src-tauri/gen
+
+# Local build output. Vercel runs the build itself.
+apps/web/dist
+dist
+
+# The ML pipeline. The web app imports exactly one file from here, ml/results/summary.json,
+# and that is a few kilobytes; the virtual environment and the adapter weights are not
+# needed to render a number.
+ml/.venv
+ml/runs
+ml/data
+ml/models
+
+# Screenshots and video takes. 45 PNGs at 2x plus 15 more, none of which the app loads.
+docs/shots
+docs/beats
+
+# The generated demo repository.
+demo
+
+# Local Postgres scratch and editor noise.
+.DS_Store
+*.log

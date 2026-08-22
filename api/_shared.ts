@@ -102,3 +102,60 @@ export const DECISION_TYPES = [
   "infra",
   "process",
 ] as const;
+
+/*
+  The local bridge.
+
+  A loopback process on the developer's machine that shells out to the Claude Code CLI
+  under his own subscription. It is reachable from `vercel dev` and from the Tauri desktop
+  app, and it is NOT reachable from a deployed function.
+
+  That limitation is the point rather than a shortcoming. Anthropic's terms permit a person
+  to script the tool they pay for and prohibit routing other people's requests through
+  those credentials, so a bridge that the public demo could reach would be the prohibited
+  thing. The deployed demo therefore does not draft, and says so.
+*/
+export async function bridgeUrl(): Promise<string | null> {
+  const base = process.env["CLAUDE_BRIDGE_URL"];
+  if (!base) return null;
+  try {
+    /* A short probe: a dead bridge should cost a third of a second, not a timeout. */
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 300);
+    const response = await fetch(`${base}/health`, { signal: controller.signal });
+    clearTimeout(timer);
+    return response.ok ? base : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Where a piece of generated text came from.
+ *
+ * Travels with every response so the UI can label it. A reader must be able to tell a
+ * record drafted on somebody's laptop from one the deployed product produced, because
+ * those are different claims.
+ */
+export type InferenceSource = "local_bridge" | "local_model" | "anthropic_api" | "none";
+
+/*
+  The house rule bans em dashes in user-facing strings, and model output is user-facing.
+  Applied on the way out rather than only asked for in a prompt, because a prompt is a
+  request and this is a rule.
+*/
+export function stripEmDashes(text: string): string {
+  return text.replace(/—/g, ", ").replace(/–/g, "-");
+}
+
+/** The same, applied to every string in a parsed object, however deep. */
+export function stripEmDashesDeep<T>(value: T): T {
+  if (typeof value === "string") return stripEmDashes(value) as unknown as T;
+  if (Array.isArray(value)) return value.map(stripEmDashesDeep) as unknown as T;
+  if (value && typeof value === "object") {
+    const out: Record<string, unknown> = {};
+    for (const [k, v] of Object.entries(value)) out[k] = stripEmDashesDeep(v);
+    return out as T;
+  }
+  return value;
+}

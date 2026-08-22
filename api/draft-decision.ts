@@ -16,7 +16,10 @@
     A refusal arrives as HTTP 200 with stop_reason "refusal", not as an exception, so it
     has to be checked before reading content.
 */
-import { preflight, json, verifyCaller, rateLimit, DECISION_TYPES } from "./_shared.js";
+import {
+  preflight, json, verifyCaller, rateLimit, DECISION_TYPES,
+  bridgeUrl, stripEmDashesDeep,
+} from "./_shared.js";
 
 export function OPTIONS(request: Request): Response {
   return preflight(request);
@@ -60,22 +63,6 @@ export async function POST(request: Request): Promise<Response> {
     return json({ error: "rate limited" }, { status: 429, origin });
   }
 
-  const apiKey = process.env["ANTHROPIC_API_KEY"];
-  if (!apiKey) {
-    /*
-      Explicit and honest rather than a canned draft returned as if it were live. The UI
-      shows the difference, because presenting a fixture as model output is exactly the
-      blur this project refuses to make.
-    */
-    return json(
-      {
-        error: "drafting is not configured",
-        detail: "ANTHROPIC_API_KEY is not set on the server. The queue stays empty rather than filling with fixtures.",
-      },
-      { status: 503, origin },
-    );
-  }
-
   const { message, diff, paths } = (await request.json()) as {
     message?: string;
     diff?: string;
@@ -87,6 +74,49 @@ export async function POST(request: Request): Promise<Response> {
     `Files touched:\n${(paths ?? []).join("\n") || "(none)"}`,
     `Diff:\n${(diff ?? "").slice(0, 24_000)}`,
   ].join("\n\n");
+
+  /*
+    Bridge first, then a metered key, then an honest refusal. Never a fourth fallback that
+    substitutes a fixture: presenting canned text as model output is exactly the blur this
+    project refuses to make.
+  */
+  const bridge = await bridgeUrl();
+  if (bridge) {
+    const response = await fetch(`${bridge}/v1/draft`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ system: SYSTEM, schema: SCHEMA, prompt: user }),
+    });
+    if (!response.ok) {
+      return json(
+        { error: "the local bridge failed", detail: (await response.text()).slice(0, 300) },
+        { status: 502, origin },
+      );
+    }
+    const { record } = (await response.json()) as { record: object };
+    return json(
+      {
+        ...stripEmDashesDeep(record),
+        drafted_by: "model",
+        inference_source: "local_bridge" as const,
+      },
+      { origin },
+    );
+  }
+
+  const apiKey = process.env["ANTHROPIC_API_KEY"];
+  if (!apiKey) {
+    return json(
+      {
+        error: "drafting is not available here",
+        detail:
+          "No local bridge is running and no API key is set. Drafting runs on a bridge to " +
+          "the developer's own machine, which the hosted demo cannot reach by design.",
+        inference_source: "none" as const,
+      },
+      { status: 503, origin },
+    );
+  }
 
   const response = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
@@ -132,5 +162,12 @@ export async function POST(request: Request): Promise<Response> {
     return json({ error: "the draft was not valid JSON" }, { status: 502, origin });
   }
 
-  return json({ ...(parsed as object), drafted_by: "model" }, { origin });
+  return json(
+    {
+      ...stripEmDashesDeep(parsed as object),
+      drafted_by: "model",
+      inference_source: "anthropic_api" as const,
+    },
+    { origin },
+  );
 }

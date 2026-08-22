@@ -40,19 +40,30 @@
     "security": {
       "csp": {
         "default-src": "'self' customprotocol: asset:",
-        "connect-src": "ipc: http://ipc.localhost 'self' https://*.supabase.co wss://*.supabase.co https://*.vercel.app",
+        "connect-src": "ipc: http://ipc.localhost 'self' https://*.supabase.co wss://*.supabase.co https://*.vercel.app https://huggingface.co https://*.hf.co https://cdn-lfs.hf.co https://cdn-lfs-us-1.hf.co",
         "img-src": "'self' asset: http://asset.localhost blob: data:",
         "style-src": "'self' 'unsafe-inline'",
-        "font-src": "'self' asset: http://asset.localhost data:"
+        "font-src": "'self' asset: http://asset.localhost data:",
+        "script-src": "'self' 'wasm-unsafe-eval'",
+        "worker-src": "'self' blob:"
       }
     }
   },
   "bundle": {
     "active": true,
-    "targets": ["app", "dmg"],
-    "icon": ["icons/icon.png"],
+    "targets": [
+      "app",
+      "dmg"
+    ],
+    "icon": [
+      "icons/icon.png"
+    ],
     "macOS": {
-      "signingIdentity": "-"
+      "signingIdentity": "-",
+      "entitlements": null,
+      "infoPlist": {
+        "NSMicrophoneUsageDescription": "Continuity transcribes desk meetings on this machine so the reasoning behind a strategy is captured while it is still being said. The audio is processed locally and is never uploaded or stored."
+      }
     }
   }
 }

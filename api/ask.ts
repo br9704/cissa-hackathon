@@ -12,7 +12,9 @@
   so this is streaming text WITH citations and the drafting route is structured JSON
   WITHOUT them. Two different shapes by necessity rather than by preference.
 */
-import { preflight, json, verifyCaller, rateLimit } from "./_shared.js";
+import {
+  preflight, json, verifyCaller, rateLimit, bridgeUrl, stripEmDashes,
+} from "./_shared.js";
 
 export function OPTIONS(request: Request): Response {
   return preflight(request);
@@ -39,18 +41,6 @@ export async function POST(request: Request): Promise<Response> {
     return json({ error: "rate limited" }, { status: 429, origin });
   }
 
-  const apiKey = process.env["ANTHROPIC_API_KEY"];
-  if (!apiKey) {
-    return json(
-      {
-        error: "the remote ask route is not configured",
-        detail:
-          "ANTHROPIC_API_KEY is not set. The in-browser retrieval path does not need it and is the primary one.",
-      },
-      { status: 503, origin },
-    );
-  }
-
   const { question, passages } = (await request.json()) as {
     question?: string;
     passages?: Passage[];
@@ -70,6 +60,56 @@ export async function POST(request: Request): Promise<Response> {
         grounded: false,
       },
       { origin },
+    );
+  }
+
+  /*
+    Bridge first, with one capability lost and stated rather than hidden. The CLI has no
+    flag for document blocks with span-level citations, so a bridged answer reports which
+    passages the model SAYS it used rather than which spans the API attributed. The
+    response says which mode produced it so the UI can be precise about how strong the
+    citation is.
+  */
+  const bridge = await bridgeUrl();
+  if (bridge) {
+    const bridged = await fetch(`${bridge}/v1/ask`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ system: SYSTEM, question, passages }),
+    });
+    if (!bridged.ok) {
+      return json(
+        { error: "the local bridge failed", detail: (await bridged.text()).slice(0, 300) },
+        { status: 502, origin },
+      );
+    }
+    const result = (await bridged.json()) as {
+      answer: string;
+      citations: unknown[];
+      grounded: boolean;
+    };
+    return json(
+      {
+        ...result,
+        answer: stripEmDashes(result.answer),
+        citation_mode: "model_reported" as const,
+        inference_source: "local_bridge" as const,
+      },
+      { origin },
+    );
+  }
+
+  const apiKey = process.env["ANTHROPIC_API_KEY"];
+  if (!apiKey) {
+    return json(
+      {
+        error: "the remote ask route is not available here",
+        detail:
+          "No local bridge is running and no API key is set. The in-browser retrieval path " +
+          "needs neither and is the primary one.",
+        inference_source: "none" as const,
+      },
+      { status: 503, origin },
     );
   }
 
@@ -136,9 +176,13 @@ export async function POST(request: Request): Promise<Response> {
 
   return json(
     {
-      answer,
+      answer: stripEmDashes(answer),
       citations: [...used].map((i) => passages[i]).filter(Boolean),
       grounded: used.size > 0,
+      /* The API attributes citations to spans, which is a stronger claim than a model
+         listing what it thinks it used. */
+      citation_mode: "span_attributed" as const,
+      inference_source: "anthropic_api" as const,
     },
     { origin },
   );

@@ -50,3 +50,5 @@ ml/runs/*/train.log
 # frozen seed. The manifest IS committed, because it records what was captured and what
 # could not be.
 docs/beats/*.png
+.vercel
+.env*

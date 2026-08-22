@@ -12,7 +12,9 @@
   the model cannot find something to ground a question in, the honest move is to ask the
   open one rather than to invent a specific.
 */
-import { preflight, json, verifyCaller, rateLimit, corsHeaders } from "./_shared.js";
+import {
+  preflight, json, verifyCaller, rateLimit, corsHeaders, bridgeUrl,
+} from "./_shared.js";
 
 export function OPTIONS(request: Request): Response {
   return preflight(request);
@@ -42,14 +44,6 @@ export async function POST(request: Request): Promise<Response> {
     return json({ error: "rate limited" }, { status: 429, origin });
   }
 
-  const apiKey = process.env["ANTHROPIC_API_KEY"];
-  if (!apiKey) {
-    return json(
-      { error: "the debrief agent is not configured", detail: "ANTHROPIC_API_KEY is not set." },
-      { status: 503, origin },
-    );
-  }
-
   const { artifacts, history } = (await request.json()) as {
     artifacts?: { title: string; occurredAt: string; detail: string }[];
     history?: { role: "agent" | "human"; text: string }[];
@@ -69,6 +63,49 @@ export async function POST(request: Request): Promise<Response> {
       content: t.text,
     })),
   ];
+
+  /*
+    Bridge first. Its stream-json output is unwrapped into the same Anthropic-shaped SSE
+    this route already forwards, so the client parser needs no branch: it cannot tell
+    which produced the question, and does not need to.
+  */
+  const bridge = await bridgeUrl();
+  if (bridge) {
+    const bridged = await fetch(`${bridge}/v1/debrief`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ system: SYSTEM, messages }),
+    });
+    if (!bridged.ok || !bridged.body) {
+      return json(
+        { error: "the local bridge failed", detail: (await bridged.text()).slice(0, 300) },
+        { status: 502, origin },
+      );
+    }
+    return new Response(bridged.body, {
+      headers: {
+        "Content-Type": "text/event-stream; charset=utf-8",
+        "Cache-Control": "no-cache, no-transform",
+        Connection: "keep-alive",
+        "X-Inference-Source": "local_bridge",
+        ...corsHeaders(origin),
+      },
+    });
+  }
+
+  const apiKey = process.env["ANTHROPIC_API_KEY"];
+  if (!apiKey) {
+    return json(
+      {
+        error: "the debrief agent is not available here",
+        detail:
+          "No local bridge is running and no API key is set. The agent runs on a bridge " +
+          "to the developer's own machine, which the hosted demo cannot reach by design.",
+        inference_source: "none" as const,
+      },
+      { status: 503, origin },
+    );
+  }
 
   const upstream = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
@@ -104,6 +141,7 @@ export async function POST(request: Request): Promise<Response> {
       "Content-Type": "text/event-stream; charset=utf-8",
       "Cache-Control": "no-cache, no-transform",
       Connection: "keep-alive",
+      "X-Inference-Source": "anthropic_api",
       ...corsHeaders(origin),
     },
   });
