@@ -1,0 +1,211 @@
+/*
+  The meeting recorder.
+
+  The visual weight here is deliberate and not decorative. This feature records people
+  talking, so the state of the microphone must be unmissable from across a room, not a
+  subtle icon somebody has to look for. Everything else on this surface is quieter than
+  the indicator on purpose.
+*/
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-l);
+  background: var(--surface-solid);
+  padding: 18px 20px;
+}
+
+.wrap[data-live="true"] {
+  border-color: var(--accent-danger);
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.title { font-size: 15px; font-weight: 560; }
+.note { font-size: 13px; color: var(--text-tertiary); max-width: 68ch; }
+
+.spacer { flex: 1; }
+
+.record {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 16px;
+  border-radius: var(--radius-s);
+  border: 1px solid var(--border-medium);
+  background: var(--surface-solid);
+  font-size: 14px;
+  font-weight: 520;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.record:hover { border-color: var(--border-strong); }
+.record:disabled { opacity: 0.5; cursor: default; }
+
+.recording {
+  border-color: var(--accent-danger);
+  color: var(--accent-danger);
+}
+
+/* The indicator. Red, moving, and large enough to see from the back of a room. */
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: var(--accent-danger);
+  animation: pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dot { animation: none; }
+}
+
+.elapsed {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 14px;
+  color: var(--accent-danger);
+}
+
+/* A live level meter, so somebody can tell the difference between a quiet room and a
+   microphone that is not actually connected to anything. */
+.meter {
+  flex: 0 0 68px;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--surface-recessed);
+  overflow: hidden;
+}
+
+.meterFill {
+  height: 100%;
+  background: var(--accent-verified);
+  transform-origin: left;
+  transition: transform 90ms linear;
+}
+
+/* ---- the consent gate ---- */
+
+.consent {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px 18px;
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-m);
+  background: var(--surface-solid);
+}
+
+.consentTitle { font-size: 14px; font-weight: 560; }
+.consentBody { font-size: 13px; color: var(--text-secondary); max-width: 66ch; }
+
+.check {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 14px;
+  cursor: pointer;
+  color: var(--text);
+}
+
+.check input { margin-top: 3px; }
+
+/* ---- transcript ---- */
+
+.turns {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 300px;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-m);
+  background: var(--surface-recessed);
+  padding: 14px 16px;
+}
+
+.turn { display: flex; flex-direction: column; gap: 2px; }
+
+.speaker {
+  font-size: 11px;
+  font-weight: 560;
+  color: var(--text-tertiary);
+}
+
+.speech { font-size: 14px; line-height: 1.55; color: var(--text); max-width: 72ch; }
+
+/* Interim text is visibly provisional: it is going to be replaced, not appended to. */
+.interim { color: var(--text-tertiary); font-style: italic; }
+
+.progress {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.progressTrack {
+  height: 3px;
+  border-radius: 999px;
+  background: var(--surface-recessed);
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: var(--accent);
+  transition: width 200ms linear;
+}
+
+.failure {
+  padding: 12px 14px;
+  border: 1px solid var(--accent-danger);
+  border-radius: var(--radius-s);
+  font-size: 13px;
+  color: var(--accent-danger);
+  max-width: 72ch;
+}
+
+.actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+
+.file {
+  padding: 8px 15px;
+  border-radius: var(--radius-s);
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: var(--surface-solid);
+  font-size: 13px;
+  font-weight: 520;
+  cursor: pointer;
+}
+
+.file:disabled { opacity: 0.5; cursor: default; }
+
+.discard {
+  padding: 8px 14px;
+  border-radius: var(--radius-s);
+  border: 1px solid var(--border-medium);
+  background: var(--surface-solid);
+  font-size: 13px;
+  cursor: pointer;
+  color: var(--text);
+}
+
+.doctrine {
+  border-top: 1px solid var(--border-subtle);
+  padding-top: 10px;
+  font-size: 12px;
+  color: var(--text-tertiary);
+  max-width: 78ch;
+}

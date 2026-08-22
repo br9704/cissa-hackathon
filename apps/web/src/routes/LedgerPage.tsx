@@ -4,6 +4,7 @@ import styles from "./LedgerPage.module.css";
 import { LedgerRail } from "../components/LedgerRail";
 import { DecisionCard } from "../components/DecisionCard";
 import { TranscriptImporter } from "../components/TranscriptImporter";
+import { Recorder } from "../components/Recorder";
 import { TaggerBadge } from "../components/TaggerBadge";
 import { PageHeader } from "../components/PageHeader";
 import { Section } from "../components/Section";
@@ -152,10 +153,11 @@ export function LedgerPage() {
         title="How records get here"
         lead={
           "Nobody types these in. A commit that touches strategy code files one by itself, a " +
-          "meeting transcript can be dropped in, and the category on each record is applied by " +
-          "a model running on this machine."
+          "meeting can be recorded and transcribed here without the audio leaving this tab, " +
+          "and the category on each record is applied by a model running on this machine."
         }
       >
+        <Recorder />
         <TranscriptImporter />
         <TaggerBadge />
       </Section>
