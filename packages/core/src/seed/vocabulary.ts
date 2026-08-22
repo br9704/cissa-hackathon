@@ -64,9 +64,11 @@ export const STRATEGIES = [
     status: "live",
     description:
       "Systematic short volatility in NIFTY weekly options, sized against realised vol and an expiry day liquidity filter.",
-    /* Daniel's. This concentration is the demo. */
+    /* Daniel's, and heavily so. This concentration IS the demo: the departure
+       simulation has nothing to show unless someone genuinely holds a book alone. */
     primary: "daniel" as PersonaKey,
     secondary: ["marcus"] as PersonaKey[],
+    dominance: 0.88,
   },
   {
     key: "expiry_effects",
@@ -76,6 +78,7 @@ export const STRATEGIES = [
       "Intraday positioning around index expiry, with position caps that tighten inside the final session.",
     primary: "daniel" as PersonaKey,
     secondary: ["priya"] as PersonaKey[],
+    dominance: 0.84,
   },
   {
     key: "vol_filter",
@@ -83,8 +86,11 @@ export const STRATEGIES = [
     status: "live",
     description:
       "A regime filter on realised versus implied vol that gates entry for the other books.",
+    /* Healthy by comparison. The contrast is the point: a desk where every book looks
+       like the India book has no story, it just has a policy problem. */
     primary: "priya" as PersonaKey,
     secondary: ["tom", "daniel"] as PersonaKey[],
+    dominance: 0.5,
   },
   {
     key: "basis_roll",
@@ -94,6 +100,7 @@ export const STRATEGIES = [
       "Calendar roll timing on index futures, currently in paper while the borrow assumptions are checked.",
     primary: "marcus" as PersonaKey,
     secondary: ["priya", "tom"] as PersonaKey[],
+    dominance: 0.45,
   },
 ] as const;
 

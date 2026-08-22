@@ -62,11 +62,21 @@ MARCUS (calm): Okay. Show me what walks out the door.
 
 SCREEN: Risk board. THE MONEY SHOT: departure simulation. Daniel selected; the
 genealogy graph desaturates; his decisions re-ink in amber, radiating outward across
-two strategies; the orphaned-decisions list fills; vacation-readiness was already
-amber at 61.
+two strategies; the orphaned-decisions list fills; vacation-readiness on the India
+book was already amber at 50.
 
-MARCUS: Two strategies, forty-one decisions only he can explain. Last month this
+MARCUS: Two strategies, fifty-three decisions only he can explain. Last month this
 number was a guess. Now it is a work order.
+
+  NUMBERS NOTE (added 22 Aug 2026, honest-claims rule D9). The figures in this scene
+  are MEASURED against the frozen video seed, not chosen for the script. As of seed
+  20260822: Daniel is top holder on two strategies, both at bus factor 1; the
+  departure simulation orphans 53 decisions, 29 on India options carry and 24 on
+  Expiry window effects; vacation readiness reads 50 on India options carry and 0 on
+  Expiry window effects. The healthy books sit at bus factor 2 for contrast.
+  If the seed changes, re-run `pnpm --filter @continuity/core seed` and read the new
+  numbers off the risk board BEFORE the take. Do not say a number the screen does not
+  show.
 
 ## Scene 3 (1:40-2:20): the exit debrief and the handover
 

@@ -128,7 +128,7 @@ export function generate(seed: number = DEFAULT_SEED): Corpus {
   */
   function authorFor(strategyKey: string): PersonaKey {
     const spec = STRATEGIES.find((s) => s.key === strategyKey)!;
-    if (rng.chance(0.72)) return spec.primary;
+    if (rng.chance(spec.dominance)) return spec.primary;
     return rng.pick(spec.secondary.length ? spec.secondary : [spec.primary]);
   }
 
@@ -187,7 +187,13 @@ export function generate(seed: number = DEFAULT_SEED): Corpus {
   const byStrategy = new Map<string, Decision[]>(strategies.map((s) => [s.id, []]));
 
   for (let i = 0; i < DECISION_COUNT; i++) {
-    const spec = rng.pick(STRATEGIES);
+    /* Weighted toward the live books. A paper strategy with as much recorded history as
+       a live one does not look like a real desk. */
+    const spec = rng.pick([
+      ...STRATEGIES.filter((s) => s.status === "live"),
+      ...STRATEGIES.filter((s) => s.status === "live"),
+      ...STRATEGIES,
+    ]);
     const strategy = strategyByKey.get(spec.key)!;
     const authorKey = authorFor(spec.key);
     const author = member(authorKey);
