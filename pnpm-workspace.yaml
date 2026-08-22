@@ -11,6 +11,12 @@ linkWorkspacePackages: true
 # install. Write the new key from day one.
 allowBuilds:
   esbuild: true
+  # transformers.js pulls these. Only onnxruntime-web is actually used in the browser,
+  # but the package installs the Node backend and sharp alongside it, and an unapproved
+  # build script is fatal on a clean checkout rather than a warning.
+  onnxruntime-node: true
+  protobufjs: true
+  sharp: true
 
 # pnpm re-runs install before every script. On a clean CI checkout that re-install can
 # re-raise an already-resolved error and kill the script. The install step is explicit.

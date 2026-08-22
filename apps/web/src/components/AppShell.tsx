@@ -1,5 +1,7 @@
+import { useEffect, useState } from "react";
 import { Link, Outlet, useRouterState } from "@tanstack/react-router";
 import styles from "./AppShell.module.css";
+import { AskBar } from "./AskBar";
 import {
   LedgerIcon,
   StrategyIcon,
@@ -20,6 +22,24 @@ const NAV = [
 
 export function AppShell() {
   const path = useRouterState({ select: (s) => s.location.pathname });
+  const [askOpen, setAskOpen] = useState(false);
+
+  /*
+    Cmd+K opens the palette from anywhere. Bound on the window rather than on a focused
+    element, because keyboard first means it works wherever the cursor happens to be, and
+    a shortcut that only fires when nothing is focused is a shortcut people stop reaching
+    for.
+  */
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key.toLowerCase() === "k" && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        setAskOpen((v) => !v);
+      }
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
 
   return (
     <div className={styles.shell}>
@@ -51,7 +71,11 @@ export function AppShell() {
       <div className={styles.main}>
         <header className={`${styles.topbar} glass`}>
           <span className={styles.firm}>Meridian Basis Partners</span>
-          <button className={styles.askTrigger} type="button">
+          <button
+            className={styles.askTrigger}
+            type="button"
+            onClick={() => setAskOpen(true)}
+          >
             <span>Ask the ledger</span>
             <kbd className={styles.kbd}>Cmd K</kbd>
           </button>
@@ -71,6 +95,8 @@ export function AppShell() {
           All data in this demo is synthetic. No real firm data is present.
         </footer>
       </div>
+
+      <AskBar open={askOpen} onClose={() => setAskOpen(false)} />
     </div>
   );
 }

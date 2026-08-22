@@ -99,6 +99,30 @@ const SCENES: {
     },
   },
   {
+    name: "ask-bar",
+    path: "/",
+    act: async (page) => {
+      await page.keyboard.press("Meta+k");
+      await page.locator('[role="dialog"] input').waitFor();
+      await page.locator('[role="dialog"] input').fill("why is the expiry window capped");
+      /* First run downloads the model and embeds the corpus, so this needs real headroom
+         rather than a token wait. */
+      await page.getByText(/passages? from the ledger/).waitFor({ timeout: 180_000 });
+      await page.waitForTimeout(400);
+    },
+  },
+  {
+    name: "ask-bar-no-answer",
+    path: "/",
+    act: async (page) => {
+      await page.keyboard.press("Meta+k");
+      await page.locator('[role="dialog"] input').waitFor();
+      await page.locator('[role="dialog"] input').fill("what is the capital of france");
+      await page.getByText(/Nothing in the corpus/).waitFor({ timeout: 180_000 });
+      await page.waitForTimeout(400);
+    },
+  },
+  {
     name: "verify-clean",
     path: "/verify",
     act: async (page) => {
