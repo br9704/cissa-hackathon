@@ -18,6 +18,7 @@ export {
   type DecisionType, type PersonaKey,
 } from "./seed/vocabulary.js";
 export * from "./scoring.js";
+export { handoverPack, rts6ChangeLog, sr117Documentation, type PackInput } from "./packs.js";
 export {
   canonicalJsonb, canonicalText, sha256Hex, eventHash, verifyChain,
   type ChainInput, type VerifiedRow,

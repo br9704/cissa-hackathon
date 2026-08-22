@@ -99,6 +99,15 @@ const SCENES: {
     },
   },
   {
+    name: "compliance-checkpoint",
+    path: "/compliance",
+    act: async (page) => {
+      await page.getByRole("button", { name: /^Export$/ }).click();
+      await page.getByLabel("Reason for export").fill("FCA thematic review, sample of five");
+      await page.waitForTimeout(400);
+    },
+  },
+  {
     name: "ask-the-departed",
     path: "/debriefs",
     act: async (page) => {

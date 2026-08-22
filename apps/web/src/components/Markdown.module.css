@@ -1,0 +1,90 @@
+/*
+  The print voice.
+
+  Screens are Geist; documents are the dossier style. A generated pack is a document, so
+  it reads in a serif with hairline tables and generous leading, and it prints the same
+  way it looks on screen.
+*/
+.doc {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--text);
+  max-width: 72ch;
+}
+
+.doc h1 {
+  font-family: var(--font-sans);
+  font-size: 23px;
+  letter-spacing: -0.015em;
+  margin: 0 0 6px;
+}
+
+.doc h2 {
+  font-family: var(--font-sans);
+  font-size: 17px;
+  margin: 26px 0 8px;
+}
+
+.doc h3 {
+  font-family: var(--font-sans);
+  font-size: 14px;
+  margin: 18px 0 4px;
+}
+
+.doc p { margin: 0 0 12px; max-width: 72ch; }
+
+.doc ul { margin: 0 0 14px; padding-left: 20px; }
+.doc li { margin-bottom: 4px; }
+
+.doc blockquote {
+  margin: 0 0 14px;
+  padding-left: 16px;
+  border-left: 2px solid var(--border-strong);
+  color: var(--text-secondary);
+}
+
+.doc hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 24px 0;
+}
+
+.doc table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0 0 16px;
+  font-family: var(--font-sans);
+  font-size: 13px;
+}
+
+.doc th {
+  text-align: left;
+  font-weight: 560;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-medium);
+  padding: 6px 10px 6px 0;
+}
+
+.doc td {
+  border-bottom: 1px solid var(--border-subtle);
+  padding: 6px 10px 6px 0;
+  vertical-align: top;
+}
+
+.doc code {
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+.doc strong { font-weight: 600; }
+
+/*
+  Print. Chrome disappears, the field goes plain white, and nothing carries a blur:
+  a backdrop filter in print produces a grey box on paper.
+*/
+@media print {
+  .doc { max-width: none; font-size: 11pt; }
+  .doc h2, .doc h3 { break-after: avoid; }
+  .doc table, .doc blockquote { break-inside: avoid; }
+}

@@ -275,19 +275,36 @@ The arc is the meal; this list is garnish. The build model may not reorder it.
 
 ## S5 — Knowledge risk and handover (budget 4h)
 
-- [ ] Scoring in `packages/core`: bus factor (adapted truck-factor over decision+artifact
+- [x] Scoring in `packages/core`: bus factor (adapted truck-factor over decision+artifact
       authorship), concentration (Herfindahl), vacation-readiness (can the desk answer
       open questions with the member masked); nightly + on-demand materialization.
-- [ ] Risk board: RiskDial, HeatStrip, departure simulation (design.md §3.3 animation,
+- [x] Risk board: RiskDial, HeatStrip, departure simulation (design.md §3.3 animation,
       orphaned-decisions list) upgraded per D14 hero 3: seed carries synthetic
       attributed-revenue per strategy (labelled "synthetic" wherever displayed); the
       simulation lands a counting-up dollar exposure figure ("$412M of attributed
       revenue, no second owner").
-- [ ] Handover pack generator (SYSC 25.9-shaped, prd §4.4), PackPreview print-styled,
-      export to md + pdf.
+- [x] Handover pack generator (SYSC 25.9-shaped, prd §4.4), PackPreview print-styled,
+      export to md + pdf. Plus the two compliance extracts, which the plan put in S3:
+      an RTS 6 Art. 5(7) change log and SR 11-7 shaped model documentation. All three
+      are pure functions from rows to markdown, so the same corpus always produces the
+      same document and a pack hash is worth storing. 13 tests.
 - **Acceptance:** demo arc step 3-4 runs scripted end to end; Daniel's pack generates
   with real corpus content; scores recompute live after his exit debrief adds answers.
-- **Sprint log:**
+- **Sprint log:** Logged: 2026-08-22T19:41+10:00 · status: partial · actual: ~2.2h (budget 3h) ·
+  by: Claude Opus 5 (Claude Code) · note: scoring, risk board, all three generated
+  documents, the export checkpoint and the access log. The documents render in the print
+  serif voice with a print stylesheet, so what is on screen is what comes out of the
+  printer. NOT done: nightly materialization of knowledge_scores (computed on demand
+  instead, which is correct for a demo and would not be at scale) and the PDF export from
+  the desktop shell, which honestly refuses and points at the web app, because
+  window.print in the macOS webview produces a blank PDF.
+
+  One bug worth recording because the fix is not obvious from the symptom: the access log
+  is read through useSyncExternalStore, and its getSnapshot returned a freshly built
+  array every call. React compares snapshots by identity, so the page re-rendered forever
+  and died with "Maximum update depth exceeded" and a stack pointing at React. The
+  snapshot is now cached and replaced only on a write, and access.test.ts asserts the
+  identity property directly.
 
 ## S6 — The on-prem tagger (parallel, owner's machine, budget 4h wall-clock)
 

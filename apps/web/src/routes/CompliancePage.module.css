@@ -1,0 +1,139 @@
+.page { display: flex; flex-direction: column; gap: 24px; }
+
+.pane {
+  background: var(--surface-solid);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-l);
+  box-shadow: var(--shadow-pane);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.title { font-size: 17px; }
+.note { font-size: 13px; color: var(--text-tertiary); max-width: 68ch; }
+
+.picker { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.tab {
+  padding: 7px 14px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface-solid);
+  font-size: 13px;
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.tab:hover { border-color: var(--border-medium); color: var(--text); }
+
+.tab[data-active="true"] {
+  border-color: var(--accent);
+  color: var(--text);
+  font-weight: 540;
+}
+
+.subjectRow { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.subjectLabel { font-size: 12px; color: var(--text-tertiary); }
+
+.docWrap {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-m);
+  background: var(--surface-solid);
+  padding: 32px 36px;
+  max-height: 620px;
+  overflow-y: auto;
+}
+
+.actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+
+.button {
+  padding: 9px 16px;
+  border-radius: var(--radius-s);
+  border: 1px solid var(--border-medium);
+  background: var(--surface-solid);
+  font-size: 13px;
+  font-weight: 520;
+  cursor: pointer;
+  color: var(--text);
+}
+
+.button:hover { border-color: var(--border-strong); }
+
+.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--surface-solid);
+}
+
+/* ---- the checkpoint ---- */
+
+.checkpoint {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 18px 20px;
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-m);
+  background: var(--surface-solid);
+}
+
+.checkpointTitle { font-size: 15px; font-weight: 560; }
+
+.checkpointBody { font-size: 13px; color: var(--text-secondary); max-width: 64ch; }
+
+.checkpointInput {
+  padding: 10px 14px;
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-s);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  color: var(--text);
+  background: var(--surface-solid);
+}
+
+.checkpointInput:focus { outline: none; border-color: var(--accent); }
+
+/* ---- access log ---- */
+
+.accessRow {
+  display: grid;
+  grid-template-columns: 92px 1fr auto;
+  gap: 14px;
+  align-items: baseline;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border-subtle);
+  font-size: 13px;
+}
+
+.accessRow:last-child { border-bottom: none; }
+
+.accessWhen {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+
+.accessWhat { color: var(--text-secondary); }
+.accessWhy { font-size: 12px; color: var(--text-tertiary); font-style: italic; }
+
+.empty {
+  font-size: 13px;
+  color: var(--text-tertiary);
+  padding: 14px 0;
+}
+
+@media print {
+  .pane { border: none; box-shadow: none; padding: 0; }
+  .picker, .actions, .subjectRow, .head, .note, .checkpoint { display: none; }
+  .docWrap { border: none; padding: 0; max-height: none; overflow: visible; }
+}
