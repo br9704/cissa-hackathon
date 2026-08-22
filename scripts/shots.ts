@@ -162,6 +162,18 @@ const SCENES: {
     },
   },
   {
+    name: "promote-answer",
+    path: "/debriefs",
+    viewportOnly: true,
+    act: async (page) => {
+      const promote = page.getByRole("button", { name: "promote to a decision" }).first();
+      await promote.scrollIntoViewIfNeeded();
+      await promote.click();
+      await page.getByText("File this answer as a decision").waitFor();
+      await page.waitForTimeout(400);
+    },
+  },
+  {
     name: "compliance-checkpoint",
     path: "/compliance",
     act: async (page) => {

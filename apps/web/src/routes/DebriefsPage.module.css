@@ -208,3 +208,83 @@
   color: var(--text-tertiary);
   background: var(--surface-solid);
 }
+
+/* ---- promote an answer to a decision ---- */
+
+.turnRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.promote {
+  flex: 0 0 auto;
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface-solid);
+  font-size: 11px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.promote:hover { border-color: var(--accent); color: var(--accent); }
+
+.promoted {
+  border-color: var(--accent-verified);
+  color: var(--accent-verified);
+  cursor: default;
+}
+
+.promoteForm {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 8px;
+  padding: 14px 16px;
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-m);
+  background: var(--surface-solid);
+}
+
+.promoteTitle { font-size: 14px; font-weight: 560; }
+
+.promoteBody { font-size: 12px; color: var(--text-secondary); max-width: 64ch; }
+
+.promoteInput {
+  padding: 9px 12px;
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-s);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  color: var(--text);
+  background: var(--surface-solid);
+}
+
+.promoteInput:focus { outline: none; border-color: var(--accent); }
+
+.promoteActions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+
+.promoteButton {
+  padding: 7px 14px;
+  border-radius: var(--radius-s);
+  border: 1px solid var(--accent);
+  background: var(--accent);
+  color: var(--surface-solid);
+  font-size: 13px;
+  font-weight: 520;
+  cursor: pointer;
+}
+
+.promoteButton:disabled { opacity: 0.5; cursor: default; }
+
+.promoteCancel {
+  padding: 7px 14px;
+  border-radius: var(--radius-s);
+  border: 1px solid var(--border-medium);
+  background: var(--surface-solid);
+  font-size: 13px;
+  cursor: pointer;
+  color: var(--text);
+}

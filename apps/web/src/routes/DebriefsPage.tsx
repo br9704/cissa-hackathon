@@ -1,9 +1,10 @@
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "motion/react";
 import styles from "./DebriefsPage.module.css";
 import { StatusChip } from "../components/StatusChip";
 import { corpus, memberInitials, memberName, strategyName } from "../data/source";
 import { recall, type Recall } from "../search/recall";
+import { promoteAnswer, promotedTurns, subscribeToPromotions } from "../data/promote";
 
 const SUGGESTIONS = [
   "why is the expiry window capped",
@@ -23,6 +24,11 @@ const TRIGGER_LABEL: Record<string, string> = {
 export function DebriefsPage() {
   const c = corpus();
   const reduced = useReducedMotion();
+
+  /* Which answer is being promoted, and what has already been. */
+  const [promoting, setPromoting] = useState<{ sessionId: string; seq: number } | null>(null);
+  const [promoteTitle, setPromoteTitle] = useState("");
+  const promoted = useSyncExternalStore(subscribeToPromotions, promotedTurns, promotedTurns);
 
   /* The person the demo turns on. If nobody has resigned this pane hides itself rather
      than inventing a departure. */
@@ -210,7 +216,83 @@ export function DebriefsPage() {
                           ) : null}
                         </>
                       ) : (
-                        <span className={styles.turnHuman}>{t.text}</span>
+                        <>
+                          <span className={styles.turnRow}>
+                            <span className={styles.turnHuman}>{t.text}</span>
+                            {/*
+                              Promoting an answer is the step that turns a conversation
+                              into a record. It is a button rather than something the
+                              agent does on its own, for the same reason approving a draft
+                              is: the machine can propose that a sentence matters, and a
+                              person decides whether it does.
+                            */}
+                            <button
+                              type="button"
+                              className={`${styles.promote} ${
+                                promoted.has(`${t.sessionId}:${t.seq}`) ? styles.promoted : ""
+                              }`}
+                              disabled={promoted.has(`${t.sessionId}:${t.seq}`)}
+                              onClick={() => {
+                                setPromoting({ sessionId: t.sessionId, seq: t.seq });
+                                setPromoteTitle(
+                                  t.text.split(/(?<=[.!?])\s/)[0]?.slice(0, 80) ?? "",
+                                );
+                              }}
+                            >
+                              {promoted.has(`${t.sessionId}:${t.seq}`)
+                                ? "filed as a decision"
+                                : "promote to a decision"}
+                            </button>
+                          </span>
+
+                          {promoting?.sessionId === t.sessionId && promoting.seq === t.seq ? (
+                            <div className={styles.promoteForm}>
+                              <span className={styles.promoteTitle}>
+                                File this answer as a decision
+                              </span>
+                              <p className={styles.promoteBody}>
+                                It will appear in the ledger as drafted by a model and
+                                awaiting approval, with this debrief turn as its source. The
+                                answer itself is not edited: the reasoning is what was said,
+                                and only the title is written here.
+                              </p>
+                              <input
+                                className={styles.promoteInput}
+                                value={promoteTitle}
+                                onChange={(e) => setPromoteTitle(e.target.value)}
+                                aria-label="Title for the promoted decision"
+                                autoFocus
+                              />
+                              <div className={styles.promoteActions}>
+                                <button
+                                  type="button"
+                                  className={styles.promoteButton}
+                                  disabled={promoteTitle.trim().length < 6}
+                                  onClick={() => {
+                                    promoteAnswer({
+                                      sessionId: t.sessionId,
+                                      seq: t.seq,
+                                      title: promoteTitle.trim(),
+                                      why: t.text,
+                                      strategyId: session.strategyId,
+                                      authorMemberId: session.memberId,
+                                    });
+                                    setPromoting(null);
+                                  }}
+                                >
+                                  File it
+                                </button>
+                                <button
+                                  type="button"
+                                  className={styles.promoteCancel}
+                                  onClick={() => setPromoting(null)}
+                                >
+                                  Cancel
+                                </button>
+                              </div>
+                            </div>
+                          ) : null}
+                        </>
                       )}
                     </div>
                   ))}

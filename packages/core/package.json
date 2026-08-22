@@ -8,7 +8,8 @@
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "seed": "tsx src/seed/run.ts",
-    "anchor": "tsx src/anchor.ts"
+    "anchor": "tsx src/anchor.ts",
+    "materialize": "tsx src/materialize.ts"
   },
   "devDependencies": {
     "@types/node": "^26.2.0",
