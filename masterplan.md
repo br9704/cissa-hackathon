@@ -390,16 +390,24 @@ The arc is the meal; this list is garnish. The build model may not reorder it.
 
 ## S10 — README and documentation (budget 2h)
 
-- [ ] README.md: one-sentence what/why, demo URL + login
+- [x] README.md: one-sentence what/why, demo URL + login
       hint, screenshot gallery, architecture mermaid, ERD mermaid, capture-flow sequence
       mermaid, the research section (numbers + citations from the dossier), tagger
       results table (D9-compliant), honest limitations, install/run, team. Professional,
       comprehensive, **no em dashes** (D8).
-- [ ] `docs/`: dossier PDF committed; METHODOLOGY-style note for the tagger; this
+- [x] `docs/`: dossier PDF committed; METHODOLOGY-style note for the tagger; this
       masterplan + prd + design linked from README.
 - **Acceptance:** README renders clean on GitHub (check raw + rendered); every number
   traceable; mermaid diagrams render.
-- **Sprint log:**
+- **Sprint log:** Logged: 2026-08-22T19:58+10:00 · status: done · actual: ~0.8h (budget 1h) ·
+  by: Claude Opus 5 (Claude Code) · note: README with 10 screenshots taken from the real
+  app, four mermaid diagrams (architecture, deployment, ERD, capture sequence), the
+  research table with dossier citation codes, the ledger described in SQL with the
+  measured claim about which layer survives a trigger bypass, and a limitations section
+  with eleven entries. No accuracy figure appears anywhere because the tagger is not
+  trained: the README says so and explicitly declines to borrow the prior project's
+  number. Zero em dashes, verified by script. Every image path and relative link checked
+  to exist.
 
 ## S11 — Video and submission (budget 2.5h + human filming)
 
