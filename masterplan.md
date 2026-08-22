@@ -360,7 +360,7 @@ The arc is the meal; this list is garnish. The build model may not reorder it.
   and the same split: 0.6155. Both in ml/results/summary.json with adapter and data
   hashes, and that file is committed because it is what D9 points at.
 
-  The 38.5 point gap is the reportable number, not the 1.0. A perfect score is equally
+  The 38 point gap is the reportable number, not the 1.0. A perfect score is equally
   consistent with a good model and a trivial benchmark, and the few-shot arm is the only
   thing that tells them apart. The corpus is template generated and the held-out split
   comes from the same generator, so the 1.0 measures template learning and cannot measure

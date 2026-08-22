@@ -15,8 +15,12 @@
     "isolatedModules": true,
     "verbatimModuleSyntax": true,
     "resolveJsonModule": true,
+    /* The tagger results file lives outside src on purpose: it is produced by the ML
+       pipeline and imported rather than copied, so the number in the UI cannot drift from
+       the run that produced it. */
+    "allowJs": true,
     "noEmit": true,
     "types": ["vite/client", "vitest/globals"]
   },
-  "include": ["src", "vite.config.ts"]
+  "include": ["src", "vite.config.ts", "../../ml/results/summary.json"]
 }

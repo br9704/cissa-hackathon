@@ -125,21 +125,70 @@ describe("canonical jsonb matches Postgres", () => {
     expect(ours).toBe(rows[0]!.hash);
   });
 
-  it("recomputes every hash in a seeded ledger", async () => {
+  it("recomputes every hash in a chain the database built", async () => {
     if (!client) return;
+
+    /*
+      This test owns its own firm, and both halves of that are load bearing.
+
+      It seeds rather than depending on a previous command: the first version required
+      `pnpm seed` to have run, so it passed or failed based on what somebody happened to
+      do last, and running the SQL suites first left the database rebuilt and empty.
+
+      And it scopes to one firm rather than reading the whole table. A chain is per firm,
+      so walking every row in id order mixes two independent chains together and the
+      predecessor is wrong from the second firm's first row onwards. The SQL suite also
+      deliberately tampers with a row, which this would otherwise pick up and report as a
+      failure of the TypeScript implementation.
+    */
+    const FIRM = "33333333-3333-3333-3333-333333333333";
+
+    await client.query("insert into firms (id, name) values ($1, $2) on conflict do nothing", [
+      FIRM,
+      "Canonical Test Firm",
+    ]);
+
+    const { rows: already } = await client.query<{ n: string }>(
+      "select count(*)::text as n from events where firm_id = $1",
+      [FIRM],
+    );
+
+    if (already[0]!.n === "0") {
+      for (let i = 0; i < 12; i++) {
+        await client.query("insert into events (firm_id, kind, payload) values ($1, $2, $3)", [
+          FIRM,
+          i % 3 === 0 ? "decision_approved" : "access_read",
+          /* Awkward on purpose: keys that sort by length before bytes, a nested object,
+             an escaped quote and a backslash, a unicode string, and a decimal. */
+          JSON.stringify({
+            z: i,
+            aa: [i, i + 1],
+            title: `Row ${i} with a quote " and a backslash \\`,
+            nested: { deep: i % 2 === 0, note: "caf\u00e9" },
+            ratio: 0.65,
+          }),
+        ]);
+      }
+    }
+
     const { rows } = await client.query<{
-      firm_id: string; kind: string; payload: unknown;
-      actor_member_id: string | null; epoch: string;
-      prev_hash: string | null; this_hash: string;
+      firm_id: string;
+      kind: string;
+      payload: unknown;
+      actor_member_id: string | null;
+      epoch: string;
+      prev_hash: string | null;
+      this_hash: string;
     }>(
       `select firm_id, kind, payload, actor_member_id,
               extract(epoch from occurred_at)::text as epoch,
               prev_hash, this_hash
-       from events order by id limit 60`,
+       from events where firm_id = $1 order by id`,
+      [FIRM],
     );
-    /* The whole point: a seeded database that the browser can check row by row without
-       asking the database whether it is right. */
-    expect(rows.length, "no seeded events. Run the seed first.").toBeGreaterThan(0);
+
+    expect(rows.length).toBeGreaterThan(10);
+
     let prev: string | null = null;
     for (const r of rows) {
       const computed = await eventHash(prev, {
@@ -149,7 +198,10 @@ describe("canonical jsonb matches Postgres", () => {
         occurredAtEpoch: r.epoch,
         payload: r.payload,
       });
-      expect(computed, `event with kind ${r.kind}`).toBe(r.this_hash);
+      /* The stored predecessor and the one we walked past must agree, or the two
+         implementations disagree about ordering rather than about hashing. */
+      expect(r.prev_hash).toBe(prev);
+      expect(computed, `event kind ${r.kind}`).toBe(r.this_hash);
       prev = r.this_hash;
     }
   });

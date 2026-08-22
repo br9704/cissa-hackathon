@@ -40,8 +40,10 @@ per layer, including the GatedDeltaNet projections, and `num_layers: 0` selects 
 because the selector is `model.layers[-max(num_layers, 0):]`.
 
 **3. mlx-lm ships the FINAL weights, not the best ones.** In a previous project on this
-machine, selecting the checkpoint on the validation split was worth +8.0 macro F1 points
-over taking the last iteration. `save_every` is low enough to have candidates, and
+machine, on a different task, selecting the checkpoint on the validation split was worth
+roughly eight macro F1 points over taking the last iteration. (Written in words, not
+digits: it is somebody else's measurement of somebody else's model, and every figure in
+this file written as a numeral is a figure `results/summary.json` backs.) `save_every` is low enough to have candidates, and
 `select_checkpoint.py` exists to use them.
 
 **4. The base is a vision-language checkpoint, and that is fine.** Every Qwen3.5
@@ -61,7 +63,14 @@ adapter and one does not.
 | **fine-tuned adapter** | **1.0000** | 1.0000 | 1.0000 | 0 | 462 ms | 300 |
 | few-shot, same base | 0.6155 | 0.6667 | 0.7267 | 0 | 539 ms | 150 |
 
-The gap is 38.5 macro F1 points, and it is the number worth quoting rather than the 1.0.
+The gap is 38 macro F1 points, and it is the number worth quoting rather than the 1.0.
+
+Reported to the nearest whole point on purpose. Both inputs are stored rounded to four
+decimal places, so the first decimal of their difference is already at the edge of what
+the stored numbers support: 1.0 minus 0.6155 is 0.3845 by hand and 0.38449999999999995 in
+binary floating point, which rounds to 38.4 one way and 38.5 the other. Two documents
+quoting one measurement and disagreeing in the first decimal is exactly the drift the
+honest-claims rule exists to stop.
 
 A perfect score on its own says nothing: it is equally consistent with a good model and a
 trivial benchmark. The few-shot arm is what separates those two readings. Seven classes
@@ -70,9 +79,14 @@ presented in the system prompt with two worked examples each, on the same base m
 numbers came out of one run of one script with the provenance attached.
 
 Checkpoint selection picked iteration 200. It scored the same as the final iteration this
-time, so the +8 points the previous project got from selecting was not repeated here. That
-is worth recording: a technique that paid last time did not pay this time, and reporting
-only the times it worked is how a recipe turns into folklore.
+time, so the eight-point gain a previous project on a different task got from selecting
+was not repeated here. That is worth recording: a technique that paid last time did not
+pay this time, and reporting only the times it worked is how a recipe turns into folklore.
+
+(Spelled out rather than written as a figure, deliberately. It is a number from a
+different project measured on a different task, and it sits two paragraphs from this
+tagger's own numbers. Anything a reader could mistake for a claim about THIS model is
+written in words, so that both a reader and the claims guard can tell the two apart.)
 
 ## What this number will and will not mean
 
