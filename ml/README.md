@@ -50,10 +50,35 @@ tower on load. Do not "simplify" the repo id to `mlx-community/Qwen3.5-2B-bf16` 
 the `-MLX-` infix: identical weights, but converted from the base model rather than the
 instruct model, which is a materially worse starting point for a strict-JSON classifier.
 
+## The result
+
+Measured 22 Aug 2026. Both arms use the same base model at the same pinned revision, the
+same prompt contract, the same strict parser, and the same held out split. One has the
+adapter and one does not.
+
+| arm | macro F1 | accuracy | risk accuracy | unparseable | p50 latency | rows |
+| --- | --- | --- | --- | --- | --- | --- |
+| **fine-tuned adapter** | **1.0000** | 1.0000 | 1.0000 | 0 | 462 ms | 300 |
+| few-shot, same base | 0.6155 | 0.6667 | 0.7267 | 0 | 539 ms | 150 |
+
+The gap is 38.5 macro F1 points, and it is the number worth quoting rather than the 1.0.
+
+A perfect score on its own says nothing: it is equally consistent with a good model and a
+trivial benchmark. The few-shot arm is what separates those two readings. Seven classes
+presented in the system prompt with two worked examples each, on the same base model, gets
+0.62. So the task is not solvable by prompting, the adapter is doing real work, and both
+numbers came out of one run of one script with the provenance attached.
+
+Checkpoint selection picked iteration 200. It scored the same as the final iteration this
+time, so the +8 points the previous project got from selecting was not repeated here. That
+is worth recording: a technique that paid last time did not pay this time, and reporting
+only the times it worked is how a recipe turns into folklore.
+
 ## What this number will and will not mean
 
-Training loss reached 0.02 by iteration 70. That is not a triumph, it is a warning, and
-the reason is in how the corpus was built.
+Training loss reached 0.02 by iteration 70 and validation loss reached 0.002 by iteration
+200. That is not a triumph, it is a warning, and the reason is in how the corpus was
+built.
 
 The training rows come from a template generator: forty templates, filled from a pool of
 parameter names, venues, dates and closing clauses. The held out split is drawn from the
@@ -76,9 +101,25 @@ The second sentence is arithmetically true of the held out split and misleading 
 everything a reader would take it to mean. `results/summary.json` carries the numbers, the
 provenance, and this caveat, and anything the product displays reads from that file.
 
+The few-shot comparison rescues part of this. If the templates were trivially separable,
+prompting would also score near 1.0, and it scores 0.62. So the adapter has learned
+something a prompt cannot express, on this data. What remains unmeasured is whether that
+something generalises to text a person wrote rather than text a generator wrote.
+
 The measurement that would settle it is a few hundred real decision records from a real
 desk, labelled by two people who disagree sometimes. That is not something a hackathon
 can produce, and pretending otherwise is worse than saying so.
+
+## Training was stopped at 300 of 1000 iterations
+
+Deliberately, and worth stating because a config that says `iters: 1000` next to a run
+that did 300 otherwise looks like a crash.
+
+Validation loss was 0.002 at iteration 200 and the checkpoint at 200 already scored a
+perfect macro F1 on the validation split. The remaining 800 iterations would have taken
+roughly half an hour to measure nothing. The config still says 1000 because that is the
+right number for a corpus that is not this easy, and the stopping decision belongs in this
+paragraph rather than hidden in a changed default.
 
 ## Honest claims
 

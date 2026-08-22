@@ -1,0 +1,290 @@
+{
+  "arms": {
+    "student": {
+      "arm": "student",
+      "provenance": {
+        "evaluated_at": "2026-08-22T10:50:37.568487+00:00",
+        "base_model": "mlx-community/Qwen3.5-2B-MLX-bf16",
+        "base_model_revision": "05ce45420036b812fe0be3f72cdc1fb62bae6891",
+        "adapter_path": "runs/current/best",
+        "adapter_sha256": "cfd950ef74739319593dca75c054810a1bf34632670901350f3d2e3c7c06265a",
+        "heldout_path": "data/mlx/test.jsonl",
+        "heldout_sha256": "958e92f50ed5a55307a03e0bf979d2c6d1043f4ff56f09ee8354afc7957f62d8",
+        "heldout_rows_scored": 300,
+        "git_commit": "9823164b0b49ca0d87c9bb19c66b1f601fcb0560",
+        "git_dirty": true
+      },
+      "n": 300,
+      "invalid_outputs": 0,
+      "scored_on": 300,
+      "scoring_note": "Unparseable outputs are counted and excluded from the class metrics rather than scored as wrong. Scoring them as wrong blends a model that classified badly with one that did not answer into a number that describes neither.",
+      "accuracy": 1.0,
+      "macro_f1": 1.0,
+      "risk_accuracy": 1.0,
+      "per_class": [
+        {
+          "label": "parameter_change",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 66
+        },
+        {
+          "label": "risk_limit",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 57
+        },
+        {
+          "label": "data_handling",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 25
+        },
+        {
+          "label": "execution",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 39
+        },
+        {
+          "label": "universe",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 43
+        },
+        {
+          "label": "infra",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 43
+        },
+        {
+          "label": "process",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "support": 27
+        }
+      ],
+      "confusion": {
+        "parameter_change": {
+          "parameter_change": 66,
+          "risk_limit": 0,
+          "data_handling": 0,
+          "execution": 0,
+          "universe": 0,
+          "infra": 0,
+          "process": 0
+        },
+        "risk_limit": {
+          "parameter_change": 0,
+          "risk_limit": 57,
+          "data_handling": 0,
+          "execution": 0,
+          "universe": 0,
+          "infra": 0,
+          "process": 0
+        },
+        "data_handling": {
+          "parameter_change": 0,
+          "risk_limit": 0,
+          "data_handling": 25,
+          "execution": 0,
+          "universe": 0,
+          "infra": 0,
+          "process": 0
+        },
+        "execution": {
+          "parameter_change": 0,
+          "risk_limit": 0,
+          "data_handling": 0,
+          "execution": 39,
+          "universe": 0,
+          "infra": 0,
+          "process": 0
+        },
+        "universe": {
+          "parameter_change": 0,
+          "risk_limit": 0,
+          "data_handling": 0,
+          "execution": 0,
+          "universe": 43,
+          "infra": 0,
+          "process": 0
+        },
+        "infra": {
+          "parameter_change": 0,
+          "risk_limit": 0,
+          "data_handling": 0,
+          "execution": 0,
+          "universe": 0,
+          "infra": 43,
+          "process": 0
+        },
+        "process": {
+          "parameter_change": 0,
+          "risk_limit": 0,
+          "data_handling": 0,
+          "execution": 0,
+          "universe": 0,
+          "infra": 0,
+          "process": 27
+        }
+      },
+      "latency_ms": {
+        "p50": 461.9,
+        "p95": 484.2,
+        "mean": 459.4
+      }
+    },
+    "few_shot": {
+      "arm": "few_shot",
+      "provenance": {
+        "evaluated_at": "2026-08-22T10:52:16.926519+00:00",
+        "base_model": "mlx-community/Qwen3.5-2B-MLX-bf16",
+        "base_model_revision": "05ce45420036b812fe0be3f72cdc1fb62bae6891",
+        "adapter_path": null,
+        "adapter_sha256": null,
+        "heldout_path": "data/mlx/test.jsonl",
+        "heldout_sha256": "958e92f50ed5a55307a03e0bf979d2c6d1043f4ff56f09ee8354afc7957f62d8",
+        "heldout_rows_scored": 150,
+        "git_commit": "9823164b0b49ca0d87c9bb19c66b1f601fcb0560",
+        "git_dirty": true
+      },
+      "n": 150,
+      "invalid_outputs": 0,
+      "scored_on": 150,
+      "scoring_note": "Unparseable outputs are counted and excluded from the class metrics rather than scored as wrong. Scoring them as wrong blends a model that classified badly with one that did not answer into a number that describes neither.",
+      "accuracy": 0.6667,
+      "macro_f1": 0.6155,
+      "risk_accuracy": 0.7267,
+      "per_class": [
+        {
+          "label": "parameter_change",
+          "precision": 0.5938,
+          "recall": 1.0,
+          "f1": 0.7451,
+          "support": 38
+        },
+        {
+          "label": "risk_limit",
+          "precision": 1.0,
+          "recall": 0.28,
+          "f1": 0.4375,
+          "support": 25
+        },
+        {
+          "label": "data_handling",
+          "precision": 0.3571,
+          "recall": 0.7143,
+          "f1": 0.4762,
+          "support": 7
+        },
+        {
+          "label": "execution",
+          "precision": 1.0,
+          "recall": 0.75,
+          "f1": 0.8571,
+          "support": 16
+        },
+        {
+          "label": "universe",
+          "precision": 0.913,
+          "recall": 0.7778,
+          "f1": 0.84,
+          "support": 27
+        },
+        {
+          "label": "infra",
+          "precision": 1.0,
+          "recall": 0.1667,
+          "f1": 0.2857,
+          "support": 24
+        },
+        {
+          "label": "process",
+          "precision": 0.5,
+          "recall": 1.0,
+          "f1": 0.6667,
+          "support": 13
+        }
+      ],
+      "confusion": {
+        "parameter_change": {
+          "parameter_change": 38,
+          "risk_limit": 0,
+          "data_handling": 0,
+          "execution": 0,
+          "universe": 0,
+          "infra": 0,
+          "process": 0
+        },
+        "risk_limit": {
+          "parameter_change": 16,
+          "risk_limit": 7,
+          "data_handling": 0,
+          "execution": 0,
+          "universe": 0,
+          "infra": 0,
+          "process": 2
+        },
+        "data_handling": {
+          "parameter_change": 0,
+          "risk_limit": 0,
+          "data_handling": 5,
+          "execution": 0,
+          "universe": 2,
+          "infra": 0,
+          "process": 0
+        },
+        "execution": {
+          "parameter_change": 4,
+          "risk_limit": 0,
+          "data_handling": 0,
+          "execution": 12,
+          "universe": 0,
+          "infra": 0,
+          "process": 0
+        },
+        "universe": {
+          "parameter_change": 6,
+          "risk_limit": 0,
+          "data_handling": 0,
+          "execution": 0,
+          "universe": 21,
+          "infra": 0,
+          "process": 0
+        },
+        "infra": {
+          "parameter_change": 0,
+          "risk_limit": 0,
+          "data_handling": 9,
+          "execution": 0,
+          "universe": 0,
+          "infra": 4,
+          "process": 11
+        },
+        "process": {
+          "parameter_change": 0,
+          "risk_limit": 0,
+          "data_handling": 0,
+          "execution": 0,
+          "universe": 0,
+          "infra": 0,
+          "process": 13
+        }
+      },
+      "latency_ms": {
+        "p50": 538.8,
+        "p95": 552.9,
+        "mean": 537.0
+      }
+    }
+  }
+}

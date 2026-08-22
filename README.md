@@ -132,6 +132,44 @@ threshold has to be set inside the noise.
 
 No source, no claim.
 
+### Tagging runs on a model fine-tuned on this machine
+
+Each decision is tagged with one of seven types and a risk flag by a LoRA fine-tune of a
+2B Qwen, trained on the M4 Pro that ran this build. Nothing about the tagging path
+requires a network.
+
+Measured 22 Aug 2026 on a held out split the training never saw, from
+[`ml/results/summary.json`](ml/results/summary.json):
+
+| arm | macro F1 | accuracy | risk accuracy | unparseable | p50 latency | rows |
+| --- | --- | --- | --- | --- | --- | --- |
+| **fine-tuned adapter** | **1.0000** | 1.0000 | 1.0000 | 0 | 462 ms | 300 |
+| few-shot, same base model | 0.6155 | 0.6667 | 0.7267 | 0 | 539 ms | 150 |
+
+**The 38.5 point gap is the number worth quoting, not the 1.0.** A perfect score on its
+own says nothing: it is equally consistent with a good model and a trivial benchmark. The
+few-shot arm separates those two readings. Seven classes described in the system prompt
+with two worked examples each, on the same base model with the same parser and the same
+split, gets 0.62. So the task is not solvable by prompting and the adapter has learned
+something a prompt cannot express.
+
+**And here is what that 1.0 does not mean.** The corpus is template-generated and the held
+out split comes from the same generator, so this measures whether a small model can learn
+forty templates. It cannot measure whether the tagger works on decisions a person wrote,
+because there are no such decisions in a synthetic corpus. The measurement that would
+settle it is a few hundred real records labelled by two people who sometimes disagree, and
+a hackathon cannot produce that. [`ml/README.md`](ml/README.md) says all of this at
+length, and the caveat travels with the number wherever it goes.
+
+The parser is strict on purpose: anything that is not one line of the expected JSON with a
+known label is UNPARSEABLE, counted, and excluded from the class metrics rather than
+coerced to a default class. Coercing would import the majority class as a free win,
+inflate accuracy, and hide exactly the template bugs the parser exists to surface.
+
+Training was stopped at 300 of 1000 configured iterations. Validation loss was 0.002 at
+iteration 200 and the checkpoint there already scored a perfect validation macro F1, so
+the remaining 800 iterations would have taken half an hour to measure nothing.
+
 ### Generated compliance artifacts
 
 <img src="docs/shots/compliance-checkpoint-1440x900.png" alt="A SYSC 25.9 shaped handover pack, with the export checkpoint asking for a justification" width="100%">
@@ -401,11 +439,11 @@ Several of these earned their place by failing first. A few worth naming:
   dollar amount.
 - **Database-level immutability is tamper resistance, not proof.** See above. The chain is
   the evidence.
-- **The on-prem tagger is not trained yet.** Decision types in the seeded corpus are known
-  by construction because the generator wrote them. The MLX LoRA fine-tune is the last
-  sprint and is not done, so no accuracy figure is quoted anywhere in this product. The
-  pipeline it will reuse shipped a measured result on a different task in a separate
-  project; that number belongs to that project and is not claimed here.
+- **The tagger's 1.0 is measured on synthetic text.** It is a real number on a real held
+  out split with the provenance committed, and it measures template learning rather than
+  performance on decisions a person wrote. The few-shot baseline at 0.62 shows the adapter
+  is doing real work; it does not show the work generalises off this corpus. Both numbers
+  and this caveat live in `ml/results/summary.json`.
 - **The LLM drafting and debrief routes are not wired.** They need an API key that is not
   provisioned. The route shapes are settled, including a constraint worth knowing: the
   API cannot combine structured output with document citations, so drafting is structured

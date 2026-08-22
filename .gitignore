@@ -38,4 +38,10 @@ ml/runs/
 # every tool that walks the tree, and the commits need to be reproducible for the video.
 demo/
 ml/.venv/
-ml/results/
+
+# ml/results/summary.json is COMMITTED on purpose. It is the artifact the honest-claims
+# rule points at: no number appears in the UI, the README or the pitch that a committed
+# file cannot back, and this is that file. The adapter weights and the run logs are not
+# committed, but their hashes are recorded inside it.
+ml/runs/*/adapters/
+ml/runs/*/train.log
