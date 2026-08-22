@@ -18,7 +18,22 @@ export function StrategiesPage() {
     [],
   );
 
-  const resigned = c.members.find((m) => m.resignedOn);
+  /*
+    Memoised, and it is not a performance tweak.
+
+    This object is a dependency of TimeMachine's state memo, which drives an effect that
+    calls back into this component's setState. Built inline it has a new identity on every
+    render, so the memo recomputes, the effect fires, the parent re-renders, and the
+    object is new again: "Maximum update depth exceeded", a blank page, and a stack that
+    points at React.
+
+    Any object or array handed to a child that feeds an effect has to be stable. The
+    callback below is memoised for the same reason.
+  */
+  const resignation = useMemo(() => {
+    const who = c.members.find((m) => m.resignedOn);
+    return who ? { memberId: who.id, on: who.resignedOn!, name: who.displayName } : null;
+  }, [c.members]);
 
   const authors = useMemo(
     () => new Map(c.decisions.map((d) => [d.id, d.authorMemberId])),
@@ -50,6 +65,20 @@ export function StrategiesPage() {
   );
 
   const active = c.strategies.find((s) => s.id === activeId)!;
+
+  /* Same reason as `resignation`: this array feeds a memo that feeds an effect. */
+  const replayItems = useMemo<ReplayItem[]>(
+    () =>
+      c.decisions
+        .filter((d) => d.strategyId === activeId)
+        .map((d) => ({
+          id: d.id,
+          occurredAt: d.occurredAt,
+          authorMemberId: d.authorMemberId,
+          riskFlag: d.riskFlag,
+        })),
+    [c.decisions, activeId],
+  );
 
   const graph = useMemo(() => {
     const decisions = c.decisions.filter((d) => d.strategyId === activeId);
@@ -144,21 +173,8 @@ export function StrategiesPage() {
         />
 
         <TimeMachine
-          items={
-            c.decisions
-              .filter((d) => d.strategyId === activeId)
-              .map((d) => ({
-                id: d.id,
-                occurredAt: d.occurredAt,
-                authorMemberId: d.authorMemberId,
-                riskFlag: d.riskFlag,
-              })) satisfies ReplayItem[]
-          }
-          resignation={
-            resigned
-              ? { memberId: resigned.id, on: resigned.resignedOn!, name: resigned.displayName }
-              : null
-          }
+          items={replayItems}
+          resignation={resignation}
           onChange={onReplay}
         />
 

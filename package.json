@@ -8,9 +8,10 @@
     "build": "pnpm --filter @continuity/web build",
     "test": "pnpm -r test",
     "typecheck": "pnpm -r typecheck",
-    "check": "pnpm run guard:hex && pnpm run guard:vars && pnpm run test",
+    "check": "pnpm run guard:hex && pnpm run guard:vars && pnpm run guard:design && pnpm -r test",
     "guard:hex": "node scripts/guard-hex.mjs",
     "guard:vars": "node scripts/guard-css-vars.mjs",
+    "guard:design": "node scripts/design-audit.mjs",
     "shots": "pnpm --filter @continuity/web exec tsx ../../scripts/shots.ts"
   },
   "devDependencies": {

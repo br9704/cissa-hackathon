@@ -1,0 +1,16 @@
+[project]
+name = "continuity-tagger"
+version = "0.1.0"
+description = "On-prem decision tagger for Continuity"
+# 3.12, not the system 3.14. mlx does ship cp314 wheels now, so 3.14 is technically
+# viable, but 3.12 is the only combination with a shipped measured result behind it and a
+# hackathon is the wrong place to be the first person to hit a cp314 edge case.
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "mlx>=0.32.1",
+    "mlx-lm>=0.31.3",
+    "pyyaml>=6.0",
+]
+
+[tool.uv]
+package = false

@@ -42,10 +42,26 @@ const VIEWPORTS = [
   README; the other three are audit passes, and they are cheap enough to always run.
 */
 const STATES = [
-  { label: "default", reducedMotion: "no-preference", contrast: "no-preference" },
-  { label: "reduced-motion", reducedMotion: "reduce", contrast: "no-preference" },
-  { label: "more-contrast", reducedMotion: "no-preference", contrast: "more" },
+  { label: "default", reducedMotion: "no-preference", contrast: "no-preference", reducedTransparency: false },
+  { label: "reduced-motion", reducedMotion: "reduce", contrast: "no-preference", reducedTransparency: false },
+  { label: "more-contrast", reducedMotion: "no-preference", contrast: "more", reducedTransparency: false },
+  /*
+    Reduced transparency is the third accessibility state design.md now requires, and
+    Playwright's emulateMedia does not offer it: it exposes colorScheme, reducedMotion,
+    forcedColors and contrast, and nothing else. Chromium does support the feature, so it
+    is set through CDP directly rather than left unchecked, which is what would have
+    happened if the harness had been allowed to define the checklist.
+  */
+  { label: "reduced-transparency", reducedMotion: "no-preference", contrast: "no-preference", reducedTransparency: true },
 ] as const;
+
+/** Set a media feature Playwright does not expose. Chromium only. */
+async function setReducedTransparency(page: Page, on: boolean) {
+  const session = await page.context().newCDPSession(page);
+  await session.send("Emulation.setEmulatedMedia", {
+    features: [{ name: "prefers-reduced-transparency", value: on ? "reduce" : "no-preference" }],
+  });
+}
 
 /*
   Walks the tab order and fails on the two things that actually break a keyboard only
@@ -270,6 +286,7 @@ async function main() {
         contrast: state.contrast,
       });
       const page = await context.newPage();
+      if (state.reducedTransparency) await setReducedTransparency(page, true);
 
       const consoleErrors: string[] = [];
       page.on("console", (m) => {
@@ -290,13 +307,25 @@ async function main() {
       if (state.label === "default" && vp.label === "1440x900") {
         await page.goto(`${BASE}/`, { waitUntil: "networkidle" });
         const order = await keyboardPass(page);
-        console.log(`keyboard pass: ${order.length} stops`);
-        order.forEach((o) => console.log("  " + o));
+        /* The count and the first few stops. Printing all sixty is noise that buries the
+           scene failures underneath it. */
+        console.log(`keyboard pass: ${order.length} stops, every one visible with a ring`);
+        order.slice(0, 8).forEach((o) => console.log("  " + o.slice(0, 60)));
+        if (order.length > 8) console.log(`  ... and ${order.length - 8} more`);
       }
 
       if (consoleErrors.length) {
-        console.error("console errors:");
-        consoleErrors.forEach((e) => console.error("  " + e));
+        /*
+          Console errors are a failure, not a note.
+
+          A React render loop reports itself here and nowhere else: the page still paints
+          something, the screenshot still succeeds, and the only evidence is a line in a
+          log nobody reads. Treating these as advisory is how "Maximum update depth
+          exceeded" ships.
+        */
+        console.error(`console errors on ${vp.label} ${state.label}:`);
+        for (const e of [...new Set(consoleErrors)]) console.error("  " + e.slice(0, 160));
+        process.exitCode = 1;
       }
 
       await context.close();
@@ -309,6 +338,29 @@ async function main() {
       deviceScaleFactor: 2,
     });
     const page = await context.newPage();
+
+    /*
+      Warm the retrieval index once, before any scene needs it.
+
+      Three scenes depend on it and the first of them was paying for the model download
+      and the whole corpus embedding inside its own timeout, which is both slow and
+      fragile: a cold cache on a slow network turned a working feature into a scene
+      failure. Warming it here makes the cost visible and shared rather than charged to
+      whichever scene happens to run first.
+    */
+    {
+      const warmStart = Date.now();
+      await page.goto(`${BASE}/`, { waitUntil: "networkidle" });
+      await page.keyboard.press("Meta+k");
+      await page.locator('[role="dialog"] input').waitFor();
+      await page.locator('[role="dialog"] input').fill("warming the retrieval index");
+      await page
+        .getByText(/passages? from the ledger|Nothing in the corpus|unavailable/)
+        .waitFor({ timeout: 300_000 });
+      await page.keyboard.press("Escape");
+      console.log(`retrieval index warm in ${Math.round((Date.now() - warmStart) / 1000)}s`);
+    }
+
     for (const scene of SCENES) {
       await page.goto(`${BASE}${scene.path}`, { waitUntil: "networkidle" });
       await page.waitForTimeout(400);

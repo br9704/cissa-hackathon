@@ -1,0 +1,44 @@
+# The tagger fine-tune.
+#
+# Read ml/README.md before changing num_layers or removing this comment about keys.
+
+model: "mlx-community/Qwen3.5-2B-MLX-bf16"
+# Pinned. An unpinned base means a rerun months later is a different experiment wearing
+# the same config file, and the provenance block in results/summary.json would be lying.
+revision: "05ce45420036b812fe0be3f72cdc1fb62bae6891"
+
+train: true
+data: "data/mlx"
+fine_tune_type: lora
+optimizer: adamw
+
+lora_parameters:
+  rank: 16
+  scale: 20.0
+  dropout: 0.0
+  # `keys` is deliberately absent. With an explicit ["self_attn.q_proj","self_attn.v_proj"]
+  # only the six full_attention layers of twenty four would get adapters, because Qwen3.5
+  # is hybrid with full_attention_interval: 4. Omitting it makes mlx-lm auto-discover
+  # every Linear in each layer, including the GatedDeltaNet in_proj_qkv, in_proj_z and
+  # out_proj.
+
+# Zero or less selects ALL layers: the selector is model.layers[-max(num_layers, 0):].
+num_layers: 0
+
+batch_size: 8
+iters: 1000
+learning_rate: 1e-5
+max_seq_length: 256
+mask_prompt: true
+
+steps_per_report: 10
+steps_per_eval: 100
+val_batches: 20
+
+# Low enough that select_checkpoint.py has something to choose from. mlx-lm ships the
+# final weights, and the final weights were 8 macro F1 points worse than the best ones
+# last time this recipe ran.
+save_every: 100
+
+adapter_path: "runs/current/adapters"
+seed: 20260822

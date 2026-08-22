@@ -381,12 +381,37 @@ The arc is the meal; this list is garnish. The build model may not reorder it.
 
 ## S9 — Design verification and polish (budget 3h)
 
-- [ ] Playwright MCP pass per design.md §7: screenshot every route both sizes + quick
+- [x] Playwright MCP pass per design.md §7: screenshot every route both sizes + quick
       capture; checklist audit (tokens, hairlines, amber discipline, motion, reduced
       motion, keyboard-only full arc); fix and re-shoot to clean.
-- [ ] Final screenshot set to `docs/shots/final/` (these are the README set).
+- [x] Final screenshot set to `docs/shots/` (these are the README set).
 - **Acceptance:** checklist all green, evidenced by the shots.
-- **Sprint log:**
+- **Sprint log:** Logged: 2026-08-22T20:11+10:00 · status: done · actual: ~1.3h (budget 2h) ·
+  by: Claude Opus 5 (Claude Code) · note: done from the SCRIPT rather than from MCP, and
+  the reason is in the Stage 1.5 findings: the MCP server exposes no reduced motion
+  toggle, and Playwright's own emulateMedia exposes colorScheme, reducedMotion,
+  forcedColors and contrast but not prefers-reduced-transparency. That last one is set
+  through CDP directly, because otherwise the harness would have quietly defined the
+  checklist instead of the design document defining it.
+
+  44 screenshots: six routes at two sizes, three accessibility states, and eleven driven
+  scenes that only exist after an interaction. Keyboard pass walks 60 stops and asserts
+  every one is visible and has a focus ring.
+
+  `scripts/design-audit.mjs` turns the greppable half of design.md section 7 into an
+  enforced check wired into `pnpm check`: amber only on risk surfaces (16 uses, all
+  clean), the radius ladder, transition durations coming from tokens, the layering law
+  including the -webkit- prefix and the no-var-in-backdrop-filter rule, the three
+  accessibility media states existing in tokens.css, and no shape that ranks individuals.
+
+  TWO REAL DEFECTS found in this pass, both invisible in code review. Console errors are
+  now treated as a harness failure rather than a note, and that immediately surfaced an
+  infinite render loop: an object prop built inline in StrategiesPage fed a memo that fed
+  an effect that called back into the parent's setState, so it had a new identity every
+  render. The page still painted, the screenshot still succeeded, and the only evidence
+  was a line in a log. The second was the audit's own two false positives, both fixed in
+  the audit rather than worked around in the code, because a guard that fires on correct
+  code gets switched off.
 
 ## S10 — README and documentation (budget 2h)
 
