@@ -33,3 +33,7 @@ engineerprompt.md
 # that produces it. The provenance file in ml/results records its sha256 instead.
 ml/data/
 ml/runs/
+
+# Built by scripts/make-demo-repo.sh. A git repository nested inside another one confuses
+# every tool that walks the tree, and the commits need to be reproducible for the video.
+demo/

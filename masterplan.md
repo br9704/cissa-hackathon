@@ -200,13 +200,16 @@ The arc is the meal; this list is garnish. The build model may not reorder it.
 
 ## S2 — Capture surfaces (budget 4h)
 
-- [ ] `packages/cli`: `continuity init` installs post-commit hook (path rules in
+- [x] `packages/cli`: `continuity init` installs post-commit hook (path rules in
       `.continuity.json`); hook posts artifact + requests LLM draft (server route);
       `continuity watch` tails notebook saves. Demo repo `demo/vol-desk-repo` with
       scripted commits for the video.
-- [ ] Server routes (LOCKED: Vercel functions per docs/scoping.md §B6): `draft-decision`
+- [⏭] Server routes (LOCKED: Vercel functions per docs/scoping.md §B6): `draft-decision`
       (diff in, structured draft out, Anthropic API), `ask` (S4), JWT-verified, rate
       limited (in-memory per-instance is acceptable; note it in README).
+      DEFERRED: needs an Anthropic key, which is a MANUAL TASK. The route shapes are
+      settled in the sprint expansion above, including the structured-output versus
+      citations split the API forces, so wiring them is mechanical once a key exists.
 - [x] Draft queue UI: DecisionCard draft variant (dashed hairline + drafted chip),
       approve = one keystroke (A), edit-then-approve, reject.
 - [x] Desktop quick capture: global hotkey window per design.md §3.4, files a manual
@@ -229,6 +232,22 @@ The arc is the meal; this list is garnish. The build model may not reorder it.
   otherwise be attributed to a person called "The rule is simple", which is the sort of
   quiet misattribution that makes a provenance product worthless.
 
+
+- **Sprint log (second entry):** Logged: 2026-08-22T19:56+10:00 · status: partial · actual: ~2.1h cumulative
+  (budget 3h) · by: Claude Opus 5 (Claude Code) · note: the CLI is done and exercised
+  against a real repository. `continuity init` refuses to clobber somebody else's
+  post-commit hook rather than merging into it, because appending works right up until
+  theirs exits non-zero and ours never runs, and then the failure looks like Continuity
+  being broken. `status` prints which of the last ten commits would draft a decision,
+  which is the fastest way to check the path rules are what a desk meant. The demo repo
+  is BUILT by `scripts/make-demo-repo.sh` rather than committed: a git repository nested
+  inside another one confuses every tool that walks the tree, and the video needs the
+  commits reproducible.
+
+  One failure mode worth naming because it is silent: a hook that shells into a command
+  that does not resolve exits zero, captures nothing, and looks installed. `init` now
+  resolves `continuity` on the PATH if it is there and falls back to an absolute path
+  into this checkout if it is not.
 ## S3 — Reading surfaces: ledger, strategy, graph (budget 5h)
 
 - [ ] LedgerRail + LedgerRow (Realtime tail, capture-to-ledger animation design.md §3.1).
