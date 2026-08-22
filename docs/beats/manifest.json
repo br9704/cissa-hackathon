@@ -1,0 +1,84 @@
+{
+  "captured_at": "2026-08-22T11:25:45.236Z",
+  "seed": 20260822,
+  "frozen_events": 184,
+  "viewport": "1152x720 at 2.5x, which is 1440p at 125 percent",
+  "beats": [
+    {
+      "scene": "1",
+      "name": "draft-card-waiting",
+      "file": "scene1-draft-card-waiting.png"
+    },
+    {
+      "scene": "1",
+      "name": "approve-keystroke",
+      "file": "scene1-approve-keystroke.png"
+    },
+    {
+      "scene": "1",
+      "name": "transcript-lands",
+      "file": "scene1-transcript-lands.png"
+    },
+    {
+      "scene": "2",
+      "name": "departure-simulation",
+      "file": "scene2-departure-simulation.png"
+    },
+    {
+      "scene": "2",
+      "name": "risk-board-cold",
+      "file": "scene2-risk-board-cold.png"
+    },
+    {
+      "scene": "3",
+      "name": "exit-debrief",
+      "file": "scene3-exit-debrief.png"
+    },
+    {
+      "scene": "3",
+      "name": "promote-to-decision",
+      "file": "scene3-promote-to-decision.png"
+    },
+    {
+      "scene": "3",
+      "name": "ask-the-departed",
+      "file": "scene3-ask-the-departed.png"
+    },
+    {
+      "scene": "3",
+      "name": "handover-pack",
+      "file": "scene3-handover-pack.png"
+    },
+    {
+      "scene": "3",
+      "name": "ask-bar-cited",
+      "file": "scene3-ask-bar-cited.png"
+    },
+    {
+      "scene": "4",
+      "name": "verify-sweep-clean",
+      "file": "scene4-verify-sweep-clean.png"
+    },
+    {
+      "scene": "4",
+      "name": "verify-tamper-halt",
+      "file": "scene4-verify-tamper-halt.png"
+    },
+    {
+      "scene": "4",
+      "name": "anchor-receipt",
+      "file": "scene4-anchor-receipt.png"
+    },
+    {
+      "scene": "4",
+      "name": "compliance-checkpoint",
+      "file": "scene4-compliance-checkpoint.png"
+    },
+    {
+      "scene": "4",
+      "name": "my-record",
+      "file": "scene4-my-record.png"
+    }
+  ],
+  "failed": []
+}

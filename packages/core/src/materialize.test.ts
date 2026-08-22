@@ -17,18 +17,80 @@ const DB_URL = process.env["DATABASE_URL"] ?? "postgres://localhost:5432/continu
 let client: Client | null = null;
 
 /*
-  The firm that actually has strategies, not whichever row Postgres returns first.
+  This test owns its own firm and builds it, rather than scoring whatever is lying around.
 
-  The first version used `select id from firms limit 1` with no ORDER BY, which is
-  unordered by definition, and the other suites leave a bare test firm in the table with
-  no strategies attached. It picked that one, scored nothing, and the failure said
-  "expected 0 to be greater than 0" with no hint that the query was the problem.
+  Two problems it solves at once. The first version used `select id from firms limit 1`
+  with no ORDER BY, which is unordered by definition, and picked a bare test firm another
+  suite had left behind with no strategies attached. And it depended on `pnpm seed` having
+  run, so running the SQL suites first left the database rebuilt and empty and this test
+  failed for a reason unrelated to the code it tests.
+
+  A test that depends on what somebody happened to do last is a test that gets deleted for
+  flaking, so it seeds a small deterministic firm with a deliberately lopsided authorship
+  distribution: one book held alone, one shared three ways, one with no decisions at all.
 */
-async function firmWithStrategies(c: Client): Promise<string | null> {
-  const { rows } = await c.query<{ firm_id: string }>(
-    `select firm_id from strategies group by firm_id order by count(*) desc limit 1`,
+const FIRM = "44444444-4444-4444-4444-444444444444";
+
+async function seedScoringFirm(c: Client): Promise<string> {
+  const { rows: existing } = await c.query<{ n: string }>(
+    "select count(*)::text as n from strategies where firm_id = $1",
+    [FIRM],
   );
-  return rows[0]?.firm_id ?? null;
+  if (Number(existing[0]!.n) > 0) return FIRM;
+
+  await c.query("insert into firms (id, name) values ($1, $2) on conflict do nothing", [
+    FIRM,
+    "Scoring Test Firm",
+  ]);
+
+  const members = ["alice", "bob", "carol"].map((name, i) => ({
+    id: `44444444-0000-0000-0000-00000000000${i + 1}`,
+    userId: `44444444-1111-0000-0000-00000000000${i + 1}`,
+    name,
+  }));
+  for (const m of members) {
+    await c.query(
+      `insert into members (id, user_id, firm_id, role, display_name)
+       values ($1, $2, $3, 'researcher', $4) on conflict do nothing`,
+      [m.id, m.userId, FIRM, m.name],
+    );
+  }
+
+  const strategies = [
+    { id: "44444444-2222-0000-0000-000000000001", name: "Held alone" },
+    { id: "44444444-2222-0000-0000-000000000002", name: "Shared three ways" },
+    { id: "44444444-2222-0000-0000-000000000003", name: "No decisions yet" },
+  ];
+  for (const s of strategies) {
+    await c.query(
+      `insert into strategies (id, firm_id, name, status) values ($1, $2, $3, 'live')
+       on conflict do nothing`,
+      [s.id, FIRM, s.name],
+    );
+  }
+
+  /* Held alone: every decision by one person. Shared: evenly split. Third: nothing, which
+     is the case that makes a scorer divide by zero if it was not written carefully. */
+  for (let i = 0; i < 9; i++) {
+    await c.query(
+      `insert into decisions (firm_id, strategy_id, title, author_member_id, risk_flag)
+       values ($1, $2, $3, $4, $5)`,
+      [FIRM, strategies[0]!.id, `Alone ${i}`, members[0]!.id, i % 3 === 0],
+    );
+    await c.query(
+      `insert into decisions (firm_id, strategy_id, title, author_member_id, risk_flag)
+       values ($1, $2, $3, $4, $5)`,
+      [FIRM, strategies[1]!.id, `Shared ${i}`, members[i % 3]!.id, i % 4 === 0],
+    );
+  }
+
+  await c.query(
+    `insert into questions (firm_id, strategy_id, text, undocumentedness_score)
+     values ($1, $2, $3, 0.8), ($1, $2, $4, 0.7)`,
+    [FIRM, strategies[0]!.id, "Why is it capped?", "Who else has run this?"],
+  );
+
+  return FIRM;
 }
 
 beforeAll(async () => {
@@ -50,12 +112,25 @@ describe("nightly materialization", () => {
     expect(client, `no database at ${DB_URL}. Run ./supabase/local/reset.sh`).not.toBeNull();
   });
 
+  it("scores a strategy with no decisions at all rather than skipping it", async () => {
+    if (!client) return;
+    const firmId = await seedScoringFirm(client);
+    await materialize(client, firmId);
+    const { rows } = await client.query<{ bus_factor: number; name: string }>(
+      `select k.bus_factor, s.name from latest_knowledge_scores($1) k
+       join strategies s on s.id = k.strategy_id where s.name = 'No decisions yet'`,
+      [firmId],
+    );
+    /* A strategy nobody has recorded anything about is the most concerning kind, and a
+       scorer that skips it reports a firm as healthier than it is. */
+    expect(rows).toHaveLength(1);
+    expect(rows[0]!.bus_factor).toBe(0);
+  });
+
   it("writes a score for every strategy, and appends rather than overwrites", async () => {
     if (!client) return;
 
-    const firmId = await firmWithStrategies(client);
-    expect(firmId, "no firm has any strategies. Run the seed first.").not.toBeNull();
-    if (!firmId) return;
+    const firmId = await seedScoringFirm(client);
 
     const { rows: strategies } = await client.query<{ id: string }>(
       "select id from strategies where firm_id = $1",
@@ -87,10 +162,7 @@ describe("nightly materialization", () => {
   it("agrees with the on demand computation, strategy for strategy", async () => {
     if (!client) return;
 
-    const firmId = await firmWithStrategies(client);
-    expect(firmId, "no firm has any strategies. Run the seed first.").not.toBeNull();
-    if (!firmId) return;
-
+    const firmId = await seedScoringFirm(client);
     await materialize(client, firmId);
 
     const { rows: decisions } = await client.query<{

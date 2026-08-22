@@ -1,0 +1,10 @@
+{
+  "seed": 20260822,
+  "frozen_at": "2026-08-22T11:22:27Z",
+  "events": 184,
+  "decisions": 184,
+  "artifacts": 188,
+  "chain_head": "12f8e8923d8fe754fbe0deeadcfb184a89f94164124e93c0149dda2efddeab6f",
+  "chain_verifies": true,
+  "note": "Read the numbers on screen before a take. This file records what the screen should be showing, so a take can be checked against it rather than against somebody's memory."
+}
