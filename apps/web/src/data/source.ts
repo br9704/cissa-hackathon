@@ -116,3 +116,71 @@ export const TYPE_LABEL: Record<string, string> = {
   infra: "Infrastructure",
   process: "Process",
 };
+
+/*
+  The chained ledger.
+
+  In the local backend the chain is built here, in the browser, using the same canonical
+  form the database trigger uses. That form is not a convenience: Postgres orders jsonb
+  keys by length before byte value and puts a space after every colon, and reproducing it
+  exactly is what lets the Verify page recompute a hash the server produced rather than
+  ask the server whether its own hash is right. canonical.test.ts checks the two engines
+  agree, against a real Postgres, over a corpus of deliberately awkward payloads.
+*/
+import { eventHash, type ChainInput } from "@continuity/core";
+
+export type ChainedEvent = ChainInput & {
+  id: string;
+  prevHash: string | null;
+  thisHash: string;
+  title: string;
+  strategyId: string | null;
+  riskFlag: boolean;
+};
+
+let chainCache: ChainedEvent[] | null = null;
+
+export async function chainedLedger(): Promise<ChainedEvent[]> {
+  if (chainCache) return chainCache;
+  const c = corpus();
+
+  /* Oldest first, because a chain is built forwards even though it is read backwards. */
+  const ordered = c.decisions
+    .slice()
+    .sort((a, b) => a.occurredAt.localeCompare(b.occurredAt));
+
+  const out: ChainedEvent[] = [];
+  let prev: string | null = null;
+
+  for (const d of ordered) {
+    const input: ChainInput = {
+      firmId: c.firmId,
+      actorMemberId: d.authorMemberId,
+      kind: d.approvedAt ? "decision_approved" : "decision_drafted",
+      /* Postgres renders extract(epoch from ...) with fractional seconds, so match it. */
+      occurredAtEpoch: (Date.parse(d.occurredAt) / 1000).toFixed(6),
+      payload: {
+        decision_id: d.id,
+        strategy_id: d.strategyId,
+        title: d.title,
+        decision_type: d.decisionType,
+        risk_flag: d.riskFlag,
+        drafted_by: d.draftedBy,
+      },
+    };
+    const thisHash = await eventHash(prev, input);
+    out.push({
+      ...input,
+      id: d.id,
+      prevHash: prev,
+      thisHash,
+      title: d.title,
+      strategyId: d.strategyId,
+      riskFlag: d.riskFlag,
+    });
+    prev = thisHash;
+  }
+
+  chainCache = out;
+  return out;
+}

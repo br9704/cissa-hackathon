@@ -99,6 +99,26 @@ const SCENES: {
     },
   },
   {
+    name: "verify-clean",
+    path: "/verify",
+    act: async (page) => {
+      await page.getByRole("button", { name: /^Verify \d+ events$/ }).click();
+      /* Wait for the sweep to finish rather than for a fixed time: the pace scales with
+         the row count, so a hard timeout would be wrong the moment the corpus changes. */
+      await page.getByText(/All \d+ events verify/).waitFor({ timeout: 15_000 });
+      await page.waitForTimeout(300);
+    },
+  },
+  {
+    name: "verify-tampered",
+    path: "/verify",
+    act: async (page) => {
+      await page.getByRole("button", { name: /tampered chain/ }).click();
+      await page.getByText(/Chain broken at event/).waitFor({ timeout: 15_000 });
+      await page.waitForTimeout(300);
+    },
+  },
+  {
     name: "strategy-decision",
     path: "/strategies",
     act: async (page) => {

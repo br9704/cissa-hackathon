@@ -18,3 +18,7 @@ export {
   type DecisionType, type PersonaKey,
 } from "./seed/vocabulary.js";
 export * from "./scoring.js";
+export {
+  canonicalJsonb, canonicalText, sha256Hex, eventHash, verifyChain,
+  type ChainInput, type VerifiedRow,
+} from "./chain.js";
