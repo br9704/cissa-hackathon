@@ -63,3 +63,53 @@
 .intro {
   color: var(--text-secondary);
 }
+
+
+/*
+  The draft queue. Sits above the ledger because it is the only thing on this screen that
+  is waiting on a person.
+*/
+.queue {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.queueHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.queueTitle { font-size: 15px; font-weight: 560; }
+.queueNote { font-size: 13px; color: var(--text-tertiary); }
+
+.queueEmpty {
+  padding: 16px 18px;
+  border: 1px dashed var(--border-medium);
+  border-radius: var(--radius-m);
+  background: var(--surface-recessed);
+  font-size: 13px;
+  color: var(--text-tertiary);
+}
+
+.landing {
+  display: flex;
+  justify-content: flex-end;
+  min-height: 34px;
+}
+
+.pillWrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--accent-verified);
+  background: var(--surface-solid);
+  font-size: 13px;
+  color: var(--accent-verified);
+  white-space: nowrap;
+}

@@ -1,0 +1,117 @@
+/*
+  A drafted decision, awaiting a human.
+
+  Drafts look like drafts. The dashed edge and the chip are not decoration: an AI written
+  record that is visually indistinguishable from an approved one is the single fastest
+  way to lose the trust this whole product is asking for.
+*/
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 18px 20px;
+  border-radius: var(--radius-l);
+  border: 1px dashed var(--draft);
+  background: var(--surface);
+  -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  backdrop-filter: blur(20px) saturate(1.4);
+  box-shadow: var(--shadow-pane);
+}
+
+.head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.title { font-size: 16px; font-weight: 560; max-width: 60ch; }
+
+.chips { display: flex; gap: 6px; flex-wrap: wrap; }
+
+.meta { font-size: 12px; color: var(--text-tertiary); }
+
+.why {
+  font-size: 14px;
+  color: var(--text-secondary);
+  max-width: 68ch;
+  line-height: 1.55;
+}
+
+.editor {
+  width: 100%;
+  min-height: 90px;
+  resize: vertical;
+  padding: 10px 12px;
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-s);
+  background: var(--surface-solid);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--text);
+}
+
+.editor:focus { outline: none; border-color: var(--accent); }
+
+.alts { margin: 0; padding-left: 18px; font-size: 13px; color: var(--text-tertiary); }
+
+.actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  padding-top: 4px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.action {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 13px;
+  border-radius: var(--radius-s);
+  border: 1px solid var(--border-medium);
+  background: var(--surface-solid);
+  font-size: 13px;
+  font-weight: 520;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.action:hover { border-color: var(--border-strong); }
+
+.approve {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--surface-solid);
+}
+
+.kbd {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  border: 1px solid currentColor;
+  border-radius: 4px;
+  padding: 0 4px;
+  opacity: 0.65;
+}
+
+.hint { font-size: 12px; color: var(--text-tertiary); margin-left: auto; }
+
+/*
+  The pill the card becomes on approve. It is the same element via layoutId, so the
+  contraction is a real transition rather than two animations that happen to line up.
+*/
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--accent-verified);
+  background: var(--surface-solid);
+  font-size: 13px;
+  color: var(--accent-verified);
+  white-space: nowrap;
+}

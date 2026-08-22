@@ -88,6 +88,9 @@ const SCENES: {
   name: string;
   path: string;
   act: (page: Page) => Promise<void>;
+  /* Some scenes are about a state at the top of the page. A full page capture of one of
+     those is mostly ledger rows shrunk to nothing. */
+  viewportOnly?: boolean;
 }[] = [
   {
     name: "risk-departure",
@@ -96,6 +99,30 @@ const SCENES: {
       /* Daniel is the resignation in the demo, and the simulation is the money shot. */
       await page.getByRole("button", { name: /Daniel Okonkwo/ }).click();
       await page.waitForTimeout(700);
+    },
+  },
+  {
+    name: "draft-queue",
+    path: "/",
+    viewportOnly: true,
+    act: async (page) => {
+      await page.getByText("awaiting approval").first().waitFor();
+      await page.waitForTimeout(400);
+    },
+  },
+  {
+    name: "draft-approved",
+    path: "/",
+    viewportOnly: true,
+    act: async (page) => {
+      /* The one keystroke. If A ever stops approving the focused draft, this scene fails
+         rather than quietly shooting the queue unchanged. */
+      const before = await page.getByText(/\d+ awaiting approval/).innerText();
+      await page.keyboard.press("a");
+      await page.getByText("Filed to the ledger, chained").waitFor({ timeout: 5000 });
+      const after = await page.getByText(/awaiting approval/).innerText();
+      if (before === after) throw new Error("pressing A did not change the queue");
+      await page.waitForTimeout(300);
     },
   },
   {
@@ -277,7 +304,10 @@ async function main() {
       /* Full page for scenes. A scene is the state after an interaction, and the thing
          the interaction reveals is usually below the fold: the departure simulation puts
          its findings under a graph that is itself most of a viewport tall. */
-      await page.screenshot({ path: `${OUT}/${scene.name}-1440x900.png`, fullPage: true });
+      await page.screenshot({
+        path: `${OUT}/${scene.name}-1440x900.png`,
+        fullPage: !scene.viewportOnly,
+      });
       shots++;
     }
     await context.close();
