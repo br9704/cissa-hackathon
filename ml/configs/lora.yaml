@@ -25,10 +25,27 @@ lora_parameters:
 # Zero or less selects ALL layers: the selector is model.layers[-max(num_layers, 0):].
 num_layers: 0
 
-batch_size: 8
+# Memory, learned the hard way.
+#
+# The first run of this config died with a Metal "Insufficient Memory" out of the GPU
+# command buffer. Adapting ALL layers is 16.8M trainable parameters against the 917K the
+# previous project trained when it was accidentally adapting four, so the optimiser state
+# and the activations are roughly eighteen times heavier and a batch of 8 no longer fits.
+#
+# The fix keeps the layer coverage and pays for it elsewhere: a smaller batch, gradient
+# accumulation to hold the effective batch at 8, gradient checkpointing to trade compute
+# for activation memory, and a sequence length measured from the data rather than guessed:
+# the training rows are 699 characters at the 95th percentile and 729 at the longest,
+# which is roughly 200 tokens, so 224 truncates nothing and 256 was paying for headroom
+# that does not exist.
+# Shrinking num_layers instead would have been easier and would have quietly undone the
+# thing this config exists to fix.
+batch_size: 2
+grad_accumulation_steps: 4
+grad_checkpoint: true
 iters: 1000
 learning_rate: 1e-5
-max_seq_length: 256
+max_seq_length: 224
 mask_prompt: true
 
 steps_per_report: 10
