@@ -5,7 +5,19 @@ import { computeLayout, type GraphEdge, type GraphNode } from "./graphLayout";
 
 const WIDTH = 1080;
 const HEIGHT = 440;
-const R = 9;
+
+/*
+  Node radius shrinks as the graph grows. A 9px node reads well for a single strategy's
+  fifty decisions and turns the whole firm's two hundred into a solid mass of overlapping
+  circles. The ring around a risk flagged node has to stay legible at the small end, so
+  it never goes below 4.
+*/
+function radiusFor(count: number): number {
+  if (count <= 40) return 9;
+  if (count <= 90) return 7;
+  if (count <= 160) return 5.5;
+  return 4.5;
+}
 
 export function GenealogyGraph({
   nodes,
@@ -41,6 +53,7 @@ export function GenealogyGraph({
   );
 
   const isDim = (id: string) => Boolean(highlighted) && !highlighted!.has(id);
+  const R = radiusFor(layout.nodes.length);
 
   return (
     <div className={styles.wrap}>

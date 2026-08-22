@@ -401,6 +401,47 @@ export function generate(seed: number = DEFAULT_SEED): Corpus {
     labelled.push({ text, label: template.type, risk: template.risk });
   }
 
+  /*
+    Disambiguate colliding titles.
+
+    The templates are drawn at random, so a strategy with fifty decisions will reuse a
+    title several times, and a list of orphaned decisions that says "Wrote down the
+    escalation path for a drawdown flag" three times reads as a rendering bug rather than
+    as three real decisions. Real desks do revisit the same ground, and when they do the
+    write up says which time it was.
+
+    Runs AFTER the labelled export is built, deliberately. The tagger should learn from
+    the language a person would write, not from a suffix we added so a list would read
+    well, and the first version of this pass ran earlier and quietly put the
+    disambiguator into 42 training rows.
+  */
+  {
+    const seenTitles = new Map<string, number>();
+    for (const d of decisions) {
+      const key = `${d.strategyId}::${d.title}`;
+      const n = (seenTitles.get(key) ?? 0) + 1;
+      seenTitles.set(key, n);
+      if (n === 1) continue;
+      const param = d.tags[1];
+      const month = new Date(d.occurredAt).toLocaleDateString("en-AU", { month: "long" });
+      d.title = param && !d.title.includes(param)
+        ? `${d.title} (${param})`
+        : `${d.title} (${month})`;
+    }
+    /* If a title still collides after that, fall back to the day. Two changes to the same
+       parameter in the same month is a real thing that happens. */
+    const secondPass = new Map<string, number>();
+    for (const d of decisions) {
+      const key = `${d.strategyId}::${d.title}`;
+      const n = (secondPass.get(key) ?? 0) + 1;
+      secondPass.set(key, n);
+      if (n === 1) continue;
+      const day = new Date(d.occurredAt).toLocaleDateString("en-AU", { day: "numeric", month: "short" });
+      d.title = `${d.title.replace(/\s*\([^)]*\)$/, "")} (${day})`;
+    }
+  }
+
+
   return {
     firmId, firmName: FIRM_NAME, members, strategies, artifacts, decisions, links,
     sessions, turns, questions, labelled,

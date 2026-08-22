@@ -23,28 +23,30 @@ export function AppShell() {
 
   return (
     <div className={styles.shell}>
-      <nav className={`${styles.rail} glass`} aria-label="Sections">
-        <div className={styles.wordmark}>
-          <span className={styles.mark} aria-hidden="true">
-            C
-          </span>
-          <span className={styles.label}>Continuity</span>
-        </div>
-        {NAV.map(({ to, label, Icon }) => (
-          <Link
-            key={to}
-            to={to}
-            className={styles.navItem}
-            data-active={path === to}
-            aria-current={path === to ? "page" : undefined}
-          >
-            <span className={styles.glyph}>
-              <Icon />
+      <div className={styles.railColumn}>
+        <nav className={styles.rail} aria-label="Sections">
+          <div className={styles.wordmark}>
+            <span className={styles.mark} aria-hidden="true">
+              C
             </span>
-            <span className={styles.label}>{label}</span>
-          </Link>
-        ))}
-      </nav>
+            <span className={styles.label}>Continuity</span>
+          </div>
+          {NAV.map(({ to, label, Icon }) => (
+            <Link
+              key={to}
+              to={to}
+              className={styles.navItem}
+              data-active={path === to}
+              aria-current={path === to ? "page" : undefined}
+            >
+              <span className={styles.glyph}>
+                <Icon />
+              </span>
+              <span className={styles.label}>{label}</span>
+            </Link>
+          ))}
+        </nav>
+      </div>
 
       <div className={styles.main}>
         <header className={`${styles.topbar} glass`}>

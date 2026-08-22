@@ -91,3 +91,25 @@ describe("synthetic corpus", () => {
     for (const l of corpus.links) expect(l.parent).not.toBe(l.child);
   });
 });
+
+describe("decision titles", () => {
+  const corpus = generate(DEFAULT_SEED);
+
+  it("are unique within a strategy, so a list of them reads as distinct work", () => {
+    /* Before the disambiguation pass the orphaned decisions list showed the same title
+       three times over, which looks like a rendering bug rather than three decisions. */
+    for (const s of corpus.strategies) {
+      const titles = corpus.decisions
+        .filter((d) => d.strategyId === s.id)
+        .map((d) => d.title);
+      expect(new Set(titles).size, s.name).toBe(titles.length);
+    }
+  });
+
+  it("keeps the training text free of the UI disambiguator", () => {
+    /* The tagger should learn from the language a person would write, not from a suffix
+       we added so a list would read well. */
+    const withSuffix = corpus.labelled.filter((l) => /\([^)]*\)\n/.test(l.text));
+    expect(withSuffix).toHaveLength(0);
+  });
+});

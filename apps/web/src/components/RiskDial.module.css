@@ -1,0 +1,43 @@
+.dial {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.svg { display: block; }
+
+.track { fill: none; stroke: var(--border); }
+
+.value { fill: none; stroke: var(--accent-verified); stroke-linecap: round; }
+
+/*
+  Amber, and only when the reading is actually a knowledge risk. A dial that turns amber
+  whenever it is not perfect would spend its whole life amber, and then the colour stops
+  meaning anything.
+*/
+.atRisk { stroke: var(--accent-risk); }
+
+.reading {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 22px;
+  fill: var(--text);
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+.readingRisk { fill: var(--accent-risk); }
+
+.label {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  text-align: center;
+}
+
+.caption {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  text-align: center;
+  max-width: 15ch;
+}

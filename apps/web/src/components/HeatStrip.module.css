@@ -1,0 +1,43 @@
+.strip {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: minmax(140px, 200px) 1fr auto;
+  align-items: center;
+  gap: 14px;
+}
+
+.name { font-size: 13px; }
+
+.bar {
+  position: relative;
+  height: 10px;
+  border-radius: 999px;
+  background: var(--surface-recessed);
+  border: 1px solid var(--border-subtle);
+  overflow: hidden;
+}
+
+.fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: var(--accent-verified);
+  border-radius: 999px;
+}
+
+/* Concentration above the threshold is a knowledge risk, so this is the one place the
+   bar is allowed to be amber. */
+.fillRisk { background: var(--accent-risk); }
+
+.reading {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 13px;
+  color: var(--text-secondary);
+  min-width: 4ch;
+  text-align: right;
+}

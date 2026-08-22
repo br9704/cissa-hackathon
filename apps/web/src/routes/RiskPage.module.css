@@ -1,0 +1,154 @@
+.page { display: flex; flex-direction: column; gap: 24px; }
+
+.pane {
+  background: var(--surface-solid);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-l);
+  box-shadow: var(--shadow-pane);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.title { font-size: 17px; }
+.note { font-size: 13px; color: var(--text-tertiary); }
+
+.dials {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 20px;
+  padding: 4px 0 8px;
+}
+
+/*
+  Graph on top at full width, findings below. The earlier two column version squeezed the
+  firm wide graph into two thirds of the pane, and a force layout given less room does not
+  simplify, it just gets denser.
+*/
+.split {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.findings {
+  display: grid;
+  grid-template-columns: minmax(280px, 400px) minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+
+@media (max-width: 1080px) {
+  .findings { grid-template-columns: 1fr; }
+}
+
+.people {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.person {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 12px 7px 8px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface-solid);
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--text-secondary);
+  transition: border-color var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
+}
+
+.person:hover { border-color: var(--border-medium); color: var(--text); }
+
+.person[data-active="true"] {
+  border-color: var(--accent-risk);
+  color: var(--text);
+  font-weight: 540;
+}
+
+.avatar {
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  font-size: 10px;
+  font-weight: 560;
+  background: var(--surface-recessed);
+  border: 1px solid var(--border);
+}
+
+.orphans {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 6px;
+  max-height: 320px;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-m);
+  background: var(--surface-recessed);
+  padding: 8px;
+}
+
+.orphan {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 8px 10px;
+  border-radius: var(--radius-s);
+  background: var(--surface-solid);
+  border: 1px solid var(--border-subtle);
+}
+
+.orphanTitle { font-size: 13px; }
+.orphanSub { font-size: 11px; color: var(--text-tertiary); }
+
+.summary {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 14px 16px;
+  border: 1px solid var(--accent-risk);
+  border-radius: var(--radius-m);
+  background: var(--surface-solid);
+}
+
+.summaryLead {
+  font-size: 14px;
+  font-weight: 560;
+  color: var(--accent-risk);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.summaryBody { font-size: 13px; color: var(--text-secondary); }
+
+.placeholder {
+  padding: 14px 16px;
+  border: 1px dashed var(--border-medium);
+  border-radius: var(--radius-m);
+  font-size: 13px;
+  color: var(--text-tertiary);
+}
+
+.doctrine {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  border-top: 1px solid var(--border-subtle);
+  padding-top: 12px;
+}

@@ -76,6 +76,40 @@ async function keyboardPass(page: Page, maxStops = 60): Promise<string[]> {
   return order;
 }
 
+/*
+  Scenes: the shots that only exist after somebody has clicked something.
+
+  The static route sweep cannot reach the departure simulation, the selected decision, or
+  any other state that is the actual point of a screen. Those are the shots that go in the
+  README and that the design pass has to audit, so they get driven explicitly rather than
+  left to whoever remembers to take them by hand.
+*/
+const SCENES: {
+  name: string;
+  path: string;
+  act: (page: Page) => Promise<void>;
+}[] = [
+  {
+    name: "risk-departure",
+    path: "/risk",
+    act: async (page) => {
+      /* Daniel is the resignation in the demo, and the simulation is the money shot. */
+      await page.getByRole("button", { name: /Daniel Okonkwo/ }).click();
+      await page.waitForTimeout(700);
+    },
+  },
+  {
+    name: "strategy-decision",
+    path: "/strategies",
+    act: async (page) => {
+      /* Any node will do: the assertion is that selecting one reveals the reasoning and
+         the rejected alternatives, which is the whole product in one pane. */
+      await page.locator("svg g[transform] circle").nth(4).click({ force: true });
+      await page.waitForTimeout(400);
+    },
+  },
+];
+
 async function main() {
   await mkdir(OUT, { recursive: true });
   const browser = await chromium.launch();
@@ -124,6 +158,33 @@ async function main() {
 
       await context.close();
     }
+  }
+
+  {
+    const context = await browser.newContext({
+      viewport: { width: 1440, height: 900 },
+      deviceScaleFactor: 2,
+    });
+    const page = await context.newPage();
+    for (const scene of SCENES) {
+      await page.goto(`${BASE}${scene.path}`, { waitUntil: "networkidle" });
+      await page.waitForTimeout(400);
+      try {
+        await scene.act(page);
+      } catch (err) {
+        /* A scene that cannot be driven is a real failure: it means the affordance it
+           depends on has moved or gone. Say so loudly rather than skipping quietly. */
+        console.error(`scene ${scene.name} could not be driven: ${(err as Error).message}`);
+        process.exitCode = 1;
+        continue;
+      }
+      /* Full page for scenes. A scene is the state after an interaction, and the thing
+         the interaction reveals is usually below the fold: the departure simulation puts
+         its findings under a graph that is itself most of a viewport tall. */
+      await page.screenshot({ path: `${OUT}/${scene.name}-1440x900.png`, fullPage: true });
+      shots++;
+    }
+    await context.close();
   }
 
   await browser.close();

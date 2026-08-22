@@ -68,7 +68,9 @@ export function computeLayout(
     .force("link", forceLink(simEdges).distance(46).strength(0.5))
     .force("charge", forceManyBody().strength(charge).distanceMax(220))
     .force("center", forceCenter(width / 2, height / 2))
-    .force("collide", forceCollide(15).strength(0.9))
+    /* Collision radius tracks the drawn radius, or a dense graph looks like a blob with
+       lines through it. */
+    .force("collide", forceCollide(simNodes.length > 90 ? 9 : 15).strength(0.9))
     .stop();
 
   sim.tick(ticks);
