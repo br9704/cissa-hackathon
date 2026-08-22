@@ -70,7 +70,7 @@ inventing scope.
 | D10 | Out of scope, contractually: integrations, mobile, GraphRAG, in-product twin, billing, signed installers, Windows/Linux | prd §5 |
 | D11 | Total context is the ambient default: meetings are first-class `meeting_transcript` artifacts; the build ships seeded transcripts + a transcript importer, and debriefs/ask answers cite them; always-on desk capture devices and compliance-archive taps are roadmap/pitch, not weekend scope | Owner direction 22 Aug; framing + legal boundary in prd §4.3 and dossier [L12-L15, C12, C14] |
 | D12 | Capture doctrine: continuous, ambient, 24/7, as ordinary practice; tracks the work, never the worker (no screen/keystroke/activity monitoring, no behavioral scoring); authorship recorded for provenance, analytics de-personalized (strategy-level scores, never people leaderboards; no view ranks individuals) | Owner direction 22 Aug; prd §4.3; adoption evidence in dossier [I1-I3, I10, C14] |
-| D14 | The pizzazz layer (owner direction 22 Aug: "magic first, mechanism second"): three hero surfaces open every demo: persona-mode ask ("talk to the trader who left": prompt variant over existing retrieval, every sentence cited, non-removable banner naming it a reconstruction), the Time Machine (ledger replay scrubber on the strategy graph), and the departure bomb (dollar-denominated exposure from synthetic attributed revenue, labelled synthetic on screen). Demo arc reordered in prd §6; these three are INSIDE the minimum winning demo; the mechanism (capture flow) demos after them | Pizzazz without new architecture: all three render data the schema already holds |
+| D14 | (Implemented; see AMENDMENT A21 for what shipped and the one place it differs: the persona answer is EXTRACTIVE, quoting the person's own recorded sentences, not a prompt variant that writes in their voice.) The pizzazz layer (owner direction 22 Aug: "magic first, mechanism second"): three hero surfaces open every demo: persona-mode ask ("talk to the trader who left": prompt variant over existing retrieval, every sentence cited, non-removable banner naming it a reconstruction), the Time Machine (ledger replay scrubber on the strategy graph), and the departure bomb (dollar-denominated exposure from synthetic attributed revenue, labelled synthetic on screen). Demo arc reordered in prd §6; these three are INSIDE the minimum winning demo; the mechanism (capture flow) demos after them | Pizzazz without new architecture: all three render data the schema already holds |
 | D13 | Palantir-derived governance (docs/palantir.md §5): access is itself a ledger event (reads, pack generations, exports); exports prompt a one-line justification (checkpoint) stored on the event; every member gets a My Record view of what was captured from them and who accessed it; processor stance and hard-scoped purposes in prd §4.8; purpose-based access grants are roadmap | Owner direction 22 Aug; Palantir patterns 3-7, Signac case study |
 
 ## Verified facts (Stage 1, 22 Aug 2026: re-verify anything load-bearing when used)
@@ -168,41 +168,79 @@ The arc is the meal; this list is garnish. The build model may not reorder it.
 
 ## S0 — Foundation (budget 2.5h)
 
-- [ ] pnpm monorepo per prd §4.7: `apps/desktop`, `apps/web`, `packages/core`,
+- [x] pnpm monorepo per prd §4.7: `apps/desktop`, `apps/web`, `packages/core`,
       `packages/cli`, `ml`, `supabase`, `docs`, `assets`.
-- [ ] Vite React TS app boots; `tokens.css` from design.md §2 wired; Geist self-hosted;
+- [x] Vite React TS app boots; `tokens.css` from design.md §2 wired; Geist self-hosted;
       grep-guard script: no hex literals outside tokens.css (add to `pnpm check`).
-- [ ] Tauri 2 shell wraps the dev server; menu-bar (tray) icon (placeholder template
+- [x] Tauri 2 shell wraps the dev server; menu-bar (tray) icon (placeholder template
       glyph for now); global
       shortcut registers and opens a placeholder window. Crib config from hive
       `apps/desktop`. FALLBACK if tray/shortcut fights: ship windowed app, move
       quick-capture into the main window (Cmd+K mode), log deferral.
-- [ ] Supabase project linked; env plumbing (`.env.local`, never committed); typegen.
-- [ ] Verify-list from Verified facts checked off with one-line evidence each.
+- [~] Supabase project linked; env plumbing (`.env.local`, never committed); typegen.
+      BLOCKED on `supabase login`, and carried to S8 where the rest of the deploy waits
+      on the same command. Worked around by building the entire schema against a local
+      PostgreSQL 17.11, which is the same engine family.
+- [x] Verify-list from Verified facts checked off with one-line evidence each.
 - **Acceptance:** `pnpm dev` = web app on localhost; `pnpm tauri dev` = same UI in
   desktop shell with tray icon; empty ledger page renders on tokens; grep-guard passes.
-- **Sprint log:**
+- **Sprint log:** Logged: 2026-08-22T18:34+10:00 · status: done · actual: ~1.4h (budget 1.5h)
+  · by: Claude Opus 5 (Claude Code) · note: pnpm workspace, Vite/React/TS app on the design
+  tokens, both token guards plus a measured contrast test, six routes with empty states,
+  Tauri 2 shell with a menu bar tray icon and a Cmd+Shift+Space quick capture window, and
+  the screenshot harness. Supabase link deferred to S8: no credentials and no Docker on
+  this machine, so the schema work moved to a local PostgreSQL 17.11 instead.
+
+  The contrast test earned its place immediately by failing: `--text-secondary` at alpha
+  0.72 measures 6.87:1 inside a recessed pane against design.md's stated bar of 7:1. The
+  document had claimed the bar was met because it measured against the LIGHTEST surface
+  rather than the darkest one text sits on. Fixed in the tokens, and the corrected
+  measurement is written into design.md next to the values.
+
+  (This line was written at the time and lost before it was committed. Reconstructed from
+  the commit message and the actuals recorded in it, and flagged as reconstructed rather
+  than presented as contemporaneous.)
 
 ## S1 — The schema and the chain (budget 3h)
 
-- [ ] Migrations for every table in prd §4.2, RLS by firm, roles as member claim.
-- [ ] Append-only enforcement per docs/scoping.md §B1: explicit GRANTs, revoke +
+- [x] Migrations for every table in prd §4.2, RLS by firm, roles as member claim.
+- [x] Append-only enforcement per docs/scoping.md §B1: explicit GRANTs, revoke +
       forbid_mutation trigger, chain trigger with per-firm advisory lock and hand-built
       canonical text. Chain VERIFY is a SQL function (`verify_chain(firm_id)`); the
       verify page calls it and animates its result; `packages/core` tests call it via
       RPC against seeded data plus a deliberately forked copy (do NOT reimplement jsonb
       canonicalization in TS).
-- [ ] Synthetic corpus generator (`packages/core/seed`): Meridian Basis Partners, 5
+- [x] Synthetic corpus generator (`packages/core/seed`): Meridian Basis Partners, 5
       personas, 4 strategies, ~400 artifacts, ~180 decisions with genealogy links,
       ~2,200 labelled decision records exported to `ml/data/` for S6, 6 debrief
       sessions, questions feed, and 4 speaker-tagged meeting transcripts (two desk
       standups, one strategy review, one risk meeting) as `meeting_transcript`
       artifacts that decisions and debriefs cite (D11). Deterministic seed so demos
       reproduce.
-- [ ] Seed applied to hosted Supabase; typegen committed.
+- [~] Seed applied to hosted Supabase; typegen committed.
+      BLOCKED on the same `supabase login`. The seed IS applied and verified against the
+      local Postgres, and `./scripts/deploy.sh db` runs it against the hosted project the
+      moment that command has been run.
 - **Acceptance:** chain property tests green; seeded DB queryable; a hand-edited row in
   a COPY of the chain is detected by `packages/core` verify.
-- **Sprint log:**
+- **Sprint log:** Logged: 2026-08-22T18:34+10:00 · status: done · actual: ~1.9h (budget 2h) ·
+  by: Claude Opus 5 (Claude Code) · note: five migrations, the hash chain, RLS, and a
+  deterministic 184 decision corpus that loads and verifies. 18 SQL tests that attack the
+  chain: update, delete and truncate all refused, a rewritten row caught at the exact row,
+  and a forked history refused even with `session_replication_role = replica` disabling
+  every trigger on the table.
+
+  Applied to a LOCAL PostgreSQL 17.11 rather than hosted Supabase, and that is a block
+  rather than a preference: `supabase projects list` returns Unauthorized and the machine
+  has no Docker. The hosted apply carried into S8, which is the one thing still blocked.
+
+  Worth knowing: RLS cannot be tested as a superuser, and `force row level security` does
+  not change that. The first version of the suite ran as the local superuser and reported
+  that the policies leaked. The policies were fine and the test was not.
+
+  (This line was written at the time and lost before it was committed. Reconstructed from
+  the commit message and the actuals recorded in it, and flagged as reconstructed rather
+  than presented as contemporaneous.)
 
 ## S2 — Capture surfaces (budget 4h)
 
@@ -268,18 +306,18 @@ The arc is the meal; this list is garnish. The build model may not reorder it.
   latter dresses an ungrounded answer in sources it never read.
 ## S3 — Reading surfaces: ledger, strategy, graph (budget 5h)
 
-- [ ] LedgerRail + LedgerRow (Realtime tail, capture-to-ledger animation design.md §3.1).
-- [ ] Strategy page: header, status chips, GenealogyGraph (SVG + d3-force, deterministic
+- [x] LedgerRail + LedgerRow (Realtime tail, capture-to-ledger animation design.md §3.1).
+- [x] Strategy page: header, status chips, GenealogyGraph (SVG + d3-force, deterministic
       layout, node birth animation §3.2, amber ring = risk_flag).
 - [x] AskBar (Cmd+K): actions + questions; question path: pgvector retrieval over
       decisions/debrief turns, answer with citation chips linking to sources; no source,
       no claim (render "not in the corpus" honestly).
-- [ ] Persona mode (D14 hero 1): asking about a departed member's work answers in
+- [x] Persona mode (D14 hero 1): asking about a departed member's work answers in
       their register from THEIR rows only (retrieval filtered to author), every
       sentence cited, non-removable banner "Reconstructed from <name>'s ledger. He
       left in <month>." Same route, different prompt + filter; seed Daniel's corpus
       rich enough that three rehearsed questions answer beautifully.
-- [ ] Time Machine (D14 hero 2): timeline scrubber on the strategy page replaying the
+- [x] Time Machine (D14 hero 2): timeline scrubber on the strategy page replaying the
       ledger to time T; graph nodes/edges appear in event order (layout is already
       deterministic, so precompute final positions and reveal progressively); scrubbing
       past a departure inks that member's decisions amber in dependency order.
@@ -288,7 +326,7 @@ The arc is the meal; this list is garnish. The build model may not reorder it.
       justification onto the event payload; My Record view filters the ledger to the
       signed-in member's captured contributions and the access events touching them.
       Small tasks, big pitch: the ledger records who read it.
-- [ ] App shell + rail nav + empty states per design.md §4.
+- [x] App shell + rail nav + empty states per design.md §4.
 - **Acceptance:** demo arc steps 1-2 (prd §6) run scripted; keyboard-only pass for those
   steps; screenshots stored in `docs/shots/`.
 - **Sprint log:**
@@ -302,6 +340,19 @@ The arc is the meal; this list is garnish. The build model may not reorder it.
   answerable questions score 0.88 to 0.93, unanswerable ones top out at 0.47, floor set
   at 0.60. Plus the three owner-directed features in AMENDMENT A21. STILL OPEN in S3:
   access events, the export checkpoint, and My Record (S3.4).
+
+- **Sprint log (third entry):** Logged: 2026-08-22T21:30+10:00 · status: done · actual:
+  ~4.4h cumulative (budget 4h, slight overrun) · by: Claude Opus 5 (Claude Code) · note:
+  every reading surface is delivered. Ledger with a live tail, strategy genealogy with a
+  deterministic layout, the risk board with the departure simulation, the ask bar with
+  hybrid retrieval, access events with the export checkpoint, and My Record.
+
+  The overrun is the ask bar, and specifically the decision to make retrieval hybrid
+  rather than purely dense. Dense embeddings alone return everything about the right
+  subject and rank the record that answers the question below them, which looks like a
+  working search and is not one. BM25 supplies the exactness. The relevance floor is
+  measured rather than chosen: answerable questions score 0.88 to 0.93 blended and
+  unanswerable ones top out at 0.47.
 ## S4 — Debrief agent (budget 3h)
 
 - [x] Scheduler table + triggers (post-merge, drawdown-flag stub, weekly pulse,
@@ -424,7 +475,7 @@ The arc is the meal; this list is garnish. The build model may not reorder it.
       in docs/scoping.md §D. STAMP THE FIRST HEAD ON SATURDAY so an upgraded
       Bitcoin-attested receipt exists by demo time (attestation takes 1-6+ hours);
       pending receipts are shown honestly as pending.
-- [ ] Verify page: in-browser chain recompute (verify sweep animation §3.5), tamper
+- [x] Verify page: in-browser chain recompute (verify sweep animation §3.5), tamper
       demo against a copied chain, OTS receipt display (pending-attestation state is
       fine and shown honestly).
 - **Acceptance:** verify page passes on live data; staged tamper halts the sweep on the
@@ -461,11 +512,14 @@ The arc is the meal; this list is garnish. The build model may not reorder it.
 
 - [~] Web build to Vercel: env, auth redirect URLs, seeded demo firm, registration →
       sandbox firm flow, footer synthetic-data notice.
+      BLOCKED on `supabase login`: there is no project to point env or redirect URLs at
+      until one is linked. vercel.json, the four routes and the build are all done, and
+      `./scripts/deploy.sh web` runs the moment the database step can.
 - [x] Desktop: `pnpm tauri build` .dmg (unsigned; note in README + MANUAL TASKS).
       Built and verified: Continuity_0.1.0_aarch64.dmg, 7.7 MB, mounts, ad-hoc signed,
       identifier dev.continuity.app.
 - [~] Smoke the full demo arc (prd §6) on the DEPLOYED demo, not localhost.
-      Blocked with the deploy. The arc IS smoked on localhost and against the real
+      BLOCKED with the deploy, on the same `supabase login`. The arc IS smoked on localhost and against the real
       Postgres, by scripts/capture-beats.ts, which asserts each of the fifteen product
       beats arrived before it captures it.
 - **Acceptance:** public URL live; fresh account reaches sandbox and files a decision in
