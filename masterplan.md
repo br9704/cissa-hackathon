@@ -472,6 +472,32 @@ The arc is the meal; this list is garnish. The build model may not reorder it.
 - [ ] Optional: purchase nothing. No paid spend is authorized in Stage 2 (D-gate).
 - [ ] Post-hackathon: decide repo visibility, codesigning, and whether the demo stays up.
 
+**Added during the Stage 2 build, 2026-08-22 evening.**
+
+- [ ] **Bruno: the one blocking item is the Supabase login.** `supabase login` then
+      `supabase link --project-ref <ref>`. Everything else in S8 is written and waiting:
+      `apps/web/vercel.json`, the two server routes, the migrations, the seed. The Vercel
+      CLI is already authenticated as `br9704`.
+- [ ] **Bruno: three environment variables, once the project exists.**
+      `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` are public and go in the client
+      bundle; `SUPABASE_SERVICE_ROLE_KEY` and `ANTHROPIC_API_KEY` are unprefixed and
+      server only. Anything with a `VITE_` prefix is baked into the JavaScript that ships
+      to a browser, so the service role key must never carry one.
+- [ ] **Bruno: Vercel project settings.** Root Directory `apps/web`, AND tick "Include
+      files outside the Root Directory" so the workspace lockfile is present. Framework
+      preset Vite, output `dist`, Node 24.
+- [ ] **Bruno: Supabase Auth settings.** Turn Confirm email OFF for the weekend, and put
+      the Vercel production URL plus `http://localhost:5273` in the redirect allow list.
+      Note the port: this project runs on 5273, not the Vite default 5173, because
+      another project on this machine already holds 5173.
+- [ ] **Bruno: decide whether the tagger number goes in the UI at all.** It is trained and
+      it will score very high, and `ml/README.md` explains why that number measures less
+      than it looks like it measures. My recommendation is to show it WITH the caveat, or
+      not at all, and never without.
+- [ ] Bruno: pgvector was installed on the local Homebrew PostgreSQL 17 during the build
+      (`brew install pgvector`) so the vector migration could be tested. Free, reversible,
+      and worth knowing about since it touched a shared install.
+
 ---
 
 ## AMENDMENTS (append-only; date + why for any change to a locked decision)
