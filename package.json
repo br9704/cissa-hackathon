@@ -1,0 +1,19 @@
+{
+  "name": "continuity",
+  "private": true,
+  "version": "0.1.0",
+  "packageManager": "pnpm@11.13.0",
+  "scripts": {
+    "dev": "pnpm --filter @continuity/web dev",
+    "build": "pnpm --filter @continuity/web build",
+    "test": "pnpm -r test",
+    "typecheck": "pnpm -r typecheck",
+    "check": "pnpm run guard:hex && pnpm run guard:vars && pnpm run test",
+    "guard:hex": "node scripts/guard-hex.mjs",
+    "guard:vars": "node scripts/guard-css-vars.mjs",
+    "shots": "pnpm --filter @continuity/web exec tsx ../../scripts/shots.ts"
+  },
+  "devDependencies": {
+    "typescript": "5.9.3"
+  }
+}

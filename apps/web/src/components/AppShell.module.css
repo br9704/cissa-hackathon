@@ -1,0 +1,209 @@
+.shell {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  height: 100%;
+}
+
+/*
+  The rail. 64px of icons, expanding to 220px on hover so the labels are available
+  without ever costing the content area the space by default.
+*/
+.rail {
+  position: sticky;
+  top: 0;
+  align-self: start;
+  height: 100vh;
+  width: 64px;
+  padding: 12px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  border-radius: 0;
+  border-top: none;
+  border-bottom: none;
+  border-left: none;
+  overflow: hidden;
+  transition: width var(--dur-med) var(--ease-out);
+}
+
+.rail:hover,
+.rail:focus-within {
+  width: 220px;
+}
+
+/*
+  The wordmark collapses the same way the nav labels do. A single "C" mark at 64px, the
+  full name once the rail expands. Letting the full word sit in a 64px column just clips
+  it to "Contin", which reads as a bug rather than as restraint.
+*/
+.wordmark {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 12px;
+  margin-bottom: 16px;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+
+.mark {
+  flex: 0 0 20px;
+  display: grid;
+  place-items: center;
+  height: 20px;
+  border-radius: 6px;
+  background: var(--text);
+  color: var(--surface-solid);
+  font-size: 12px;
+  font-weight: 620;
+  letter-spacing: 0;
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 12px;
+  border-radius: var(--radius-s);
+  color: var(--text-secondary);
+  white-space: nowrap;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: background var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out);
+}
+
+.navItem:hover {
+  background: var(--surface-hover);
+  color: var(--text);
+  text-decoration: none;
+}
+
+.navItem[data-active="true"] {
+  background: var(--surface-hover);
+  color: var(--text);
+  font-weight: 540;
+}
+
+.glyph {
+  flex: 0 0 20px;
+  display: grid;
+  place-items: center;
+  color: inherit;
+}
+
+.label {
+  opacity: 0;
+  transition: opacity var(--dur-fast) var(--ease-out);
+}
+
+.rail:hover .label,
+.rail:focus-within .label {
+  opacity: 1;
+}
+
+.main {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px var(--gutter);
+  border-radius: 0;
+  border-left: none;
+  border-right: none;
+  border-top: none;
+}
+
+.firm {
+  font-weight: 540;
+  white-space: nowrap;
+}
+
+.askTrigger {
+  flex: 1;
+  max-width: 420px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 7px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-s);
+  background: var(--surface-solid);
+  color: var(--text-tertiary);
+  cursor: pointer;
+}
+
+.askTrigger:hover {
+  border-color: var(--border-medium);
+}
+
+.kbd {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-tertiary);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 1px 5px;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.member {
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  font-weight: 560;
+  background: var(--surface-recessed);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+
+/*
+  The scroll edge. Content passes under the blurred top bar, so it needs a legibility
+  gradient beneath it. One per view edge, only where floating UI actually exists.
+*/
+.scrollEdge {
+  position: sticky;
+  top: 53px;
+  z-index: 9;
+  height: var(--scroll-edge-h);
+  margin-bottom: calc(var(--scroll-edge-h) * -1);
+  background: var(--scroll-edge);
+  pointer-events: none;
+}
+
+.content {
+  flex: 1;
+  width: 100%;
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 24px var(--gutter) 64px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.footer {
+  padding: 16px var(--gutter) 32px;
+  color: var(--text-tertiary);
+  font-size: 13px;
+  text-align: center;
+}

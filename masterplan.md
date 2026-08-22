@@ -1,6 +1,6 @@
 # masterplan.md: Continuity
 
-> **Current sprint: S0 — Foundation** _(Stage 1 closed on delivery of the pack; Stage 1.5 verification and expansion closed 2026-08-22)_
+> **Current sprint: S1 — The schema and the chain** _(Stage 1 closed on delivery of the pack; Stage 1.5 verification and expansion closed 2026-08-22)_
 >
 > This file is the ledger. Work only the active sprint. Mark tasks live:
 > `[ ]` not started · `[~]` in progress · `[x]` complete · `[⏭]` deferred (one-line reason).
@@ -658,20 +658,23 @@ S6 (tagger) runs in parallel on the owner's machine from Sat evening.
 
 ## S0 — Foundation (budget 1.5h)
 
-- [ ] pnpm monorepo per prd §4.7: `apps/desktop`, `apps/web`, `packages/core`,
+- [x] pnpm monorepo per prd §4.7: `apps/desktop`, `apps/web`, `packages/core`,
       `packages/cli`, `ml`, `supabase`, `docs`, `assets`.
-- [ ] Vite React TS app boots; `tokens.css` from design.md §2 wired; Geist self-hosted;
+- [x] Vite React TS app boots; `tokens.css` from design.md §2 wired; Geist self-hosted;
       grep-guard script: no hex literals outside tokens.css (add to `pnpm check`).
-- [ ] Tauri 2 shell wraps the dev server; menu-bar (tray) icon (placeholder template
+- [x] Tauri 2 shell wraps the dev server; menu-bar (tray) icon (placeholder template
       glyph for now); global
       shortcut registers and opens a placeholder window. Crib config from hive
       `apps/desktop`. FALLBACK if tray/shortcut fights: ship windowed app, move
       quick-capture into the main window (Cmd+K mode), log deferral.
-- [ ] Supabase project linked; env plumbing (`.env.local`, never committed); typegen.
-- [ ] Verify-list from Verified facts checked off with one-line evidence each.
+- [~] Supabase project linked; env plumbing (`.env.local`, never committed); typegen.
+      BLOCKED on the human: `supabase projects list` returns Unauthorized and this
+      machine has no Docker, so `supabase start` is unavailable too. Worked around by
+      developing the schema against the local Homebrew PostgreSQL 17.11 (see S1).
+- [x] Verify-list from Verified facts checked off with one-line evidence each.
 **Expanded steps (Stage 1.5). Run in this order; each is a checkpoint.**
 
-- [ ] S0.0 Commit the Stage 1 pack FIRST so there is a baseline to diff against:
+- [x] S0.0 Commit the Stage 1 pack FIRST so there is a baseline to diff against:
       `git add -A && git commit -m "Stage 1 pack: prd, design, masterplan, dossiers"`.
       **`CLAUDE.md` and `ENGINEERPROMPT.md` are NEVER committed** (owner rule,
       22 Aug 2026); both are already in `.gitignore`, so `git add -A` is safe, but check
@@ -679,7 +682,7 @@ S6 (tagger) runs in parallel on the owner's machine from Sat evening.
       The pack is currently untracked. Remote is already
       `https://github.com/br9704/cissa-hackathon.git`; `vercel whoami` already returns
       `br9704`. Delete the placeholder `src/.gitkeep` when `apps/` lands.
-- [ ] S0.1 Workspace. `pnpm-workspace.yaml` at root:
+- [x] S0.1 Workspace. `pnpm-workspace.yaml` at root:
       `packages: ["apps/*", "packages/*"]`. **Write `allowBuilds`, not
       `onlyBuiltDependencies`**: pnpm 11 reads only the former and a clean checkout dies
       with `ERR_PNPM_IGNORED_BUILDS` while an existing dev machine never sees it (this
@@ -693,10 +696,10 @@ S6 (tagger) runs in parallel on the owner's machine from Sat evening.
       ```
       If an install fails on pnpm 11's `minimumReleaseAge` supply-chain guard, the
       exemption list takes BARE package names, never `name@version`.
-- [ ] S0.2 Directories per prd §4.7: `apps/web`, `apps/desktop`, `packages/core`,
+- [x] S0.2 Directories per prd §4.7: `apps/web`, `apps/desktop`, `packages/core`,
       `packages/cli`, `ml`, `supabase`, `docs`, `assets`. NOTE the Vercel constraint
       from A9: server routes live at **`apps/web/api/`**, not repo root.
-- [ ] S0.3 `apps/web`: `pnpm create vite@latest . --template react-ts`, then pin
+- [x] S0.3 `apps/web`: `pnpm create vite@latest . --template react-ts`, then pin
       exactly. `typescript` is **5.9.3**, NOT the 7.0.2 npm reports as latest (A8).
       ```
       pnpm add react@19.2.8 react-dom@19.2.8 @tanstack/react-router@1.170.31 \
@@ -710,7 +713,7 @@ S6 (tagger) runs in parallel on the owner's machine from Sat evening.
       the real failure is two resolutions in the lockfile, not two names.
       If any Vite config in a doc says `build.rollupOptions`, it is `rolldownOptions`
       in Vite 8 (A7).
-- [ ] S0.4 `apps/web/src/styles/tokens.css` from design.md §2, WITH the three Stage 1.5
+- [x] S0.4 `apps/web/src/styles/tokens.css` from design.md §2, WITH the three Stage 1.5
       corrections applied (see AMENDMENTS A6 and A11):
       `--font-sans: "Geist Variable", ...` and `--font-mono: "Geist Mono Variable", ...`
       (the bare names "Geist"/"Geist Mono" do not exist and fall silently through to the
@@ -718,7 +721,7 @@ S6 (tagger) runs in parallel on the owner's machine from Sat evening.
       0.55 to **0.62**. Import the two font CSS files FIRST in `main.tsx`:
       `import '@fontsource-variable/geist'` then
       `import '@fontsource-variable/geist-mono'`.
-- [ ] S0.5 Guardrails, all wired into one `pnpm check` script. Three of them, ported
+- [x] S0.5 Guardrails, all wired into one `pnpm check` script. Three of them, ported
       from hive (`apps/web/lib/css-tokens.test.ts`, `readability-guardrails.test.ts`):
       (a) **hex grep-guard**:
       `grep -rnE '#[0-9a-fA-F]{3,8}\b' apps/web/src --include='*.css' --include='*.tsx' | grep -v tokens.css && exit 1 || exit 0`
@@ -731,14 +734,14 @@ S6 (tagger) runs in parallel on the owner's machine from Sat evening.
       against the WORST body surface, which is `--surface-recessed` composited over the
       bottom stop of `--bg-field`, NOT `--surface-hover`. Getting the worst case wrong is
       how design.md's own claim came to be technically true and practically misleading.
-- [ ] S0.6 Tauri shell. `cd apps/desktop && pnpm add -D @tauri-apps/cli@2.11.4 &&
+- [x] S0.6 Tauri shell. `cd apps/desktop && pnpm add -D @tauri-apps/cli@2.11.4 &&
       pnpm add @tauri-apps/api@2.11.1 && npx tauri init`. Cargo:
       `tauri = { version = "2.11.5", features = ["tray-icon", "image-png"] }` and
       `tauri-build = "2.6.3"`. **Use 2.11.5, not 2.11.4** (2.11.4 pinned `time` and can
       hit a cookie/time compile error, tauri#15615). Crib config layout and the
       per-platform `tauri.macos.conf.json` override from `~/Desktop/hive/apps/desktop`,
       but note hive has NO tray and NO global shortcut, so those two are built fresh.
-- [ ] S0.7 Global shortcut: `pnpm tauri add global-shortcut`, then **hand-edit
+- [x] S0.7 Global shortcut: `pnpm tauri add global-shortcut`, then **hand-edit
       `src-tauri/capabilities/default.json`**, because the `global-shortcut:default`
       permission the CLI writes is DELIBERATELY EMPTY and every JS call fails silently
       against it. Full file:
@@ -756,7 +759,7 @@ S6 (tagger) runs in parallel on the owner's machine from Sat evening.
       ```
       The `$schema` path does not exist until the first build; that is expected.
       Gate the handler on `event.state === 'Pressed'` or the action fires twice.
-- [ ] S0.8 Quick-capture window and tray. Static window entry in `tauri.conf.json`
+- [x] S0.8 Quick-capture window and tray. Static window entry in `tauri.conf.json`
       `app.windows[]` with `transparent: true`, `decorations: false`,
       `alwaysOnTop: true`, `visible: false`, `skipTaskbar: true`, plus
       `"app": { "macOSPrivateApi": true }` (exact casing) or the transparent window
@@ -767,24 +770,24 @@ S6 (tagger) runs in parallel on the owner's machine from Sat evening.
       `#[cfg(target_os = "macos")]` (the `App` form returns `()`, the `AppHandle` form
       returns `Result`). Tray PNG: monochrome black with alpha, ~44x44 @2x, in
       `src-tauri/icons/tray.png`.
-- [ ] S0.9 CSP in `tauri.conf.json` `app.security.csp`, object form. **Keep `ipc:` and
+- [x] S0.9 CSP in `tauri.conf.json` `app.security.csp`, object form. **Keep `ipc:` and
       `http://ipc.localhost` in `connect-src`** alongside
       `https://<ref>.supabase.co wss://<ref>.supabase.co`, or Tauri's own IPC breaks.
       Documented fast path if CSP fights at 3am: hive ships `"csp": null`.
-- [ ] S0.10 Shell detection helper in `apps/web/src/lib/shell.ts`. Prefer
+- [x] S0.10 Shell detection helper in `apps/web/src/lib/shell.ts`. Prefer
       `'isTauri' in window` (the documented contract from api 2.4.2; both `isTauri` and
       `__TAURI_INTERNALS__` are injected unconditionally) and guard every Tauri import
       behind it so the Vercel bundle never pulls the desktop API.
-- [ ] S0.11 Router: `createHashHistory()` inside Tauri (the custom protocol has no
+- [x] S0.11 Router: `createHashHistory()` inside Tauri (the custom protocol has no
       rewrites), `createBrowserHistory()` on the web. Both are re-exported from
       `@tanstack/react-router`; do not add `@tanstack/history`.
-- [ ] S0.12 Supabase project linked; `.env.local` (gitignored) with `VITE_SUPABASE_URL`
+- [~] S0.12 Supabase project linked; `.env.local` (gitignored) with `VITE_SUPABASE_URL`
       and `VITE_SUPABASE_ANON_KEY`. **Anything `VITE_`-prefixed is baked into the client
       bundle and is public**: the service-role key, the Anthropic key and the OpenAI key
       are UNPREFIXED and only ever read from `process.env` inside `apps/web/api/`.
       Typegen: `supabase gen types typescript --linked > packages/core/src/db.types.ts`.
       BLOCKED until the human logs the Supabase CLI in (MANUAL TASKS).
-- [ ] S0.13 Add Playwright MCP now so S9 is not a scramble:
+- [x] S0.13 Add Playwright MCP now so S9 is not a scramble:
       `claude mcp add --scope project playwright -- npx @playwright/mcp@latest`.
       Also `pnpm add -D playwright@1.62.1 tsx && npx playwright install chromium` for
       the scripted path, because the MCP server has NO reduced-motion toggle and that
@@ -795,7 +798,12 @@ S6 (tagger) runs in parallel on the owner's machine from Sat evening.
   both die -> in-window mode.
 - **Acceptance:** `pnpm dev` = web app on localhost; `pnpm tauri dev` = same UI in
   desktop shell with tray icon; empty ledger page renders on tokens; grep-guard passes.
-- **Sprint log:**
+- **Sprint log:** Logged: 2026-08-22T18:12+10:00 · status: done · actual: ~1.4h (budget 1.5h) ·
+  by: Claude Opus 5 (Claude Code) · note: monorepo, Vite/React/TS app on tokens, both
+  token guards plus a measured contrast test, six routes with empty states, Tauri 2
+  shell with tray icon and Cmd+Shift+Space quick capture, screenshot harness. Supabase
+  link deferred to S8, no credentials and no Docker on this machine; schema work moved
+  to a local Postgres 17.11 instead.
 
 ## S1 — The schema and the chain (budget 1h)
 

@@ -1,0 +1,38 @@
+[package]
+name = "continuity"
+version = "0.1.0"
+description = "The strategy continuity layer for quantitative trading firms"
+edition = "2021"
+rust-version = "1.77.2"
+
+[lib]
+name = "continuity_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2.6.3", features = [] }
+
+[dependencies]
+# 2.11.5 and not 2.11.4. 2.11.4 pinned the `time` crate below 0.3.52 and can fail to
+# compile through the cookie dependency; 2.11.5 unpinned it.
+#
+# tray-icon is a core feature and it is only auto enabled when a trayIcon block exists
+# in tauri.conf.json. We build the tray in Rust, so it has to be listed here explicitly.
+# image-png is what makes Image::from_bytes available for the template icon.
+#
+# macos-private-api is listed here as well as in tauri.conf.json. The docs say the config
+# flag enables the feature, and it does, but only when the build goes through the tauri
+# CLI. A plain `cargo check` fails with "does not match the allowlist defined under
+# tauri.conf.json", so anyone type checking the Rust without the CLI hits it. Listing it
+# costs nothing and makes both paths work.
+tauri = { version = "2.11.5", features = ["tray-icon", "image-png", "macos-private-api"] }
+tauri-plugin-global-shortcut = "2.3.2"
+tauri-plugin-opener = "2.5.4"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+[profile.release]
+# Deliberately not setting lto or codegen-units = 1. They shave a little off the binary
+# and cost minutes on every cold build, which is the wrong trade for a 48 hour build.
+opt-level = "s"
+strip = true

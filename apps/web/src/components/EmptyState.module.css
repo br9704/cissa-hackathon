@@ -1,0 +1,42 @@
+.empty {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 40px 28px;
+  border: 1px dashed var(--border-medium);
+  border-radius: var(--radius-l);
+  background: var(--surface-recessed);
+}
+
+.title {
+  font-size: 15px;
+  font-weight: 560;
+}
+
+.body {
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+/*
+  Empty states teach: each one names the capture surface that would fill it. The hint is
+  the point of the component, not decoration on top of it.
+*/
+.hint {
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-tertiary);
+  font-size: 13px;
+}
+
+.kbd {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 1px 5px;
+  background: var(--surface-solid);
+}

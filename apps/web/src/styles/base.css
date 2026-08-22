@@ -1,0 +1,114 @@
+/*
+  Base layer. Everything here reads a token; nothing here invents a value.
+*/
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  background-image: var(--bg-field);
+  background-attachment: fixed;
+  color: var(--text);
+  font-family: var(--font-sans);
+  /* design.md readability floor: body at least 15px, line height at least 1.5. */
+  font-size: 15px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3, h4 {
+  margin: 0;
+  font-weight: 560;
+  letter-spacing: -0.011em;
+  line-height: 1.25;
+}
+
+p {
+  margin: 0;
+  /* Measure stays under 72ch. Whitespace is load bearing, not leftover. */
+  max-width: 72ch;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+}
+
+/*
+  Keyboard first means the focus ring is a feature, not a default to be reset away.
+  Every interactive element gets a visible ring, and the S9 pass asserts it.
+*/
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: var(--radius-s);
+}
+
+/*
+  THE GLASS. One material, one radius. Navigation layer only: rail, top bar, ask bar,
+  quick capture, toasts, DecisionCard. Never inside a content pane, never on itself.
+
+  The blur radius is written as a literal on purpose. A backdrop-filter that references
+  a CSS custom property fails outright on macOS Sonoma under Safari 18.x, and Tauri
+  renders in the OS WKWebView, so that is a real machine and not a hypothetical one.
+  The -webkit- prefix comes first for the same reason: unprefixed backdrop-filter only
+  reached Baseline in Safari 18.0.
+*/
+.glass {
+  background: var(--surface);
+  -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  backdrop-filter: blur(20px) saturate(1.4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-l);
+  box-shadow: var(--shadow-pane);
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass {
+    background: var(--surface-solid);
+  }
+}
+
+/*
+  Kill switch. If blur ever costs us frames on stage, one class on <html> turns every
+  glass surface opaque without touching a component.
+*/
+html.no-blur .glass {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  background: var(--surface-solid);
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .glass {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+/* Numerals in tables, hashes and ids only. Never nav, buttons, headings or body. */
+.mono {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}

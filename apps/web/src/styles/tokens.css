@@ -1,0 +1,159 @@
+/*
+  tokens.css: the single source of truth for the Continuity design language.
+
+  Nothing else in the codebase may contain a colour literal. The guard in
+  scripts/guard-hex.mjs fails the build if it finds one, and that is deliberate:
+  the moment a component carries its own hex, the token file stops describing the
+  product and starts describing a subset of it.
+
+  Values come from design.md section 2. Three of them were changed on 22 Aug 2026
+  after the alphas were actually measured rather than assumed. See masterplan
+  amendments A6, A11 and A15 for the reasoning.
+*/
+
+:root {
+  /* FIELD: warm gallery white, lit from top left. Never flat white. */
+  --bg: #fafaf8;
+  --bg-field:
+    radial-gradient(ellipse 120% 80% at 18% -8%, #ffffff 0%, #fafaf8 55%, #f3f3f0 100%);
+
+  /*
+    GLASS SURFACES. One variant, one blur radius.
+
+    Glass belongs to the navigation layer only: the rail, the top bar, the ask bar,
+    the quick capture window, toasts, and DecisionCard. It never appears in the
+    content layer and it never stacks on itself. A pane inside a pane is opaque.
+    Two near identical translucencies read as an accident rather than a system,
+    which is why --surface and --nav-bg are now the same value.
+  */
+  --surface: rgba(255, 255, 255, 0.72);
+  --surface-hover: rgba(255, 255, 255, 0.82);
+  --nav-bg: rgba(255, 255, 255, 0.72);
+  --surface-recessed: #f6f6f4;
+  --surface-solid: #ffffff;
+
+  /*
+    SCROLL EDGE. Ledger rows pass under the blurred top bar, so the bar needs a soft
+    legibility gradient beneath it. Add one only where floating UI actually exists.
+    These are not decorative.
+  */
+  --scroll-edge: linear-gradient(to bottom,
+    rgba(250, 250, 248, 0.92) 0%, rgba(250, 250, 248, 0) 100%);
+  --scroll-edge-h: 48px;
+
+  /* HAIRLINES: ink at low alpha. 0.5px at 2x, 1px fallback. */
+  --border-subtle: rgba(20, 20, 25, 0.05);
+  --border: rgba(20, 20, 25, 0.08);
+  --border-medium: rgba(20, 20, 25, 0.12);
+  --border-strong: rgba(20, 20, 25, 0.18);
+
+  /*
+    TEXT: near black ink tiers.
+
+    The alphas below are measured, not chosen. Full sRGB compositing of each tier over
+    every surface over every stop of --bg-field, taking the worst result. The worst
+    surface for dark ink is --surface-recessed, not --surface-hover: dark text gets
+    harder to read as the background darkens, so the binding case is the darkest pane
+    body copy ever sits on. Measuring against the lightest surface is how the previous
+    --text-secondary looked compliant at 7.10 while actually measuring 6.87 where it
+    mattered.
+
+    Worst case measurements at these values: text 16.68, secondary 7.40, tertiary 4.91.
+  */
+  --text: #16161a;
+  --text-secondary: rgba(22, 22, 26, 0.74);
+  --text-tertiary: rgba(22, 22, 26, 0.62);
+  /*
+    --text-chrome measures 2.04 and is not readable as text anywhere. It is for
+    dividers and disabled affordances only, and it must never appear on a glass
+    surface.
+  */
+  --text-chrome: rgba(22, 22, 26, 0.32);
+
+  /*
+    ACCENTS. Ink blue is the interactive voice. Amber is reserved for knowledge risk
+    and appears nowhere else, ever. The moment amber decorates, the risk signal dies.
+    At most one filled --accent button per view.
+  */
+  --accent: #0a58ca;
+  --accent-verified: #1d7a46;
+  --accent-risk: #b45309;
+  --accent-danger: #b3261e;
+  --draft: rgba(10, 88, 202, 0.5);
+
+  /* SHADOWS: one soft key light, no harsh drops. */
+  --shadow-pane: 0 1px 2px rgba(20, 20, 25, 0.04), 0 8px 32px rgba(20, 20, 25, 0.06);
+  --shadow-float: 0 2px 8px rgba(20, 20, 25, 0.08), 0 24px 64px rgba(20, 20, 25, 0.12);
+
+  /*
+    GEOMETRY: 4px rhythm, radius ladder 8/12/16, one container.
+    The ladder describes OUTER radii. An inner radius is derived, not picked:
+    inner equals outer minus padding, so a 16 pane with 4px padding holds a 12 child.
+  */
+  --radius-s: 8px;
+  --radius-m: 12px;
+  --radius-l: 16px;
+  --container: 1280px;
+  --container-prose: 680px;
+  --gutter: clamp(16px, 4vw, 32px);
+
+  /*
+    TYPE. The family names below are the ones the fontsource packages actually
+    register. The bare names "Geist" and "Geist Mono" match nothing and fall silently
+    through to the system font, which is the kind of defect that survives until the
+    screenshots. Mono is for hashes, ids, code and table numerals only: never nav,
+    buttons, headings or body. Never use Thin, Light or Ultralight weights.
+  */
+  --font-sans: "Geist Variable", -apple-system, "Helvetica Neue", sans-serif;
+  --font-mono: "Geist Mono Variable", ui-monospace, monospace;
+
+  /* MOTION: three durations, two curves. */
+  --dur-fast: 140ms;
+  --dur-med: 240ms;
+  --dur-slow: 420ms;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: cubic-bezier(0.34, 1.4, 0.4, 1);
+}
+
+/*
+  ACCESSIBILITY MEDIA QUERIES.
+
+  These live here rather than in components so nothing has to opt in. The document had
+  a strong reduced motion story and no reduced transparency story at all, which was the
+  larger of the two gaps: Apple treats reduce transparency and increase contrast as
+  first class material states, not as afterthoughts.
+*/
+
+@media (prefers-reduced-transparency: reduce) {
+  :root {
+    --surface: var(--surface-solid);
+    --surface-hover: var(--surface-solid);
+    --nav-bg: var(--surface-solid);
+  }
+}
+
+@media (prefers-contrast: more) {
+  :root {
+    --border-subtle: rgba(20, 20, 25, 0.12);
+    --border: rgba(20, 20, 25, 0.18);
+    --border-medium: rgba(20, 20, 25, 0.24);
+    --border-strong: rgba(20, 20, 25, 0.32);
+    --text-secondary: rgba(22, 22, 26, 0.86);
+    --text-tertiary: rgba(22, 22, 26, 0.74);
+    --accent-risk: #8a3f07;
+  }
+}
+
+/*
+  Under reduced motion every animation collapses to a fade, and the spring curve falls
+  back to the plain ease out. Shortening a duration while keeping a 1.4 overshoot still
+  bounces, so the curve has to change too, not just the timing.
+*/
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-fast: 100ms;
+    --dur-med: 120ms;
+    --dur-slow: 140ms;
+    --ease-spring: var(--ease-out);
+  }
+}

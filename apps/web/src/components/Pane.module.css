@@ -1,0 +1,34 @@
+/*
+  A content pane. Opaque on purpose.
+
+  Glass is a navigation layer material. A pane inside the content column that also
+  carried backdrop-filter would be glass on glass, which reads as complexity rather than
+  depth and is the specific thing Apple's material guidance tells you not to do.
+*/
+.pane {
+  background: var(--surface-solid);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-l);
+  box-shadow: var(--shadow-pane);
+  /* 4px padding on a 16px outer radius gives a concentric 12px inner radius. */
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.title {
+  font-size: 17px;
+}
+
+.subtitle {
+  color: var(--text-tertiary);
+  font-size: 13px;
+}

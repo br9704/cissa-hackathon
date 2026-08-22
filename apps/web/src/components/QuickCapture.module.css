@@ -1,0 +1,87 @@
+/*
+  The quick capture panel. Ten seconds, keyboard only, from anywhere in macOS.
+
+  The window itself is transparent, so this element paints the whole visible surface.
+  Blurring through a transparent Tauri window to the desktop behind it does not work
+  (tauri#12804, #13801), so there is no attempt to: the panel paints its own field and
+  looks like glass because of its edge and its shadow, not because of what is behind it.
+*/
+.panel {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface-solid);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-l);
+  box-shadow: var(--shadow-float);
+  overflow: hidden;
+}
+
+.drag {
+  height: 8px;
+  flex: 0 0 8px;
+  cursor: grab;
+}
+
+.row {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 18px;
+}
+
+.mark {
+  flex: 0 0 20px;
+  height: 20px;
+  display: grid;
+  place-items: center;
+  border-radius: 6px;
+  background: var(--text);
+  color: var(--surface-solid);
+  font-size: 12px;
+  font-weight: 620;
+}
+
+.input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: none;
+  font-family: var(--font-sans);
+  font-size: 17px;
+  color: var(--text);
+  padding: 0;
+}
+
+.input::placeholder {
+  color: var(--text-tertiary);
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 18px 12px;
+  border-top: 1px solid var(--border-subtle);
+  padding-top: 10px;
+  font-size: 13px;
+  color: var(--text-tertiary);
+}
+
+.strategy {
+  font-weight: 540;
+  color: var(--text-secondary);
+}
+
+.spacer {
+  flex: 1;
+}
+
+.kbd {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 1px 5px;
+}

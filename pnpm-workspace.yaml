@@ -1,0 +1,17 @@
+packages:
+  - "apps/*"
+  - "packages/*"
+
+linkWorkspacePackages: true
+
+# pnpm 11 reads allowBuilds. The older onlyBuiltDependencies spelling is ignored by
+# pnpm 11, and the failure only shows up on a CLEAN checkout: an existing dev machine
+# already has esbuild built in node_modules, so there is nothing left to ignore. The
+# hive repo sat broken this way for every fresh clone until someone finally ran a clean
+# install. Write the new key from day one.
+allowBuilds:
+  esbuild: true
+
+# pnpm re-runs install before every script. On a clean CI checkout that re-install can
+# re-raise an already-resolved error and kill the script. The install step is explicit.
+verifyDepsBeforeRun: false
