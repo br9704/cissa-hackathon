@@ -50,6 +50,36 @@ tower on load. Do not "simplify" the repo id to `mlx-community/Qwen3.5-2B-bf16` 
 the `-MLX-` infix: identical weights, but converted from the base model rather than the
 instruct model, which is a materially worse starting point for a strict-JSON classifier.
 
+## What this number will and will not mean
+
+Training loss reached 0.02 by iteration 70. That is not a triumph, it is a warning, and
+the reason is in how the corpus was built.
+
+The training rows come from a template generator: forty templates, filled from a pool of
+parameter names, venues, dates and closing clauses. The held out split is drawn from the
+same generator. So a high macro F1 here measures **"can a small model learn forty
+templates"**, and the answer to that was always going to be yes. It does not measure
+"can this tag a real desk's decisions", because there are no real decisions to measure
+against, and there will not be any in a synthetic corpus.
+
+That distinction has to travel with the number wherever it goes. The claim this
+directory supports is:
+
+> Tagging runs on a model fine-tuned on this machine, and the data never leaves the
+> building.
+
+The claim it does not support is:
+
+> The tagger is 97 percent accurate on decision records.
+
+The second sentence is arithmetically true of the held out split and misleading about
+everything a reader would take it to mean. `results/summary.json` carries the numbers, the
+provenance, and this caveat, and anything the product displays reads from that file.
+
+The measurement that would settle it is a few hundred real decision records from a real
+desk, labelled by two people who disagree sometimes. That is not something a hackathon
+can produce, and pretending otherwise is worse than saying so.
+
 ## Honest claims
 
 No accuracy figure from this directory appears anywhere in the product until
