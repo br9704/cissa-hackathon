@@ -3,6 +3,7 @@ import styles from "./CaptureSheet.module.css";
 import { Recorder } from "./Recorder";
 import { TranscriptImporter, type ParsedTurn } from "./TranscriptImporter";
 import { capture } from "../data/capture";
+import { LiveTagger } from "./LiveTagger";
 import { corpus } from "../data/source";
 
 /*
@@ -173,6 +174,9 @@ export function CaptureSheet({ open, onClose }: { open: boolean; onClose: () => 
                   ))}
                 </select>
               </label>
+              {/* The model classifies what you typed, on this machine, while you watch. */}
+              <LiveTagger text={why} />
+
               <div className={styles.actions}>
                 <button
                   type="button"

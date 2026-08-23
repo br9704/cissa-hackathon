@@ -20,16 +20,27 @@ export function devApi(apiDir: string): Plugin {
   return {
     name: "continuity-dev-api",
     configureServer(server: ViteDevServer) {
-      const routes = readdirSync(apiDir)
-        .filter((f) => f.endsWith(".ts") && !f.startsWith("_"))
-        .map((f) => f.replace(/\.ts$/, ""));
+      /*
+        Resolved per request, not once at startup.
+
+        The route list used to be read here and cached for the life of the server, so a route
+        file added while the dev server was running returned 404 until somebody restarted it.
+        The comment two lines down promised that editing a route needs no restart, and that
+        was true for edits and false for new files, which is the most confusing shape a
+        half truth can take. A readdir per /api request is microseconds and this is the dev
+        server, not production.
+      */
+      const routesNow = (): string[] =>
+        readdirSync(apiDir)
+          .filter((f) => f.endsWith(".ts") && !f.startsWith("_") && !f.endsWith(".test.ts"))
+          .map((f) => f.replace(/\.ts$/, ""));
 
       server.middlewares.use(async (req, res, next) => {
         const url = req.url ?? "";
         if (!url.startsWith("/api/")) return next();
 
         const name = url.slice("/api/".length).split("?")[0]!;
-        if (!routes.includes(name)) return next();
+        if (!routesNow().includes(name)) return next();
 
         try {
           /* ssrLoadModule so the route gets Vite's transform pipeline and hot reload,

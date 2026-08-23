@@ -1,0 +1,40 @@
+/*
+  The model, working, where you can see it.
+
+  The finding was that a trained model rendered as a panel of numbers reads as decoration.
+  This is deliberately small and deliberately live: it sits under the field you are typing
+  into and classifies what you wrote, on this machine, while you watch.
+*/
+.wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 26px;
+  font-size: 12px;
+  color: var(--text-tertiary);
+  flex-wrap: wrap;
+}
+
+.label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.result {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-secondary);
+}
+
+.ms {
+  font-variant-numeric: tabular-nums;
+  color: var(--text-chrome);
+}
+
+.offline {
+  color: var(--text-chrome);
+  line-height: 1.5;
+}

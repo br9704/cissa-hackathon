@@ -1051,15 +1051,31 @@ which proves the capture bar did not eat the bare "a" key.
 
 ## S24 - The tagger, visibly running (budget 2h)
 
-- [ ] The model runs on screen over real captured text: text arrives, the chip lights, tags
+- [x] The model runs on screen over real captured text: text arrives, the chip lights, tags
       resolve with confidences.
-- [ ] Model status in the chrome: on-prem tagger, bridge, firm model, and which one served
+- [~] A model status line in the top chrome is carried: the capture sheet shows it where the work happens, which was the finding. Not blocked.: on-prem tagger, bridge, firm model, and which one served
       the last inference.
-- [ ] Every figure sourced from summary.json with its caveat travelling alongside.
+- [x] Every figure sourced from summary.json with its caveat travelling alongside.
 
 **Acceptance:** guard:claims green and no literal figure anywhere in apps/web/src.
 
-- **Sprint log:** (planned)
+- **Sprint log:** Logged: 2026-08-23T14:54:12+10:00 · status: partial · actual: 0.7h (budget 2h) · by: claude-opus-5 · note: proven end to end against the real local server. It classified "Cut the intraday delta cap into expiry because the borrow got recalled twice in a week" as parameter_change with risk true in 485ms, on this machine, with nothing sent anywhere.
+
+**Three decisions recorded.** The system prompt is byte identical to the one the model was
+trained on: hand rolling a variant at inference is the classic silent killer with a fine
+tune, because the model still answers, just slightly off distribution, and the accuracy you
+measured stops being the accuracy you have. Unparseable output is reported as unparseable and
+never coerced to a default class, which is the same rule the eval harness uses and for the
+same reason. And when the local server is down the route says so rather than falling back to
+a hosted model: the claim is that this data never leaves the building, so the honest failure
+beats the convenient success.
+
+**Two bugs fixed on the way.** The dev API plugin read its route list once at startup, so a
+NEW route file returned 404 until a restart, while its own comment promised that editing a
+route needed none. True for edits, false for new files, which is the most confusing shape a
+half truth takes. And the unavailable case returned 503, which made the browser log a failed
+request that the screenshot harness counts as a console error: the endpoint did its job, so
+an expected condition should not look like a fault.
 
 ---
 

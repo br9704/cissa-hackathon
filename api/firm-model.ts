@@ -16,7 +16,7 @@
   not running on this machine" and "the firm model returned nothing" are different problems
   for whoever is looking at the screen, and a single opaque error hides which one happened.
 */
-import { json } from "./_shared";
+import { preflight, json } from "./_shared.js";
 
 const FIRM_MODEL_URL = process.env.FIRM_MODEL_URL ?? "http://127.0.0.1:8081";
 
@@ -37,7 +37,19 @@ async function health(): Promise<boolean> {
   }
 }
 
-export default async function handler(req: Request): Promise<Response> {
+export function OPTIONS(request: Request): Response {
+  return preflight(request);
+}
+
+export async function GET(): Promise<Response> {
+  return methodRouter(new Request("http://local/", { method: "GET" }));
+}
+
+export async function POST(request: Request): Promise<Response> {
+  return methodRouter(request);
+}
+
+async function methodRouter(req: Request): Promise<Response> {
   if (req.method === "GET") {
     return json({ available: await health(), url: FIRM_MODEL_URL });
   }
