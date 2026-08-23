@@ -12,6 +12,7 @@ import {
   type CaptureChannel,
 } from "../data/capture";
 import { ago, strategyName } from "../data/source";
+import { PageHeader } from "../components/PageHeader";
 
 /*
   Every way in, in one room.
@@ -92,12 +93,10 @@ export function CapturePage() {
 
   return (
     <div className={styles.page}>
-      <h1>Capture</h1>
-      <p className={styles.lede}>
-        A ledger is worth exactly what people put into it, and asking somebody to stop working
-        and write is the reason wikis fail. So capture happens where the work already happens,
-        and everything lands in an inbox first: nothing reaches the record unread.
-      </p>
+      <PageHeader
+        title="Capture"
+        lead="A ledger is worth exactly what people put into it, and asking somebody to stop working and write is the reason wikis fail. So capture happens where the work already happens, and everything lands in an inbox first: nothing reaches the record unread."
+      />
 
       <div className={styles.grid}>
         <div>

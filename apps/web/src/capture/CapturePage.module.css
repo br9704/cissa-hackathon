@@ -1,4 +1,5 @@
-.page { max-width: var(--container); margin: 0 auto; padding: 24px var(--gutter) 96px; }
+/* Full width. The shell already supplies the gutter, so the page just fills it. */
+.page { width: 100%; padding-bottom: 72px; }
 .lede { color: var(--text-secondary); max-width: var(--container-prose); line-height: 1.65; margin: 0 0 24px; }
 
 .grid { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 24px; align-items: start; }

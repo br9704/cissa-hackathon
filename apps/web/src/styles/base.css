@@ -112,3 +112,79 @@ html.no-blur .glass {
   font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
 }
+
+/*
+  Interaction feel, in one place.
+
+  These are the rules that make clicking things feel like touching an object rather than
+  toggling a boolean, and they are here rather than in each component so a new panel inherits
+  them instead of re-inventing them slightly differently.
+
+  Three rules, and the third is the one most interfaces skip:
+
+    1. Hover lifts a surface that is clickable, and only one that is clickable. A card that
+       moves under the pointer and then does nothing is a lie about what it is.
+    2. Press settles it back. Without the active state a button rises on hover and then
+       stays risen while being pressed, which reads as unresponsive at exactly the moment
+       feedback matters most.
+    3. Nothing overshoots. The spring curve exists for one thing, the approve flight, and a
+       bouncing panel undercuts a product whose subject is records that do not move.
+*/
+
+button,
+a,
+[role="button"],
+[role="tab"],
+[role="menuitem"] {
+  transition:
+    background-color var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out),
+    color var(--dur-fast) var(--ease-out),
+    transform var(--dur-fast) var(--ease-out),
+    opacity var(--dur-fast) var(--ease-out);
+}
+
+/* Only an element that actually goes somewhere gets the lift. */
+@media (hover: hover) {
+  a[href]:hover,
+  button:not(:disabled):hover {
+    transform: translateY(-1px);
+  }
+}
+
+a[href]:active,
+button:not(:disabled):active {
+  transform: translateY(0);
+  transition-duration: var(--dur-live);
+}
+
+/*
+  Content arriving on a route change.
+
+  A page that appears fully formed at a new scroll position is disorienting; four pixels of
+  rise and a fade is enough to say "this is new" without making somebody wait for it. It
+  runs once on mount, so navigating back to a page does not replay it as though something
+  had changed.
+*/
+main > * {
+  animation: pageIn var(--dur-med) var(--ease-out) both;
+}
+
+@keyframes pageIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  a[href]:hover,
+  button:not(:disabled):hover,
+  a[href]:active,
+  button:not(:disabled):active {
+    /* The state change still happens through colour. Only the travel goes. */
+    transform: none;
+  }
+
+  main > * {
+    animation: none;
+  }
+}

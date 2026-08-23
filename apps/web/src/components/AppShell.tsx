@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import { Link, Outlet, useRouterState } from "@tanstack/react-router";
 import styles from "./AppShell.module.css";
 import { AskBar } from "./AskBar";
@@ -6,6 +6,7 @@ import { CaptureSheet } from "./CaptureSheet";
 import { PixelMark } from "./pixel/PixelMark";
 import { PixelBlast } from "./pixel/PixelBlast";
 import { UserMenu } from "../auth/UserMenu";
+import { railCollapsed, setRailCollapsed, subscribeToRail } from "./useRailState";
 import { LivenessStrip } from "./LivenessStrip";
 import {
   LedgerIcon,
@@ -34,8 +35,8 @@ const NAV = [
   { to: "/", label: "The record", hint: "every decision, locked", Icon: LedgerIcon },
   { to: "/strategies", label: "Strategies", hint: "how the thinking developed", Icon: StrategyIcon },
   { to: "/risk", label: "Knowledge risk", hint: "who holds a book alone", Icon: RiskIcon },
-  { to: "/debriefs", label: "Debriefs", hint: "capture reasoning, ask leavers", Icon: DebriefIcon },
-  { to: "/compliance", label: "Reports", hint: "handover and regulator packs", Icon: ComplianceIcon },
+  { to: "/debriefs", label: "Debriefs", hint: "ask people before they go", Icon: DebriefIcon },
+  { to: "/compliance", label: "Reports", hint: "handover and regulator", Icon: ComplianceIcon },
   { to: "/verify", label: "Verify", hint: "check nothing was altered", Icon: VerifyIcon },
   /*
     My Record was reachable only from the avatar, which meant the transparency principle
@@ -45,7 +46,7 @@ const NAV = [
   {
     to: "/academy",
     label: "Academy",
-    hint: "learn the desk from its own record",
+    hint: "learn the desk from the record",
     Icon: AcademyIcon,
   },
   { to: "/system", label: "The system", hint: "what this is, checked live", Icon: SystemIcon },
@@ -56,6 +57,7 @@ export function AppShell() {
   const path = useRouterState({ select: (s) => s.location.pathname });
   const [askOpen, setAskOpen] = useState(false);
   const [captureOpen, setCaptureOpen] = useState(false);
+  const collapsed = useSyncExternalStore(subscribeToRail, railCollapsed, () => false);
 
   /*
     Cmd+K opens the palette from anywhere. Bound on the window rather than on a focused
@@ -101,10 +103,26 @@ export function AppShell() {
     <div className={styles.shell}>
       <PixelBlast />
       <div className={styles.railColumn}>
-        <nav className={styles.rail} aria-label="Sections">
+        <nav className={styles.rail} aria-label="Sections" data-collapsed={collapsed}>
           <div className={styles.wordmark}>
             <PixelMark size={22} title="Continuity" />
             <span className={styles.label}>Continuity</span>
+            <button
+              type="button"
+              className={styles.collapseButton}
+              onClick={() => setRailCollapsed(!collapsed)}
+              aria-label={collapsed ? "Expand the navigation" : "Collapse the navigation"}
+              title={collapsed ? "Expand the navigation" : "Collapse the navigation"}
+            >
+              <svg width="14" height="14" viewBox="0 0 12 12" fill="currentColor" shapeRendering="crispEdges" aria-hidden="true">
+                <rect x="1" y="1" width="1" height="10" />
+                <rect x="8" y="5" width="3" height="1" />
+                <rect x="7" y="4" width="1" height="1" />
+                <rect x="7" y="6" width="1" height="1" />
+                <rect x="6" y="3" width="1" height="1" />
+                <rect x="6" y="7" width="1" height="1" />
+              </svg>
+            </button>
           </div>
           {NAV.map(({ to, label, hint, Icon }) => (
             <Link
@@ -113,6 +131,9 @@ export function AppShell() {
               className={styles.navItem}
               data-active={path === to}
               aria-current={path === to ? "page" : undefined}
+              /* Collapsed hides the words, so the name has to live here too. */
+              aria-label={label}
+              title={collapsed ? `${label}: ${hint}` : undefined}
             >
               <span className={styles.glyph}>
                 <Icon />

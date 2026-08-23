@@ -35,11 +35,12 @@
 .name { font-size: 13px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .role { font-size: 11px; color: var(--text-tertiary); }
 
+/*
+  Fixed, not absolute. The rail clips its own overflow for the collapse animation, so a menu
+  anchored inside it was cut off entirely. Position comes from measuring the trigger.
+*/
 .pop {
-  position: absolute;
-  bottom: calc(100% + 6px);
-  left: 0;
-  width: max(240px, 100%);
+  position: fixed;
   background: var(--surface-solid);
   border: 1px solid var(--border);
   border-radius: var(--radius-m);
@@ -48,7 +49,21 @@
   display: flex;
   flex-direction: column;
   gap: 2px;
-  z-index: 30;
+  z-index: 120;
+  animation: menuIn var(--dur-fast) var(--ease-out);
+}
+
+/* Arrives from the direction it opens, which is upward. */
+@keyframes menuIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pop {
+    /* The settled state, immediately. */
+    animation: none;
+  }
 }
 
 .email {
@@ -83,6 +98,13 @@
 
 .row:hover { background: var(--surface-hover); color: var(--text); }
 .row:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+
+/*
+  The rail sets data-collapsed on itself, so the menu inside it reads that rather than
+  duplicating the breakpoint and drifting out of step with it.
+*/
+[data-collapsed="true"] .who { display: none; }
+[data-collapsed="true"] .trigger { justify-content: center; }
 
 @media (max-width: 1080px) {
   .who { display: none; }

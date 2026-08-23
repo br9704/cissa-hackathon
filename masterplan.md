@@ -1485,6 +1485,44 @@ is worth.
   listening to, so all 184 were dead ends; as anchors they also get middle click and open in
   new tab for free.
 
+## S31 - Layout and interaction pass (budget 2h)
+
+Owner feedback after seeing the finished build, and all of it was right.
+
+- [x] The rail collapses by choice, remembered in localStorage rather than reset every load.
+      A navigation you have to re-collapse every morning is worse than not offering it.
+- [x] Collapsed HIDES the words rather than letting the width clip them. The first attempt
+      animated only the width and a 62px rail showed the first letter and a half of each
+      label. A word cut mid letter reads as a rendering fault, not as a compact mode.
+- [x] The collapse control stays visible when collapsed. The first version hid it, which made
+      the collapsed state one the interface could not leave.
+- [x] Full width pages, not a centred 1280 column. Panels here are instruments, not prose:
+      capping the page left wide monitors with empty margins and forced everything into one
+      narrow stack, which is what made this read as a document rather than as a tool. Prose
+      still caps its own measure, because that belongs to the paragraph.
+- [x] Desk is a grid. The first attempt spanned the opening panel across two columns, which
+      sounds right and looked wrong: three panels in three tracks produced a two-plus-one row
+      and then a lone panel underneath, so the page was mostly a hole.
+- [x] The account menu no longer clips. The rail hides its own overflow so the collapse
+      animation clips labels rather than reflowing them, which meant a menu anchored inside
+      it was cut off entirely. It is positioned in viewport space from the trigger's rect.
+- [x] Interaction feel in one place in base.css: hover lifts only what is actually clickable,
+      press settles it back so a button does not stay risen while being held, and content
+      rises four pixels on arrival. Nothing overshoots; the spring curve stays reserved for
+      the approve flight.
+- [x] Every page uses PageHeader, so each screen says what it is in one sentence. Four newer
+      surfaces had been using a bare h1.
+- [x] Nav hints shortened, and they ellipsise as a backstop rather than running off the edge.
+- [x] 14 fresh screenshots in docs/new pics, taken through demo mode so anybody can
+      regenerate them without a database.
+
+**Acceptance:** verified live after deploy. Demo path works, 184 records, 11 nav entries,
+zero console errors.
+
+- **Sprint log:** Logged: 2026-08-23T16:15:41+10:00 · status: done · actual: 1.1h (budget 2h) · by: claude-opus-5 · note: three of my own layout attempts were wrong first and are recorded above rather than quietly fixed. The screenshot script was also writing into apps/web/docs, which is gitignored, so the pictures were going somewhere they could never be committed from.
+
+---
+
 ## STAGE 3 CLOSING REPORT (2026-08-23)
 
 **What shipped.** The three P0 bugs that made the app feel broken to type in. The P1 tier

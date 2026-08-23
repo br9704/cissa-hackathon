@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import styles from "./SystemPage.module.css";
 import { PixelIcon, type GlyphName } from "../components/pixel/PixelIcon";
 import { corpus, backend } from "../data/source";
+import { PageHeader } from "../components/PageHeader";
 
 /*
   What the thing actually is, drawn.
@@ -130,13 +131,10 @@ export function SystemPage() {
 
   return (
     <div className={styles.page}>
-      <h1>The system</h1>
-      <p className={styles.lede}>
-        What this actually is, checked against itself. Anything that can be probed is probed
-        live, so this diagram is either true or it tells you which part is not running. The
-        shape is the whole argument: many ways in, one append only spine, and everything else
-        derived from it.
-      </p>
+      <PageHeader
+        title="The system"
+        lead="What this actually is, checked against itself. Anything that can be probed is probed live, so this diagram is either true or it tells you which part is not running. The shape is the whole argument: many ways in, one append only spine, and everything else derived from it."
+      />
 
       <div className={styles.flow}>
         {layers.map((layer, i) => (

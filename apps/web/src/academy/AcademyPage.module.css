@@ -1,7 +1,7 @@
+/* Full width. The shell already supplies the gutter, so the page just fills it. */
 .page {
-  max-width: var(--container);
-  margin: 0 auto;
-  padding: 24px var(--gutter) 96px;
+  width: 100%;
+  padding-bottom: 72px;
 }
 
 .lede {

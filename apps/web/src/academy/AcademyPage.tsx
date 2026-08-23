@@ -4,6 +4,7 @@ import { buildCurriculum } from "./curriculum";
 import { corpus } from "../data/source";
 import { DecisionLink, QuestionLink, StrategyLink } from "../components/EntityLink";
 import { StatusChip } from "../components/StatusChip";
+import { PageHeader } from "../components/PageHeader";
 
 /*
   The Academy.
@@ -49,13 +50,10 @@ export function AcademyPage() {
 
   return (
     <div className={styles.page}>
-      <h1>Academy</h1>
-      <p className={styles.lede}>
-        The desk's own record, arranged for somebody who was not there. Modules are books,
-        lessons are the decisions actually recorded on them, and the order follows what
-        replaced what, because a change only makes sense after the thing it replaced. Nothing
-        here is written for training: it is the ledger, which is why it cannot go stale.
-      </p>
+      <PageHeader
+        title="Academy"
+        lead="The desk's own record, arranged for somebody who was not there. Modules are books, lessons are the decisions actually recorded on them, and the order follows what replaced what. Nothing here is written for training: it is the ledger, which is why it cannot go stale."
+      />
 
       <div className={styles.grid}>
         <div>

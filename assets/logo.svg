@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 222 64" width="222" height="64" role="img" aria-label="Continuity">
+  <title>Continuity</title>
+  <!-- Horizontal lockup: the mark at full height, then the wordmark.
+       See logo-mark.svg for the geometry and for why the weave is drawn
+       in that order. Clear space either side is one ring radius, 13. -->
+  <style>
+    .ink { stroke: #16161a; }
+    .inkfill { fill: #16161a; }
+    @media (prefers-color-scheme: dark) {
+      .ink { stroke: #f2f2f0; }
+      .inkfill { fill: #f2f2f0; }
+    }
+  </style>
+  <g fill="none" stroke-linecap="round" stroke-width="6">
+    <circle class="ink" cx="25" cy="25" r="13"/>
+    <circle cx="39" cy="39" r="13" stroke="#0a58ca"/>
+    <path class="ink" d="M 37.22 20.55 A 13 13 0 0 1 36.26 31.50"/>
+  </g>
+  <text class="inkfill" x="73" y="41"
+        font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, Helvetica, Arial, sans-serif"
+        font-size="27" font-weight="600" letter-spacing="-0.6">Continuity</text>
+</svg>

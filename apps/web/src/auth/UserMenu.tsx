@@ -21,12 +21,43 @@ export function UserMenu() {
   useSyncExternalStore(subscribeToViewer, viewerId, () => null);
   const [open, setOpen] = useState(false);
   const wrap = useRef<HTMLDivElement>(null);
+  const trigger = useRef<HTMLButtonElement>(null);
+  /*
+    The popover is positioned in VIEWPORT space, not inside the rail.
+
+    The rail has overflow hidden, which it needs for the collapse animation to clip the
+    labels rather than reflow them. Anything absolutely positioned inside it is therefore
+    cut off, and this menu opens upward from the very bottom of that column, so it was
+    clipped completely. Measuring the trigger and rendering fixed is the fix that does not
+    require giving up the collapse animation.
+  */
+  const [anchor, setAnchor] = useState<{ left: number; bottom: number; width: number } | null>(
+    null,
+  );
 
   const member = corpus().members.find((m) => m.id === viewerId());
   const role = viewerRole();
 
   useEffect(() => {
-    if (!open) return;
+    if (!open) {
+      setAnchor(null);
+      return;
+    }
+    function place() {
+      const rect = trigger.current?.getBoundingClientRect();
+      if (!rect) return;
+      setAnchor({
+        left: rect.left,
+        bottom: window.innerHeight - rect.top + 6,
+        /* Never narrower than the trigger, never wider than the viewport allows. */
+        width: Math.max(rect.width, 240),
+      });
+    }
+    place();
+    window.addEventListener("resize", place);
+    /* A scroll moves the trigger out from under a fixed popover, so close rather than
+       leaving a menu floating beside nothing. */
+    window.addEventListener("scroll", () => setOpen(false), { once: true, capture: true });
     function onDown(e: MouseEvent) {
       if (wrap.current && !wrap.current.contains(e.target as Node)) setOpen(false);
     }
@@ -38,6 +69,7 @@ export function UserMenu() {
     return () => {
       document.removeEventListener("mousedown", onDown);
       document.removeEventListener("keydown", onKey);
+      window.removeEventListener("resize", place);
     };
   }, [open]);
 
@@ -47,6 +79,7 @@ export function UserMenu() {
   return (
     <div className={styles.wrap} ref={wrap}>
       <button
+        ref={trigger}
         type="button"
         className={styles.trigger}
         onClick={() => setOpen((v) => !v)}
@@ -63,8 +96,12 @@ export function UserMenu() {
         </span>
       </button>
 
-      {open ? (
-        <div className={styles.pop} role="menu">
+      {open && anchor ? (
+        <div
+          className={styles.pop}
+          role="menu"
+          style={{ left: anchor.left, bottom: anchor.bottom, width: anchor.width }}
+        >
           {email ? <span className={styles.email}>{email}</span> : null}
           <span className={styles.note}>
             {member

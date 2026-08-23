@@ -1,4 +1,5 @@
-.page { max-width: var(--container); margin: 0 auto; padding: 24px var(--gutter) 96px; }
+/* Full width. The shell already supplies the gutter, so the page just fills it. */
+.page { width: 100%; padding-bottom: 72px; }
 
 .head { display: flex; align-items: flex-start; gap: 16px; flex-wrap: wrap; margin-bottom: 8px; }
 .title { font-size: 30px; font-weight: 600; letter-spacing: -0.02em; margin: 0; }
@@ -31,7 +32,35 @@
   margin: 0 0 24px;
 }
 
-.sections { display: flex; flex-direction: column; gap: 20px; }
+/*
+  A grid, not a stack.
+
+  Every panel in one column meant a wide screen showed three things and a lot of nothing,
+  and it read as a document rather than as a desk. auto-fit with a sensible minimum lets the
+  layout decide: three across on a wide monitor, two on a laptop, one on a narrow window,
+  without a media query per breakpoint guessing at widths it cannot know.
+
+  The first panel spans two columns because it is the one thing the role opens on, and
+  design.md's rhythm rule is that every screen has exactly one loud thing.
+*/
+.sections {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 20px;
+  align-items: start;
+}
+
+/*
+  Equal columns, no spanning.
+
+  The first version gave the opening panel two columns, which sounds right and looked wrong:
+  with three panels in three tracks it produced a two-plus-one row and then a lone panel
+  underneath, so the page was mostly a hole. Panels of equal weight sitting side by side read
+  as a desk; one big panel and a gap reads as a layout that gave up.
+*/
+.sections > * {
+  min-width: 0;
+}
 
 .panel {
   background: var(--surface);

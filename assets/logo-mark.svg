@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Continuity">
+  <title>Continuity</title>
+  <!--
+    Two interlocking links. It is the honest glyph for a hash-chained ledger:
+    two rings that only mean something because they are joined, and a chain
+    that is worth something only while every link still holds the next one.
+
+    The weave is the whole mark. Circle A is drawn, then B over it, then a
+    short arc of A is redrawn on top around the crossing at (37.9, 26.1) —
+    so A passes over B at one crossing and under it at the other. Two rings
+    that merely overlap read as a Venn diagram, not a chain.
+
+    Geometry, so it can be rebuilt rather than traced: r = 13, stroke 6,
+    centres (25,25) and (39,39). The centres are 19.8 apart, which puts the
+    crossings at (37.9,26.1) and (26.1,37.9) and gives an overlap wide
+    enough to read as an interlock at 16px.
+
+    Ink is the record; accent is the link carrying it forward. The ink half
+    flips for dark surfaces; the accent does not, because it is the brand.
+  -->
+  <style>
+    .ink { stroke: #16161a; }
+    @media (prefers-color-scheme: dark) { .ink { stroke: #f2f2f0; } }
+  </style>
+  <g fill="none" stroke-linecap="round" stroke-width="6">
+    <circle class="ink" cx="25" cy="25" r="13"/>
+    <circle cx="39" cy="39" r="13" stroke="#0a58ca"/>
+    <path class="ink" d="M 37.22 20.55 A 13 13 0 0 1 36.26 31.50"/>
+  </g>
+</svg>

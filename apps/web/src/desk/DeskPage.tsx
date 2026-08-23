@@ -15,6 +15,7 @@ import { corpus, ago, memberName } from "../data/source";
 import { buildCurriculum } from "../academy/curriculum";
 import { DecisionLink, PersonLink, StrategyLink, QuestionLink } from "../components/EntityLink";
 import { StatusChip } from "../components/StatusChip";
+import { PageHeader } from "../components/PageHeader";
 
 /*
   The Desk: what somebody opens in the morning.
@@ -224,7 +225,7 @@ export function DeskPage() {
   return (
     <div className={styles.page}>
       <div className={styles.head}>
-        <h1 className={styles.title}>Desk</h1>
+        <PageHeader title="Desk" lead={ROLE_LEDE[role]} />
         <span className={styles.spacer} />
         <label className={styles.who}>
           viewing as
@@ -244,8 +245,6 @@ export function DeskPage() {
           <StatusChip>{ROLE_LABEL[role]}</StatusChip>
         </label>
       </div>
-
-      <p className={styles.lede}>{ROLE_LEDE[role]}</p>
 
       <div className={styles.sections}>{SECTIONS[role].map(panel)}</div>
 

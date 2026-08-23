@@ -5,10 +5,10 @@
   link, a title, a row of facts, then sections. Six bespoke layouts would drift apart within
   a week and give a reader six things to learn instead of one.
 */
+/* Full width. The shell already supplies the gutter, so the page just fills it. */
 .page {
-  max-width: var(--container);
-  margin: 0 auto;
-  padding: 24px var(--gutter) 96px;
+  width: 100%;
+  padding-bottom: 72px;
 }
 
 .back {

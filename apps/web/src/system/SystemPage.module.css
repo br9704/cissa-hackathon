@@ -5,7 +5,8 @@
   week after it is made. This one reads its own status: every box that CAN be checked is
   checked, live, so the picture is either true or visibly says which part is not running.
 */
-.page { max-width: var(--container); margin: 0 auto; padding: 24px var(--gutter) 96px; }
+/* Full width. The shell already supplies the gutter, so the page just fills it. */
+.page { width: 100%; padding-bottom: 72px; }
 .lede { color: var(--text-secondary); max-width: var(--container-prose); line-height: 1.65; margin: 0 0 28px; }
 
 .flow { display: flex; flex-direction: column; gap: 0; }
@@ -28,7 +29,7 @@
 .layerWhat { font-size: 12px; color: var(--text-tertiary); }
 .layerNote { font-size: 13px; color: var(--text-secondary); line-height: 1.55; margin: 6px 0 14px; max-width: 78ch; }
 
-.nodes { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 10px; }
+.nodes { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; }
 
 .node {
   border: 1px solid var(--border);

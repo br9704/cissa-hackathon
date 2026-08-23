@@ -50,9 +50,26 @@
   transition: width var(--dur-med) var(--ease-out);
 }
 
+/*
+  Collapsed by choice, and the choice is remembered.
+
+  Width is the only thing that animates. Fading the labels out at the same time reads as two
+  separate events happening at once; letting them be clipped by the width means the rail
+  behaves like a drawer, which is what it is.
+*/
+.rail[data-collapsed="true"] {
+  width: 62px;
+  padding: 12px 8px;
+}
+
+/*
+  Below 1080 the trade is real rather than a preference, so it collapses regardless and
+  expands on hover or keyboard focus. A person who cannot reach the toggle still gets the
+  navigation.
+*/
 @media (max-width: 1080px) {
   .rail {
-    width: 64px;
+    width: 62px;
     padding: 12px 8px;
   }
   .rail:hover,
@@ -62,12 +79,59 @@
 }
 
 /*
+  The toggle sits at the top of the rail, beside the mark, where a person looks for it. It
+  is a real button with a real label rather than a bare chevron, because a chevron alone
+  makes somebody guess which direction it means.
+*/
+.collapseButton {
+  flex: none;
+  margin-left: auto;
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-s);
+  color: var(--text-chrome);
+  cursor: pointer;
+  padding: 0;
+  transition: color var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out),
+    transform var(--dur-med) var(--ease-out);
+}
+
+.collapseButton:hover {
+  color: var(--text);
+  border-color: var(--border);
+}
+
+.collapseButton:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+/*
+  Rotates to point the way it will move, and stays VISIBLE when collapsed.
+
+  The first version hid it in the collapsed state, which removed the only way to get the
+  rail back. A control that can put the interface into a state it cannot leave is worse than
+  no control.
+*/
+.rail[data-collapsed="true"] .collapseButton {
+  transform: rotate(180deg);
+  margin-left: 0;
+}
+
+/*
   The wordmark collapses the same way the nav labels do. A single "C" mark at 64px, the
   full name once the rail expands. Letting the full word sit in a 64px column just clips
   it to "Contin", which reads as a bug rather than as restraint.
 */
 .wordmark {
   display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
   align-items: center;
   gap: 12px;
   padding: 9px 12px;
@@ -125,6 +189,19 @@
   transition: opacity var(--dur-fast) var(--ease-out);
 }
 
+/*
+  Collapsed hides the words entirely, rather than letting the width clip them.
+
+  The first version animated only the width, and a 62px rail with the labels still in flow
+  showed the first character and a half of each one: "D", "Ca", "Th". A word cut mid letter
+  reads as a rendering fault, not as a compact mode. display:none also takes them out of the
+  accessibility tree, which is correct here because the icon carries an aria-label.
+*/
+.rail[data-collapsed="true"] .label,
+.rail[data-collapsed="true"] .navHint {
+  display: none;
+}
+
 @media (max-width: 1080px) {
   .label { opacity: 0; }
   .rail:hover .label,
@@ -132,12 +209,20 @@
 }
 
 /* A word under the section name, so the navigation itself explains the product. */
+/*
+  One line, and if a hint ever outgrows the rail it ellipsises rather than running off the
+  edge. A label cut mid word reads as a rendering fault; a label with an ellipsis reads as a
+  label that is too long, which is true and is the author's problem to fix.
+*/
 .navHint {
   display: block;
   font-size: 11px;
   color: var(--text-tertiary);
   font-weight: 400;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 
 @media (max-width: 1080px) {
@@ -236,11 +321,20 @@
   pointer-events: none;
 }
 
+/*
+  Full width, with gutters. Not a centred column.
+
+  Panels here are instruments, not prose: a table of 184 records, a genealogy graph, a
+  dollar exposure. Capping the whole page at 1280 and centring it left a wide monitor with
+  empty margins on both sides and forced everything into one narrow stack, which is the
+  layout that made this read as a document rather than as a tool.
+
+  Individual TEXT still caps its own measure, because a 2000px line of prose is unreadable.
+  That belongs to the paragraph, not to the page.
+*/
 .content {
   flex: 1;
   width: 100%;
-  max-width: var(--container);
-  margin: 0 auto;
   padding: 24px var(--gutter) 64px;
   display: flex;
   flex-direction: column;

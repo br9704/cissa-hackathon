@@ -42,6 +42,36 @@ honestly rather than pretending:
 - **Retrieval** runs entirely in your browser tab, so it works on the live site with no
   server involved, and falls back to keyword matching if the model cannot download.
 
+## What it looks like
+
+<img src="docs/new%20pics/01-desk.png" alt="The Desk, arranged by who is looking" width="900" />
+
+The Desk. The same ledger arranged by role: a desk head opens on what is waiting and what
+would be lost, a researcher on what nobody has answered, compliance on the chain, and
+somebody new on the curriculum.
+
+<img src="docs/new%20pics/12-ask-the-ledger.png" alt="Asking the ledger, with the model's answer struck through" width="900" />
+
+Asking the ledger. Retrieval returns the passages that answer the question; when the local
+model is running it answers too, and any sentence the record cannot support is struck through
+and labelled. The model is never allowed to outrank the ledger.
+
+<img src="docs/new%20pics/04-knowledge-risk.png" alt="Knowledge risk and the departure simulation" width="900" />
+
+Knowledge risk. Concentration is scored per strategy and never per person, and the departure
+simulation puts a dollar figure on what a resignation would take with it.
+
+<img src="docs/new%20pics/07-the-system.png" alt="The system, checked live" width="900" />
+
+The system, checking itself. Every component that can be probed reports live, so the diagram
+is either true or it says which part is not running.
+
+The rest are in [`docs/new pics`](docs/new%20pics): the record, strategies with the replay,
+capture, the Academy, verify, debriefs, reports, my record, the capture sheet, and the
+collapsed rail.
+
+---
+
 ## Status
 
 Built to a fixed external brief with a hard deadline, then continued as a personal project.
