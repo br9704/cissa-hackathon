@@ -1091,9 +1091,9 @@ ledger, and no surface is access gated by role.
 
 The highest value per hour in this plan and the most novel thing in the build.
 
-- [ ] A stdio server over packages/core exposing record_decision, search_ledger and
+- [x] A stdio server over packages/core exposing record_decision, search_ledger and
       get_decision.
-- [ ] A quant changes a parameter in Claude Code or Cursor and the assistant files the
+- [x] A quant changes a parameter in Claude Code or Cursor and the assistant files the
       decision record as part of the change, so the why is captured at the moment it exists
       rather than reconstructed later.
 
@@ -1101,7 +1101,14 @@ The highest value per hour in this plan and the most novel thing in the build.
 app hash chained and verifiable, and a question about a capped parameter is answered from
 the ledger without leaving the editor.
 
-- **Sprint log:** (planned)
+- **Sprint log:** Logged: 2026-08-23T14:36:58+10:00 · status: done · actual: 0.8h (budget 3h) · by: claude-opus-5 · note: registered and connected in Claude Code, four tools, driven end to end over stdio. Protocol written directly rather than via an SDK: MCP over stdio is JSON-RPC with four methods that matter, about a hundred lines, no supply chain, and legible to somebody reading the repo. My own tests caught two real bugs, a synchronous throw escaping the promise catch and stopwords letting "what is the capital of france" match records about slippage budgets.
+
+**A decision worth recording.** Records filed from an editor land in a DRAFT inbox, not in
+the ledger. Two reasons and both are load bearing: the ledger is append only and chained, so
+a write has to go through the real event path or it is not a ledger row; and nothing reaches
+the ledger without a human approving it. The editor produces drafts, the app shows them, a
+person presses one key. An MCP server that wrote straight to the chain would be faster and
+would quietly turn the product from evidence into a log.
 
 ---
 

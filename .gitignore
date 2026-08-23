@@ -65,3 +65,4 @@ apps/web/docs/
 apps/desktop/src-tauri/target/
 target/
 !.env.example
+.continuity-inbox.jsonl
