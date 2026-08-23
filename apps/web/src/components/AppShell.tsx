@@ -16,6 +16,7 @@ import {
   MyRecordIcon,
   AcademyIcon,
   DeskIcon,
+  CaptureIcon,
 } from "./icons";
 
 /*
@@ -27,6 +28,7 @@ import {
 */
 const NAV = [
   { to: "/desk", label: "Desk", hint: "what needs you today", Icon: DeskIcon },
+  { to: "/capture", label: "Capture", hint: "every way in, one room", Icon: CaptureIcon },
   { to: "/", label: "The record", hint: "every decision, locked", Icon: LedgerIcon },
   { to: "/strategies", label: "Strategies", hint: "how the thinking developed", Icon: StrategyIcon },
   { to: "/risk", label: "Knowledge risk", hint: "who holds a book alone", Icon: RiskIcon },

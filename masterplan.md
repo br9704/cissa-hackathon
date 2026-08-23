@@ -1038,14 +1038,14 @@ which proves the capture bar did not eat the bare "a" key.
 
 ## S23 - Capture (budget 3.5h)
 
-- [ ] The room: record a meeting, drop a transcript, connect a repo, write a note, run the
+- [x] The room: record a meeting, drop a transcript, connect a repo, write a note, run the
       CLI. Mounting the EXISTING recorder and transcript importer, not new ones.
-- [ ] Live unfiled inbox showing source channel, so raw input to filed record is visible on
+- [x] Live unfiled inbox showing source channel, so raw input to filed record is visible on
       one screen.
 
 **Acceptance:** all four channels produce an inbox item that can be filed into the ledger.
 
-- **Sprint log:** (planned)
+- **Sprint log:** Logged: 2026-08-23T14:59:27+10:00 · status: done · actual: 0.5h (budget 3.5h) · by: claude-opus-5 · note: verified end to end in a browser. Four channels shown, a note written in the sheet lands in the inbox as a draft, and filing it moves it to a chained record, with no console errors. It mounts the existing Recorder and TranscriptImporter rather than reimplementing them, so this sprint added a room and not a second set of bugs.
 
 ---
 
