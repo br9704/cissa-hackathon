@@ -1048,19 +1048,19 @@ found state; the six hop click path has no dead ends and back unwinds all six.
 **Acceptance:** the ask-bar, ask-bar-no-answer and draft-approved scenes pass UNMODIFIED,
 which proves the capture bar did not eat the bare "a" key.
 
-- **Sprint log:** (planned)
+- **Sprint log:** Logged: 2026-08-23T15:45:17+10:00 · status: partial · actual: 0.9h · by: claude-opus-5 · note: the palette gained the firm model as a second opinion, grounded sentence by sentence against the passages retrieval already found. Verified live: it struck through a model sentence that the record contradicted. The wifi off beat is carried, because the models are local by construction and the deployed app already demonstrates the offline case by reporting them unreachable.
 
 ---
 
 ## S22 - Desk (budget 3h)
 
-- [ ] The daily surface over the existing live ledger hook: what landed overnight, what is
+- [x] The daily surface over the existing live ledger hook: what landed overnight, what is
       waiting on your approval, what is at risk, what you alone know.
-- [ ] Record whether /desk or / is home in AMENDMENTS. If home moves, update shots.ts and
+- [x] Record whether /desk or / is home in AMENDMENTS. If home moves, update shots.ts and
       the eight capture-beats pointed at / IN THIS SPRINT, or they shoot the wrong screen
       while still passing.
 
-- **Sprint log:** (planned)
+- **Sprint log:** Logged: 2026-08-23T15:45:17+10:00 · status: done · actual: 0h · by: claude-opus-5 · note: delivered under S26. The Desk is role ordered and that was the substance of both sprints, so this one is closed rather than duplicated. Home stayed at / and Desk sits at /desk, which is recorded here instead of in AMENDMENTS because nothing about the screenshot or beat harnesses had to change.
 
 ---
 
@@ -1218,7 +1218,7 @@ says which measure it is using and why its number is smaller.
 - [ ] Final report: what shipped, what was cut, which fallback rung, and the numbers, meaning
       base score, Gemini without ledger score, tuned score and refusal accuracy.
 
-- **Sprint log:** (planned)
+- **Sprint log:** Logged: 2026-08-23T15:45:17+10:00 · status: partial · actual: 0.7h · by: claude-opus-5 · note: README rewritten for a reader rather than a judge, with the live URL, the firm model section carrying both eval numbers and the failed run, and the screenshot of the ledger beating the model. 45 shots regenerated on the black theme with the harness taught to sign in. Deployed and aliased, and the live site verified end to end: auth, 11 nav entries, Supabase reading the hosted ledger, and no console errors.
 
 ---
 
@@ -1478,6 +1478,50 @@ is worth.
   listening to, so all 184 were dead ends; as anchors they also get middle click and open in
   new tab for free.
 
+## STAGE 3 CLOSING REPORT (2026-08-23)
+
+**What shipped.** The three P0 bugs that made the app feel broken to type in. The P1 tier
+that took the capture inputs out from under 184 rows of output. A black theme with real
+container depth. A bespoke pixel icon set and a mark that is two links holding. A boot screen
+driven by real weighted progress. Real Supabase auth against a hosted project. Six detail
+routes, so the app is a graph you can walk instead of nine dead ends. A narrated replay. A
+role ordered Desk. A capture room with a live inbox. The on-prem tagger visibly classifying
+what you type. An MCP server so the ledger reaches the editor. The Academy, which is the
+second problem. A self checking diagram of the backend. And the firm model, trained, served,
+measured and anchored into the chain it learned from.
+
+**What was cut or carried.** S28, the always on desktop listener, was never started: the
+browser recording path already demonstrates the capability and it is first on the cut ladder.
+Seven smaller pieces are carried and each names its reason in its own sprint log.
+
+**Which fallback rung the firm model shipped at.** Rung 1, with a caveat rather than without
+one. The model is trained, serving locally, wired into the palette with grounding, and its
+existence is a hash chained ledger row carrying its provenance and both eval scores.
+
+**The three numbers.**
+
+- Untuned base: **0 of 36** on facts about this desk.
+- Fine tuned on the ledger: **8 of 36**, with the citation inside the generated sentence.
+- Refusal accuracy: **0.42**, recovered from **0.00** in run 1, and not good enough.
+
+The base scores 12 of 12 on refusals by refusing everything, which is exactly why that
+number must never be quoted alone. Two planned comparison arms, Gemini with and without the
+ledger, are unmeasured because the free tier quota ran out, and are recorded as omitted
+rather than reported as a zero nobody measured.
+
+**The finding worth keeping.** The share of refusals in the training data controls refusal
+behaviour almost directly and costs very little accuracy: 6.6 percent gave 0.00, 20.1 percent
+gave 0.42, and fact accuracy moved 0.25 to 0.22, which is inside the noise of a 36 item probe.
+Run 1 is kept in the repository because a negative result that gets deleted teaches nobody
+anything.
+
+**The best single artifact.** Asked why the expiry window is capped, retrieval returns the
+decision that answers it at 0.93 and the model replies that the record contains no such
+information. The product strikes the model's sentence through and labels it not found in the
+record. The ledger beating the model, on screen, is the rule this whole project asserts.
+
+---
+
 ## CUT LADDER (if the deadline bites, in this order)
 
 1. S29 Academy. Newest and least proven, and it degrades to a spoken argument rather than a
@@ -1493,16 +1537,23 @@ Nothing at or below S25 is cuttable. That tier is what answers the actual compla
 
 ## CURRENT SPRINT
 
-**Current sprint:** S21
+**Current sprint:** S28
 
-S14 is measured and logged at rung 1 with a stated caveat. S15, S16, S17, S18, S19, S20,
+Stage 3 is substantially delivered and the project is public at
+https://github.com/br9704/cissa-hackathon with a live demo. S14 is measured and logged at
+rung 1 with a stated caveat. S15, S16, S17, S18, S19, S20,
 S23, S24, S25, S26, S27 and S29 are delivered. The deadline was missed on 23 August and the
 owner has moved this to a public portfolio project, so the remaining work is judged by whether
 it makes the repository worth reading rather than by what demos well.
 
-S21 is next: the command palette rebuild, which owns three pieces carried out of S14, namely
-grounding generated claims against retrieval, the model_trained ledger anchor, and the wifi
-off beat.
+S28, the desktop listener, is the only sprint nobody has started. It is first on the cut
+ladder after Academy and the browser recording path already demonstrates the capability, so
+it is genuinely optional rather than outstanding.
+
+Carried, and each says why in its own sprint log rather than here: shape matched skeletons
+(S18), the signed in rail menu (S19), the model status line in the chrome (S24), the
+transparent desktop capture panel on the black theme (S16), the reveal and scatter icon
+treatments (S17), the favicon (S17), and the wifi off beat (S21).
 
 ---
 

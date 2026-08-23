@@ -295,7 +295,34 @@ const SCENES: {
 */
 async function open(page: Page, path: string): Promise<void> {
   await page.goto(`${BASE}${path}`, { waitUntil: "networkidle" });
-  await page.waitForSelector("nav", { timeout: 30_000 }).catch(() => {});
+  await page.waitForSelector("nav, form", { timeout: 30_000 }).catch(() => {});
+  await signInIfAsked(page);
+}
+
+/*
+  Auth is real when Supabase is configured, so the harness has to be a user.
+
+  DEMO_EMAIL and DEMO_PASSWORD come from the environment and are never in the repository.
+  With no Supabase configured this does nothing, because the login screen never appears, and
+  the shots still run against the seeded corpus. That is the same degradation the product
+  makes and the harness should not need a special case for it.
+*/
+async function signInIfAsked(page: Page): Promise<void> {
+  const email = process.env["DEMO_EMAIL"];
+  const password = process.env["DEMO_PASSWORD"];
+  const needsLogin =
+    (await page.locator("form").count()) > 0 && (await page.locator("nav").count()) === 0;
+  if (!needsLogin) return;
+  if (!email || !password) {
+    throw new Error(
+      "The app is asking for a sign in and DEMO_EMAIL / DEMO_PASSWORD are not set. " +
+        "Either export them, or unset VITE_SUPABASE_URL to shoot the seeded corpus.",
+    );
+  }
+  await page.locator('input[type="email"]').fill(email);
+  await page.locator('input[type="password"]').fill(password);
+  await page.getByRole("button", { name: /^Sign in$/ }).click();
+  await page.waitForSelector("nav", { timeout: 30_000 });
 }
 
 async function main() {

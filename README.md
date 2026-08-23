@@ -15,6 +15,24 @@ interfaces exist to feed it and to ask it questions.
 
 ---
 
+## Try it
+
+**https://continuity-nu.vercel.app**
+
+It asks for an account. Create one on the sign in screen: sign up is open, the data behind it
+is entirely synthetic, and row level security is what protects it rather than the key in the
+page. Shared credentials are deliberately not published here, because a public password on a
+writable ledger is a bad idea even when the ledger is invented.
+
+Two things on the live site need a machine that is not this one and therefore degrade
+honestly rather than pretending:
+
+- The **on-prem tagger** and the **firm model** run locally by design, so the deployed app
+  reports them as not reachable. That is the argument for training them, not a limitation
+  worked around.
+- **Retrieval** runs entirely in your browser tab, so it works on the live site with no
+  server involved, and falls back to keyword matching if the model cannot download.
+
 ## Status
 
 Built for the CISSA hackathon (Fundamentum track) and continued afterwards as a portfolio
