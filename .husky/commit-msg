@@ -1,0 +1,12 @@
+#!/bin/sh
+# D8 is non-negotiable and was enforced by attention alone until now. A commit message is
+# read far more often than most prose here and cannot be edited once pushed, so it is
+# exactly the wrong place to rely on remembering.
+#
+# Literal characters rather than grep -P: BSD grep on macOS has no -P, and the first version
+# of this hook used it and therefore passed every message silently, which is the failure
+# mode this whole guard family exists to prevent.
+if LC_ALL=en_US.UTF-8 grep -q '[‒——−]' "$1"; then
+  echo "commit-msg: this message contains an em dash. Use a comma, a colon, or a full stop."
+  exit 1
+fi

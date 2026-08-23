@@ -53,3 +53,5 @@ docs/beats/*.png
 .vercel
 .env*
 ENGINEERPROMPT2.md
+AGENTS.md
+supabase/.temp/

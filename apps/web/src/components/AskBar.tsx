@@ -93,7 +93,16 @@ export function AskBar({ open, onClose }: { open: boolean; onClose: () => void }
     void buildIndex((done, total) => {
       if (!live) return;
       setIndexProgress(done >= total ? null : Math.round((done / total) * 100));
-    }).catch(() => {});
+    })
+      /*
+        Clear the bar however the build ends. embedMany reports progress per document and
+        can reject part way through, and the old catch swallowed that without resetting, so
+        a failed model download left a progress bar frozen at 43 percent for the rest of the
+        session while the palette was in fact answering from the keyword index.
+      */
+      .finally(() => {
+        if (live) setIndexProgress(null);
+      });
     return () => {
       live = false;
     };
@@ -253,9 +262,29 @@ export function AskBar({ open, onClose }: { open: boolean; onClose: () => void }
                   ))}
                 </>
               ) : hits && hits.length === 0 && !busy ? (
+                /*
+                  The mode caveat matters MORE here than beside a list of results.
+
+                  "Nothing in the corpus is close to that" is a claim about meaning, and in
+                  keyword mode no meaning search ever ran: an empty result may only mean the
+                  question was worded differently from the record. Saying the confident
+                  version of this sentence while degraded would be the exact misreading the
+                  caveat exists to prevent.
+                */
                 <div className={styles.empty}>
-                  Nothing in the corpus is close to that. That is the honest answer rather
-                  than the nearest few passages dressed up as one: no source, no claim.
+                  {mode === "lexical" ? (
+                    <>
+                      No passage uses enough of those words. The meaning-search model could
+                      not be reached, so this is a keyword match only and a differently
+                      worded question can miss. Reload to try the model again.
+                    </>
+                  ) : (
+                    <>
+                      Nothing in the corpus is close to that. That is the honest answer
+                      rather than the nearest few passages dressed up as one: no source, no
+                      claim.
+                    </>
+                  )}
                 </div>
               ) : (
                 <div className={styles.empty}>Searching the ledger</div>

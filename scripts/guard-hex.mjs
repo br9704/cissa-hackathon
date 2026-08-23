@@ -15,8 +15,19 @@ const ROOTS = ["apps/web/src", "apps/desktop/src-tauri/src", "packages", "apps/w
 const SKIP = new Set(["node_modules", "dist", "target", ".turbo", "gen"]);
 const ALLOW = new Set(["apps/web/src/styles/tokens.css"]);
 
-/* Three or more hex digits after a #, not part of a longer word. */
-const HEX = /#[0-9a-fA-F]{3,8}\b/g;
+/*
+  Any literal colour, not only hex notation.
+
+  This looked for # notation alone, so `background: rgba(20, 20, 25, 0.18)` sat in
+  AskBar.module.css as a hardcoded near-black with the guard reporting ok. That is the
+  cheapest possible way to fork the design system, and a dark theme leans on rgba far more
+  than a light one does, so the hole would have widened exactly when it mattered most.
+
+  0x notation is deliberately NOT matched. The only 0x literals here are the mulberry32 and
+  FNV-1a constants in the seeded generator, and flagging those would train people to ignore
+  this guard, which costs more than the hole is worth.
+*/
+const HEX = /#[0-9a-fA-F]{3,8}\b|\b(?:rgba?|hsla?|hwb|oklch|oklab|lab|lch|color-mix)\s*\(/g;
 
 /*
   Blank out comments before scanning, preserving line numbers so the report still points

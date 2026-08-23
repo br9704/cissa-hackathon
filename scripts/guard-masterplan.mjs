@@ -23,6 +23,22 @@ const parts = text.split(/^(## S\d+ .*)$/m);
 const failures = [];
 const rows = [];
 
+/*
+  The Current sprint pointer.
+
+  claude.md opens every session with "find the Current-sprint pointer", and there was no
+  pointer in this file at all. The instruction had been unfollowable since it was written,
+  and nothing said so.
+*/
+const pointer = text.match(/^\*\*Current sprint:\*\*\s*(S\d+|none)\s*$/m);
+if (!pointer) {
+  failures.push(
+    'No "**Current sprint:** S<n>" line. Every session starts by reading it, so it has to exist.',
+  );
+} else if (pointer[1] !== "none" && !text.includes(`## ${pointer[1]} `)) {
+  failures.push(`Current sprint points at ${pointer[1]}, which has no section in this file.`);
+}
+
 for (let i = 1; i < parts.length; i += 2) {
   const header = parts[i];
   const id = header.split(/\s+/)[1];
@@ -36,12 +52,39 @@ for (let i = 1; i < parts.length; i += 2) {
     had never owned.
   */
   const rawBody = parts[i + 1] ?? "";
-  const nextHeading = rawBody.search(/^## /m);
+  const nextHeading = rawBody.search(/^#{1,6} /m);
   const body = nextHeading === -1 ? rawBody : rawBody.slice(0, nextHeading);
 
-  const statuses = [...body.matchAll(/status:\s*(\w+)/g)].map((m) => m[1]);
+  /*
+    The log line must be a real log line.
+
+    This used to extract /status:\s*(\w+)/ from anywhere in the body, so the bare words
+    "status: done" sitting in a sentence satisfied it, and the Logged timestamp that the
+    header calls "written at the moment it closed" was never looked at once. A date nobody
+    checks is a date nobody writes honestly.
+  */
+  const logged = [...body.matchAll(/Logged:\s*([^\s·]+)\s*·\s*status:\s*(\w+)/g)];
+  const statuses = logged.map((m) => m[2]);
+
+  for (const m of logged) {
+    const when = new Date(m[1]);
+    if (Number.isNaN(when.getTime())) {
+      failures.push(`${id} has a Logged value that is not a date: ${m[1]}`);
+    } else if (when.getTime() > Date.now() + 60_000) {
+      failures.push(`${id} is logged in the future: ${m[1]}. Log at the moment of completion.`);
+    }
+  }
 
   if (statuses.length === 0) {
+    /*
+      The sprint currently being worked has not closed, so it cannot have a completion
+      record yet. Requiring one made it impossible to open a sprint before finishing it,
+      which is backwards: the plan is supposed to exist before the work does.
+    */
+    if (pointer && pointer[1] === id) {
+      rows.push({ id, status: "open", open: (body.match(/^\s*- \[ \]/gm) ?? []).length });
+      continue;
+    }
     failures.push(`${id} has no Sprint log line. Every sprint closes with one.`);
     rows.push({ id, status: "MISSING", open: 0 });
     continue;

@@ -35,6 +35,14 @@ export function bareKeyAllowed(e: KeyboardEvent): boolean {
   if (e.metaKey || e.ctrlKey || e.altKey) return false;
   /* IME composition sends keydown for every keystroke of a candidate. */
   if (e.isComposing) return false;
+  /*
+    Auto-repeat. The card's own comment says "only the focused card takes keystrokes, or A
+    would approve the whole queue at once", and holding the key defeated that: the OS sends
+    about thirty keydowns a second, the queue re-renders a fresh draft after each approval,
+    and a held key walks the whole backlog. Approving is irreversible in this product's own
+    words, so a leaned-on keyboard must not file records nobody read.
+  */
+  if (e.repeat) return false;
   if (isTypingTarget(e.target)) return false;
   if (overlayOpen()) return false;
   return true;

@@ -660,6 +660,44 @@ matching with a visible notice rather than dying.
 
 ---
 
+## S13 — P1 and live infrastructure (budget 4h)
+
+Source: ENGINEERPROMPT2.md Mission 1, P1 tier. Every item here is structural or behavioural
+rather than visual, so none of it is thrown away by the black theme that follows.
+
+- [ ] "+ New record" capture sheet reachable from the record page header, three tabs: note,
+      record a meeting, import transcript. The inputs currently sit below 184 ledger rows.
+- [ ] Quick capture on the web and as a palette action. It exists only as the Tauri window
+      route today, so web visitors never see it.
+- [ ] My Record in the nav. The page exists and the transparency principle D13 is invisible
+      without it.
+- [ ] The liveness strip: last capture, tagger state, chain verified at.
+- [ ] Graph node labels, hover tooltips, and click through to the decision.
+- [ ] Strategy cards as real controls with a selected state driving the graph.
+- [ ] Time Machine above the graph rather than below it.
+- [x] Supabase provisioned, linked, migrated and seeded. Chain verified on hosted Postgres:
+      184 events, no breaks.
+- [x] Gemini key health checked and stored in the environment.
+- [ ] Re-run the critique verification checklist and record the result here.
+
+**Acceptance:** a stranger given the app cold can file a note, record or import something,
+and find what the system holds about them, without scrolling past instructions.
+
+- **Sprint log:** (open)
+
+---
+
+## CURRENT SPRINT
+
+**Current sprint:** S13
+
+S12 is closed. S13 is P1 from docs/critique.md plus the live infrastructure: the capture
+sheet reachable without scrolling, quick capture on the web and in the palette, My Record in
+the nav, the liveness strip, graph labels and tooltips, strategy card selection states, and
+the Time Machine above the graph. Supabase is provisioned, migrated and seeded already.
+
+---
+
 ## OPEN QUESTIONS (build model appends here instead of inventing scope)
 
 - (Stage 1 close) none pending; engineerprompt.md instructs the next session to ask

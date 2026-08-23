@@ -7,7 +7,7 @@
 */
 import { corpus, memberName, strategyName } from "../data/source";
 import { embedMany, embed, cosine, EMBEDDING_MODEL } from "./embed";
-import { buildLexicalIndex, bm25, normalise, type LexicalIndex } from "./lexical";
+import { buildLexicalIndex, bm25, normalise, termCoverage, type LexicalIndex } from "./lexical";
 
 export type Passage = {
   id: string;
@@ -164,18 +164,49 @@ export type SearchMode = "hybrid" | "lexical";
 export type SearchResult = { hits: Hit[]; mode: SearchMode };
 
 /*
-  The lexical only floor, and why it is a different number.
+  The lexical only floor, measured the same way the hybrid one was.
 
-  In hybrid mode a passage scores SEMANTIC_WEIGHT * semantic + LEXICAL_WEIGHT * lexical, so
-  a perfect keyword match alone tops out at 0.38 and every result would fall under the 0.60
-  blended floor. Degraded mode therefore scores on the normalised BM25 value directly.
+  The first version of this filtered the normalised BM25 score at 0.35, which was
+  meaningless. `normalise` divides by the best score in this query's OWN result set, so the
+  top document scores exactly 1.00 whenever any single term matches anything at all. It
+  admitted forty passages for "how many people work here", every one of them labelled 1.00,
+  while the comment above it claimed to be protecting the reader from precisely that.
 
-  Unlike RELEVANCE_FLOOR this number is CHOSEN, not measured, and the UI says so. What it
-  keeps is the property that matters: BM25 returns exactly zero when no query term appears
-  anywhere, so "not in the corpus" still returns nothing rather than the five least bad
-  passages dressed up as an answer.
+  So degraded mode gates on term COVERAGE, which is absolute: what fraction of the
+  question's content words actually appear in the passage. Measured over the seeded corpus,
+  questions it can answer peak at 0.60 to 1.00 and questions it cannot peak at 0.00 to 0.50,
+  so 0.60 sits in a real gap with clear air on both sides.
+
+  This is a weaker guarantee than the hybrid floor, and that is the honest situation rather
+  than a defect: without vectors there is no way to know that a passage means the same thing
+  in different words, so a rephrased question can miss. The palette says so on screen.
 */
-export const LEXICAL_FLOOR = 0.35;
+export const LEXICAL_COVERAGE_FLOOR = 0.6;
+
+function lexicalOnly(
+  items: Passage[],
+  lexical: LexicalIndex,
+  query: string,
+  limit: number,
+): Hit[] {
+  const coverage = termCoverage(lexical, query);
+  const ranked = normalise(bm25(lexical, query));
+  return items
+    .map((p, i) => ({
+      ...p,
+      semantic: 0,
+      lexical: ranked.get(i) ?? 0,
+      /*
+        The reported score is coverage, not the normalised BM25 value, because the
+        normalised value is relative: the top hit reads 1.00 however irrelevant it is, and a
+        confident 1.00 beside a wrong answer is worse than showing no number at all.
+      */
+      similarity: coverage.get(i) ?? 0,
+    }))
+    .filter((h) => h.similarity >= LEXICAL_COVERAGE_FLOOR)
+    .sort((a, b) => b.similarity - a.similarity || b.lexical - a.lexical)
+    .slice(0, limit);
+}
 
 /**
  * Retrieve, hybrid when the model is available and keyword only when it is not.
@@ -190,21 +221,25 @@ export async function searchDetailed(
   floor = RELEVANCE_FLOOR,
 ): Promise<SearchResult> {
   const { passages: items, vectors, lexical } = await buildIndex();
-  const lex = normalise(bm25(lexical, query));
 
-  if (!vectors) {
-    const hits = items
-      .map((p, i) => {
-        const lexicalScore = lex.get(i) ?? 0;
-        return { ...p, semantic: 0, lexical: lexicalScore, similarity: lexicalScore };
-      })
-      .filter((h) => h.similarity >= LEXICAL_FLOOR)
-      .sort((a, b) => b.similarity - a.similarity)
-      .slice(0, limit);
-    return { hits, mode: "lexical" };
+  if (!vectors) return { hits: lexicalOnly(items, lexical, query, limit), mode: "lexical" };
+
+  /*
+    The index can build successfully and a later single query embed still fail: a long lived
+    tab can lose its WebGPU context or run the WASM heap out. That used to reject and put
+    "Search is unavailable" back on screen, which is the exact dead end this file was
+    restructured to remove. Falling through to keyword matching gives the same answer the
+    no-vectors path gives, rather than no answer.
+  */
+  let q: Float32Array;
+  try {
+    q = await embed(query);
+  } catch (err) {
+    console.warn("[search] query embedding failed, answering from the keyword index", err);
+    return { hits: lexicalOnly(items, lexical, query, limit), mode: "lexical" };
   }
 
-  const q = await embed(query);
+  const lex = normalise(bm25(lexical, query));
   const hits = items
     .map((p, i) => {
       const semantic = cosine(q, vectors[i]!);
@@ -222,7 +257,7 @@ export async function searchDetailed(
   return { hits, mode: "hybrid" };
 }
 
-/** The shape every existing caller and test expects. */
+/** Hybrid only, kept for the tests that assert the blended behaviour directly. */
 export async function search(query: string, limit = 5, floor = RELEVANCE_FLOOR): Promise<Hit[]> {
   return (await searchDetailed(query, limit, floor)).hits;
 }

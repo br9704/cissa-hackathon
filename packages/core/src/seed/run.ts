@@ -19,6 +19,19 @@ import { generate, DEFAULT_SEED } from "./generate.js";
 import { load } from "./load.js";
 import { makeRng } from "../rng.js";
 
+/** Strip the password from a connection string before it is printed anywhere. */
+function redactUrl(url: string): string {
+  try {
+    const u = new URL(url);
+    if (u.password) u.password = "***";
+    return u.toString();
+  } catch {
+    /* Not parseable as a URL, so assume the worst rather than printing it raw. */
+    return url.replace(/:\/\/([^:]+):[^@]+@/, "://$1:***@");
+  }
+}
+
+
 const REPO_ROOT = join(dirname(fileURLToPath(import.meta.url)), "..", "..", "..", "..");
 const DB_URL =
   process.env.DATABASE_URL ??
@@ -105,7 +118,13 @@ async function main() {
 
   try {
     const stats = await load(client, corpus);
-    console.log(`\nloaded into ${DB_URL}`);
+    /*
+      Redacted, because this line is printed by a command people run in shared terminals,
+      paste into issues, and pipe into CI logs. Against a local database the URL is
+      harmless; the moment it points at a hosted project it is a live credential, and it
+      printed one in full the first time this ran against Supabase.
+    */
+    console.log(`\nloaded into ${redactUrl(DB_URL)}`);
     console.log(
       "  " + Object.entries(stats).map(([k, v]) => `${v} ${k}`).join(", "),
     );

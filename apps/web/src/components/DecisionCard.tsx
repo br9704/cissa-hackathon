@@ -47,9 +47,17 @@ export function DecisionCard({
   useEffect(() => {
     if (!active) return;
     function onKey(e: KeyboardEvent) {
-      /* While editing, the keys belong to the textarea. Escape leaves. */
+      /*
+        While editing, the keys belong to the textarea. Escape leaves.
+
+        Scoped to the editor itself, because this branch sat ABOVE the shared guard and so
+        ran for every Escape anywhere in the document. Opening the ask palette over a draft
+        you were half way through editing and pressing Escape to dismiss the palette also
+        reverted your edit, silently, to the original text. The guard below is worth nothing
+        if the branch in front of it re-derives the rule wrong.
+      */
       if (editing) {
-        if (e.key === "Escape") {
+        if (e.key === "Escape" && e.target === editorRef.current) {
           e.preventDefault();
           setEditing(false);
           setWhy(decision.why);

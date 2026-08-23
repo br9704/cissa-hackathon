@@ -5,29 +5,40 @@
   There was no script. The rule survived on attention alone, which is exactly the kind of
   rule that quietly stops being true.
 
-  Scope is everything a reader can see: UI strings, docs, the README, and commit messages
-  are checked separately by the commit path. Code comments count too, because the house
-  voice is meant to be consistent and a comment is read more often than most prose.
+  Scope is everything a reader can see: UI strings, docs and the README. Code comments count
+  too, because the house voice is meant to be consistent and a comment is read more often
+  than most prose. Commit messages are covered by .husky/commit-msg, which runs the same
+  character class; an earlier version of this comment claimed that enforcement existed
+  before it did, which is the exact failure this file was written to stop.
 
   The en dash is left alone: it has a legitimate use in numeric ranges.
 */
 import { readdirSync, statSync, readFileSync } from "node:fs";
 import { join, relative } from "node:path";
 
-const ROOTS = ["apps", "packages", "scripts", "api", "tools", "docs", "ml"];
+const ROOTS = ["apps", "packages", "scripts", "api", "tools", "docs", "ml", "supabase", "demo"];
 const FILES = ["README.md", "masterplan.md", "prd.md", "design.md", "videoscript.md"];
-const SKIP = new Set([
-  "node_modules", "dist", "target", ".turbo", "gen", "shots", "beats",
-  "adapters", "data", "results",
-  /* Third party source. Their punctuation is not ours to police. */
-  ".venv", "site-packages", "__pycache__", ".git", ".pytest_cache",
-]);
-const SCANNABLE = /\.(tsx?|jsx?|mjs|cjs|css|html|md|py|json|toml|rs)$/;
+/*
+  Skipped by PATH, not by directory name.
+
+  The first version matched bare names at any depth, and it listed "data" and "results" to
+  avoid the ml corpora. apps/web/src/data is not a data dump, it is nine live source files
+  including the tagger caveat string that renders on screen, and the guard could not see any
+  of it. A guard that reports "157 files clean" while blind to the surface it protects is
+  worse than no guard, because it is trusted.
+*/
+const SKIP_PATHS = [
+  "node_modules", ".git", ".venv", "site-packages", "__pycache__", ".pytest_cache",
+  "dist", "target", ".turbo", "gen",
+  "ml/data", "ml/results", "ml/runs", "docs/shots", "docs/beats",
+];
+
+const SCANNABLE = /\.(tsx?|jsx?|mjs|cjs|css|html|md|py|json|jsonl|toml|rs|sql|ya?ml|sh|svg|txt)$/;
 
 /* Documents written by other people, quoted into this repo as evidence. Rewriting someone
    else's punctuation would misquote them, so they are recorded here instead. */
 const ALLOW = new Set([
-  "ENGINEERPROMPT.md", "ENGINEERPROMPT2.md", "CLAUDE.md", "AGENTS.md",
+  "ENGINEERPROMPT.md", "ENGINEERPROMPT2.md",
   /* These three must contain the character in order to strip it or assert its absence,
      which is the guard working rather than the guard being violated. */
   "scripts/guard-emdash.mjs",
@@ -35,7 +46,13 @@ const ALLOW = new Set([
   "packages/core/src/packs.test.ts",
 ]);
 
-const EM_DASH = /—/;
+/*
+  The whole family, not just U+2014. A search and replace that swaps in a horizontal bar, or
+  a minus sign pasted out of a maths context, reads identically on screen and would have
+  shipped silently. U+2013 en dash is deliberately absent: it has a real use in numeric
+  ranges.
+*/
+const EM_DASH = /[\u2012\u2014\u2015\u2212\u2E3A\u2E3B\uFE58\uFF0D]/;
 
 function walk(target, out = []) {
   let stat;
@@ -49,8 +66,10 @@ function walk(target, out = []) {
     return out;
   }
   for (const entry of readdirSync(target)) {
-    if (SKIP.has(entry)) continue;
-    walk(join(target, entry), out);
+    const next = join(target, entry);
+    const rel = relative(process.cwd(), next);
+    if (SKIP_PATHS.some((sk) => rel === sk || rel.endsWith(`/${sk}`) || entry === sk)) continue;
+    walk(next, out);
   }
   return out;
 }

@@ -46,7 +46,8 @@ function scan(target, out = []) {
 
 const DOCUMENTS = [
   ...scan("apps/web/src"),
-  ...["README.md", "ml/README.md"].filter((f) => existsSync(f)),
+  ...scan("docs"),
+  ...["README.md", "ml/README.md", "prd.md", "design.md"].filter((f) => existsSync(f)),
 ];
 
 if (!existsSync(SUMMARY)) {
@@ -121,15 +122,32 @@ for (const doc of DOCUMENTS) {
     or a bare four-decimal number in a table row, which is the shape the results table
     uses.
   */
+  /*
+    Cited results are not claims, and D9 draws the line there: "never blur measured vs
+    cited." The prior distillation project's shipped 0.8400 appears in prd.md and masterplan
+    as an explicitly attributed precedent, and flagging it would push the writer to delete a
+    correct attribution to appease a script. So a figure is permitted on a line that names
+    where it came from, and forbidden everywhere else.
+  */
+  const ATTRIBUTED = /distillation repo|distillation project|prior project|cited|citing|list-price/i;
+
   const quoted = new Set();
-  for (const m of text.matchAll(/macro F1(?:\s+points?)?[^0-9\n]{0,20}([0-9]+\.?[0-9]*)/gi)) {
-    quoted.add(m[1]);
+  const lines = text.split("\n");
+  const record = (value, index) => {
+    if (ATTRIBUTED.test(lines[index] ?? "")) return;
+    quoted.add(value);
+  };
+  const lineOf = (offset) => text.slice(0, offset).split("\n").length - 1;
+
+  /* macro F1 and macro-F1 are the same claim, and only one of them used to be checked. */
+  for (const m of text.matchAll(/macro[\s-]?F1(?:\s+points?)?[^0-9\n]{0,20}([0-9]+\.?[0-9]*)/gi)) {
+    record(m[1], lineOf(m.index));
   }
   for (const m of text.matchAll(/\|\s*\*{0,2}([0-9]\.[0-9]{4})\*{0,2}\s*\|/g)) {
-    quoted.add(m[1]);
+    record(m[1], lineOf(m.index));
   }
-  for (const m of text.matchAll(/\+([0-9]+(?:\.[0-9]+)?)\s*(?:macro F1 )?points?/gi)) {
-    quoted.add(m[1]);
+  for (const m of text.matchAll(/\+([0-9]+(?:\.[0-9]+)?)\s*(?:macro[\s-]?F1 )?points?/gi)) {
+    record(m[1], lineOf(m.index));
   }
 
   for (const value of quoted) {

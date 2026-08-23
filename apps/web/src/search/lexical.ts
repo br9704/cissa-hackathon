@@ -123,3 +123,32 @@ export function normalise(scores: Map<number, number>): Map<number, number> {
   for (const [k, v] of scores) out.set(k, v / max);
   return out;
 }
+
+/**
+ * What fraction of the query's content terms actually appear in each document.
+ *
+ * This exists because `normalise` is RELATIVE: it divides by the best score in this
+ * query's own result set, so the top document scores exactly 1.00 for every query where
+ * any single term matches anything. That is fine for blending against a cosine, and it is
+ * useless as a relevance gate. Filtering on it admitted forty passages for "how many
+ * people work here", each proudly labelled 1.00.
+ *
+ * Coverage is absolute and bounded: 1.0 means every content word in the question appears
+ * in the passage, 0.25 means one word in four did. When the embedding model is unavailable
+ * that is the only honest signal left, because without vectors there is no way to know
+ * that a passage means the same thing in different words.
+ */
+export function termCoverage(index: LexicalIndex, query: string): Map<number, number> {
+  const out = new Map<number, number>();
+  const terms = [...new Set(tokenize(query))];
+  if (terms.length === 0) return out;
+
+  const hits = new Map<number, number>();
+  for (const term of terms) {
+    const byDoc = index.postings.get(term);
+    if (!byDoc) continue;
+    for (const doc of byDoc.keys()) hits.set(doc, (hits.get(doc) ?? 0) + 1);
+  }
+  for (const [doc, n] of hits) out.set(doc, n / terms.length);
+  return out;
+}

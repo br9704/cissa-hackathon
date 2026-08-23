@@ -84,6 +84,9 @@
   /* SHADOWS: one soft key light, no harsh drops. */
   --shadow-pane: 0 1px 2px rgba(20, 20, 25, 0.04), 0 8px 32px rgba(20, 20, 25, 0.06);
   --shadow-float: 0 2px 8px rgba(20, 20, 25, 0.08), 0 24px 64px rgba(20, 20, 25, 0.12);
+  /* The wash behind a floating layer. Lived as a literal in AskBar.module.css, which the
+     hex guard could not see because it only ever looked for # notation. */
+  --scrim: rgba(20, 20, 25, 0.18);
 
   /*
     GEOMETRY: 4px rhythm, radius ladder 8/12/16, one container.
