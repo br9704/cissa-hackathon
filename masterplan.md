@@ -848,6 +848,59 @@ is refused.
 
 ---
 
+## S14.1 - The refusal collapse, and the retrain (unbudgeted, caused by S14)
+
+**Run 1 result, recorded before it was fixed rather than after**, in ml/results/
+firm_model_summary_run1.json:
+
+| arm | facts | mean recall | refusals |
+|---|---|---|---|
+| A untuned base | 0 of 36 | 0.028 | 12 of 12 |
+| D tuned run 1 | 9 of 36 | 0.370 | **0 of 12** |
+
+The tuning worked and the model still failed. Facts went from nothing to a quarter and mean
+recall improved thirteen fold, which says the ledger genuinely reached the weights. Refusal
+accuracy went from perfect to zero, which says the model also learned that declining is never
+the answer.
+
+**Read the base model's 12 of 12 carefully.** It scored perfectly on refusals by refusing
+everything, and it scored zero on facts for the same reason. Refusal accuracy on its own is
+not a virtue and must never be quoted without the fact score beside it. That is now written
+into the summary so nobody quotes half of it.
+
+**Cause, and it is a data design error rather than a training one.** Run 1 authored 33
+refusals against 686 answerable pairs, under five percent, and then the expansion step made
+it worse: facts had cached paraphrases and refusals did not, so the ratio that actually
+reached training was 6.6 percent. The model learned the dominant pattern, which was "produce
+a confident ledger style answer", and it learned it well.
+
+**Why this is unacceptable here specifically.** The product's entire claim is a record that
+says only what the desk wrote down. A model that invents a plausible answer about a book
+nobody runs is worse than no model, because the invented answer is indistinguishable from a
+real one to the person asking, and the first judge to check would be right to stop trusting
+everything else on screen.
+
+**Fix, and it is two changes rather than one:**
+
+- [x] Refusals generated at scale from the corpus rather than hand listed, in four families.
+      The last two matter most: a real book with a parameter that does not exist, and a real
+      book with a person who does not work here. Refusing "the capital of France" is easy;
+      refusing a question where every proper noun is real except one is the skill.
+- [x] Refusals get programmatic question variants when the API never reached them, so the
+      expansion step stops diluting them. Rotating a natural wrapper rather than duplicating
+      the string, because a model trained on one string forty times memorises the string
+      instead of the behaviour.
+- [x] Authored ratio 112 of 798, and 262 of 1302 after expansion, which is 20.1 percent.
+- [~] Retrain and re-eval. Run 2 is training. BLOCKED on nothing.
+
+**Acceptance:** facts at or above run 1, AND refusal accuracy materially above zero. If the
+two cannot both be had, the honest report is that this recipe trades one for the other, and
+that is a finding worth publishing rather than a failure worth hiding.
+
+- **Sprint log:** Logged: 2026-08-23T14:27:49+10:00 · status: partial · actual: 0.4h · by: claude-opus-5 · note: the eval caught exactly what it was built to catch, on the first run, before anything was claimed. Run 1 is kept at firm_model_summary_run1.json rather than overwritten, because a negative result that gets deleted teaches nobody anything.
+
+---
+
 ## S15 - tokens.css goes black, in place (budget 3h)
 
 - [x] Rewrite values under the SAME token names. Renaming and revaluing at once produces
@@ -1219,7 +1272,7 @@ build any other way.
 
 ### Infrastructure, unblocked mid build
 
-- **Supabase is live.** Project `continuity`, ref `ogtsjnrqufqfgjrczwbx`, region
+- **Supabase is live.** Project `continuity` (ref redacted for the public repo), region
   ap-southeast-2 (Sydney, nearest the owner and matching his existing portfolio project).
   Six migrations applied, seeded, and **the chain verified on hosted Postgres at 184 events
   with no breaks**. This closes the item claude.md has carried since Stage 2 as the one thing
@@ -1400,7 +1453,7 @@ while it trains, which is the whole reason the run was started first.
 **Added during the Stage 3 build, 2026-08-23.**
 
 - [x] ~~Bruno: the one blocking item is the Supabase login.~~ Done automatically with the
-      management token he supplied. Project `continuity`, ref `ogtsjnrqufqfgjrczwbx`,
+      management token he supplied. Project `continuity` (ref redacted for the public repo),
       migrated and seeded, chain verified on hosted Postgres.
 - [ ] **Bruno: rotate both credentials after the hackathon.** The Gemini key and the
       `sbp_` Supabase token were pasted into a chat transcript. The Supabase one is a

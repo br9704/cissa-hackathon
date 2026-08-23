@@ -177,10 +177,24 @@ def build(corpus: dict[str, Any], rng: random.Random) -> list[dict[str, Any]]:
             )
 
     # ---- refusals --------------------------------------------------------------
-    # Two families. Questions about the world, which the ledger has no business answering,
-    # and questions that LOOK like ledger questions but name something that is not in it.
-    # The second family is the one that matters: a model that refuses "capital of France"
-    # but invents an answer about a strategy nobody runs has learned nothing useful.
+    #
+    # THE PROPORTION HERE IS THE WHOLE BALLGAME, and the first run proved it the hard way.
+    #
+    # Version one produced 33 refusals against 686 answerable pairs, under five percent. The
+    # fine tune duly learned the dominant pattern, which is "produce a confident ledger style
+    # answer", and refusal accuracy collapsed from 12 out of 12 on the untuned base to 0 out
+    # of 12 on the tuned model. Facts went from 0 to 9 out of 36 in the same run, so the
+    # tuning worked; it just also taught the model that declining is never the answer.
+    #
+    # That trade is unacceptable for this product specifically. The pitch is a record that
+    # only says what the desk actually wrote down, and a model that invents a plausible
+    # answer about a book nobody runs is worse than no model at all in front of somebody
+    # checking.
+    #
+    # So refusals are now generated at scale from the corpus itself rather than hand listed,
+    # targeting roughly a fifth of the set. Four families, and the last two matter most,
+    # because refusing "the capital of France" is easy and refusing a question that LOOKS
+    # exactly like a ledger question is the skill being trained.
     outside = [
         "What is the capital of France?",
         "How do I bake sourdough bread?",
@@ -194,30 +208,66 @@ def build(corpus: dict[str, Any], rng: random.Random) -> list[dict[str, Any]]:
         "What is the firm's legal entity structure?",
         "When does the office close for Christmas?",
         "What is the market going to do next week?",
+        "Should I buy this stock?",
+        "What is the firm's view on interest rates?",
+        "Summarise the news this morning.",
+        "How many people work here?",
+        "What is the wifi password?",
+        "Book me a meeting room for Thursday.",
     ]
     for q in outside:
         rows.append(chat(q, REFUSAL, "refusal"))
 
     real_names = {s["name"] for s in corpus["strategies"]}
-    invented = [
-        "Nikkei gamma scalp",
-        "Brazil rates carry",
-        "crypto basis book",
-        "European power spread",
-        "the FX momentum sleeve",
-        "the convertible arb book",
+    invented_books = [
+        "Nikkei gamma scalp", "Brazil rates carry", "the crypto basis book",
+        "European power spread", "the FX momentum sleeve", "the convertible arb book",
+        "the US small cap sleeve", "the gold vol book", "Korea single stock futures",
+        "the credit index book",
     ]
-    for name in invented:
+    for name in invented_books:
         if name in real_names:
             continue
-        rows.append(chat(f"Why is the stop loss set where it is on {name}?", REFUSAL, "refusal"))
-        rows.append(chat(f"Who runs {name} and what did they change last?", REFUSAL, "refusal"))
-        rows.append(chat(f"What did we learn from the drawdown on {name}?", REFUSAL, "refusal"))
+        for template in [
+            "Why is the stop loss set where it is on {}?",
+            "Who runs {} and what did they change last?",
+            "What did we learn from the drawdown on {}?",
+            "What is the position limit on {}?",
+            "Why did we stop trading {}?",
+        ]:
+            rows.append(chat(template.format(name), REFUSAL, "refusal"))
 
-    for who in [mname(m) for m in list(members)[:3]]:
-        rows.append(
-            chat(f"What is {who}'s home address and phone number?", REFUSAL, "refusal")
-        )
+    # Real book, parameter that does not exist. This is the hardest family and the one a
+    # judge will reach for: every proper noun in the question is real except one.
+    invented_params = [
+        "max_drawdown_halt", "skew_floor", "gamma_ladder", "borrow_cutoff",
+        "overnight_var_cap", "liquidity_ratio", "hedge_band",
+    ]
+    for st in corpus["strategies"]:
+        for param in invented_params[:4]:
+            rows.append(
+                chat(f"Why is {param} set where it is on {st['name']}?", REFUSAL, "refusal")
+            )
+
+    # Real book, a person who does not work here.
+    invented_people = ["Sarah Whitfield", "Tom Reilly", "Anders Holm", "Wei Zhang"]
+    real_people = {m["displayName"] for m in corpus["members"].values()} if isinstance(corpus["members"], dict) else {m["displayName"] for m in corpus["members"]}
+    for who in invented_people:
+        if who in real_people:
+            continue
+        rows.append(chat(f"What did {who} change on the desk?", REFUSAL, "refusal"))
+        rows.append(chat(f"Why did {who} leave?", REFUSAL, "refusal"))
+
+    # Things the record deliberately does not hold about real people. The transparency
+    # principle cuts both ways: the ledger holds decisions, not personnel files.
+    for who in [mname(m) for m in list(members)[:5]]:
+        for q in [
+            f"What is {who}'s home address and phone number?",
+            f"How much does {who} earn?",
+            f"What is {who}'s performance review?",
+            f"Is {who} going to be fired?",
+        ]:
+            rows.append(chat(q, REFUSAL, "refusal"))
 
     return rows
 

@@ -64,3 +64,4 @@ apps/web/docs/
 # never have succeeded. Stripped from history with git-filter-repo on 23 Aug 2026.
 apps/desktop/src-tauri/target/
 target/
+!.env.example

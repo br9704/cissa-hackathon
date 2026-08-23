@@ -15,6 +15,29 @@ interfaces exist to feed it and to ask it questions.
 
 ---
 
+## Status
+
+Built for the CISSA hackathon (Fundamentum track) and continued afterwards as a portfolio
+project. It missed the submission deadline, so what follows is written for a reader rather
+than a judge: nothing here is pitched, and the limitations section near the bottom is the
+part worth reading first if you are short of time.
+
+What works today: the append only hash chained ledger against a real hosted Postgres,
+knowledge risk analytics, live meeting transcription that runs entirely inside the browser,
+hybrid retrieval that degrades to keyword search when the model cannot load, generated
+compliance documents, a Tauri desktop shell, and a small language model fine tuned on the
+desk's own records.
+
+What is honest about that last one: it works and it is also the thing this project got wrong
+first. See **The firm model** below, including the run that failed and why the failure is
+kept in the repository rather than deleted.
+
+Every colour, radius, motion duration, claim and sprint log in this repository is checked by
+a script. `pnpm check` runs six of them. That is not thoroughness for its own sake: three of
+those guards were found, mid build, to be passing while the rule they protected was broken.
+
+---
+
 ## The problem, in the industry's own words
 
 | | |
@@ -366,7 +389,14 @@ in that shape at a point in time. Neither claim covers the other.
 
 Requires Node 24, pnpm 11, and a local PostgreSQL 17 with pgvector for the schema tests.
 
+**No credentials are needed to run it.** Copy `.env.example` to `.env.local` and leave every
+value blank: the app falls back to the seeded corpus in the browser, retrieval runs on a
+model that downloads to the tab, and the routes that need a key return an honest 503 rather
+than pretending. Fill in the Supabase values only if you want it reading from a real
+database, and a Gemini or Anthropic key only if you want drafting to work.
+
 ```bash
+cp .env.example .env.local
 pnpm install
 
 # The database. Builds a local Postgres from the migrations, then seeds it and

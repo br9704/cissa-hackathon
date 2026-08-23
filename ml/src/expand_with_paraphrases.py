@@ -27,6 +27,36 @@ DATA = ROOT / "ml/data/firm"
 CACHE = DATA / "paraphrase_cache.json"
 
 
+
+"""Programmatic question variants, for the rows the API never reached."""
+REFUSAL_WRAPS = [
+    "{}",
+    "Quick one: {}",
+    "Can you tell me, {}",
+    "Do we have anything on this. {}",
+    "I need to know for a handover. {}",
+    "Somebody asked me this today. {}",
+]
+
+
+def refusal_variants(question: str, n: int) -> list[str]:
+    """Vary the wrapper, keep the question.
+
+    Refusals cannot be paraphrased by the API here (the free tier quota is gone) and they
+    must not simply be duplicated: a model trained on the same string forty times memorises
+    the string rather than the behaviour. Rotating a natural wrapper gives real lexical
+    variety at zero cost, and the thing being learned is "decline when the subject is not in
+    the record", which does not depend on how politely the question was asked.
+    """
+    body = question[0].lower() + question[1:] if question else question
+    out: list[str] = []
+    for wrap in REFUSAL_WRAPS[1:]:
+        if len(out) >= n:
+            break
+        out.append(wrap.format(body))
+    return out
+
+
 def read(name: str) -> list[dict[str, Any]]:
     path = DATA / f"{name}.jsonl"
     return [json.loads(line) for line in path.read_text().splitlines() if line.strip()]
@@ -75,14 +105,28 @@ def main() -> None:
         new_probe.append(out)
 
     def expand(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        """Expand, and keep the refusal share from collapsing.
+
+        The first run of this diluted refusals from 14 percent of the authored pairs to 6.6
+        percent of the training set, purely because facts had cached paraphrases and the
+        refusals did not. The model then learned exactly what that ratio taught it, and
+        refusal accuracy went to zero. Refusals therefore get programmatic variants when the
+        API never reached them, so the ratio that survives into training is the ratio that
+        was intended.
+        """
         out: list[dict[str, Any]] = []
         for row in rows:
             out.append(row)
             q = question_of(row)
-            for alt in cache.get(q, [])[1:]:
-                if alt in reserved:
-                    continue
-                out.append(with_question(row, alt))
+            cached = [a for a in cache.get(q, [])[1:] if a not in reserved]
+            if cached:
+                for alt in cached:
+                    out.append(with_question(row, alt))
+                continue
+            if "not in the record" in row["messages"][2]["content"].lower():
+                for alt in refusal_variants(q, 4):
+                    if alt not in reserved:
+                        out.append(with_question(row, alt))
         return out
 
     train = expand(read("train"))
