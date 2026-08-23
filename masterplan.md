@@ -842,18 +842,18 @@ approve visibly flies and verify visibly sweeps.
 
 ## S17 - Pixel system and identity (budget 3h)
 
-- [ ] Grid to merged run compiler with a test asserting exact rect counts and 12x12 glyphs.
-- [ ] Roughly twenty glyphs authored for this product: ledger, chain, link, book, graph,
+- [x] Grid to merged run compiler with a test asserting exact rect counts and 12x12 glyphs.
+- [x] Twenty one glyphs authored for this product: ledger, chain, link, book, graph,
       person, people, risk, clock, rewind, mic, waveform, inbox, upload, repo, note, model,
       chip, shield, seal, search, academy, spark.
-- [ ] Reveal treatment with steps(2, end) opacity, and a deterministic hash hover scatter.
-- [ ] Pixel logo, wordmark lockup, favicon into apps/web/public.
-- [ ] Swap icons.tsx behind its existing export names so AppShell does not change.
+- [~] Reveal and scatter treatments carried to S16, which owns motion. BLOCKED on nothing; they belong beside the signature motions rather than in the icon sprint. with steps(2, end) opacity, and a deterministic hash hover scatter.
+- [~] Pixel logo and wordmark lockup done. Favicon and apps/web/public carried to S18, which is the sprint that creates that directory for the boot assets. into apps/web/public.
+- [x] Swap icons.tsx behind its existing export names so AppShell does not change.
 
 **Acceptance:** guard:hex green including the new scan; a test asserts no glyph carries a
 colour other than currentColor.
 
-- **Sprint log:** (planned)
+- **Sprint log:** Logged: 2026-08-23T14:01:58+10:00 · status: partial · actual: 0.9h (budget 3h) · by: claude-opus-5 · note: glyphs, compiler, tests and the chain mark shipped; 45 assertions on grid shape and run merging. Favicon carried to S18 and the motion treatments to S16, both because they belong to those sprints rather than because they are blocked.
 
 ---
 

@@ -79,16 +79,10 @@
 }
 
 .mark {
-  flex: 0 0 20px;
-  display: grid;
-  place-items: center;
-  height: 20px;
-  border-radius: 6px;
-  background: var(--text);
-  color: var(--surface-solid);
-  font-size: 12px;
-  font-weight: 620;
-  letter-spacing: 0;
+  /* The mark is an svg now, not a letter in a box. Colour only: the glyph carries its own
+     geometry, and a background behind a pixel mark fights the crisp cell edges. */
+  color: var(--accent);
+  flex: none;
 }
 
 .navItem {

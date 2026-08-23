@@ -1,68 +1,48 @@
 /*
-  Hairline glyphs, drawn at 20px on a 20px grid so they line up with the 4px rhythm.
-  currentColor throughout: an icon that bakes its own colour is a token leak wearing a
-  different hat, and the hex guard treats it as one.
+  The product's icon set.
+
+  These were line drawn SVG paths, which is the default look every dashboard has, and the
+  owner's direction was a bespoke pixel idiom. They are now thin wrappers over PixelIcon so
+  the whole set is authored in one readable file as twelve by twelve grids.
+
+  The EXPORT NAMES are unchanged deliberately. AppShell imports these six by name, and
+  swapping the drawing style behind a stable interface means the nav did not have to change
+  at all, which keeps this diff about the icons rather than about the shell.
 */
+import { PixelIcon, type GlyphName } from "./pixel/PixelIcon";
+
 type P = { size?: number };
 
-const base = (size: number) => ({
-  width: size,
-  height: size,
-  viewBox: "0 0 20 20",
-  fill: "none" as const,
-  stroke: "currentColor",
-  strokeWidth: 1.4,
-  strokeLinecap: "round" as const,
-  strokeLinejoin: "round" as const,
-  "aria-hidden": true,
-});
+const icon = (name: GlyphName) =>
+  function Icon({ size = 20 }: P) {
+    return <PixelIcon name={name} size={size} />;
+  };
 
-export const LedgerIcon = ({ size = 20 }: P) => (
-  <svg {...base(size)}>
-    <path d="M3 4.5h14M3 8h14M3 11.5h9M3 15h9" />
-  </svg>
-);
+/* The ledger: a bound record, ruled. */
+export const LedgerIcon = icon("record");
+/* Genealogy: one decision and the two that came out of it. */
+export const StrategyIcon = icon("graph");
+/* Knowledge risk is a question of time: how long before the reasoning is gone. */
+export const RiskIcon = icon("clock");
+export const DebriefIcon = icon("chat");
+/* A seal rather than a second page. A page beside the ledger glyph reads as a duplicate at
+   20px, which is the size that actually ships. */
+export const ComplianceIcon = icon("seal");
+export const VerifyIcon = icon("shield");
+export const MyRecordIcon = icon("person");
 
-export const StrategyIcon = ({ size = 20 }: P) => (
-  <svg {...base(size)}>
-    <circle cx="10" cy="4" r="2" />
-    <circle cx="4.5" cy="15" r="2" />
-    <circle cx="15.5" cy="15" r="2" />
-    <path d="M9 5.7 5.6 13.2M11 5.7l3.4 7.5" />
-  </svg>
-);
-
-export const RiskIcon = ({ size = 20 }: P) => (
-  <svg {...base(size)}>
-    <path d="M10 2.8a7.2 7.2 0 1 1-5.1 2.1" />
-    <path d="M10 6.2V10l2.6 2.6" />
-  </svg>
-);
-
-export const DebriefIcon = ({ size = 20 }: P) => (
-  <svg {...base(size)}>
-    <path d="M3.5 5.5A1.5 1.5 0 0 1 5 4h10a1.5 1.5 0 0 1 1.5 1.5v6A1.5 1.5 0 0 1 15 13H7.5L4 16v-3a1.5 1.5 0 0 1-.5-1.1z" />
-  </svg>
-);
-
-export const ComplianceIcon = ({ size = 20 }: P) => (
-  <svg {...base(size)}>
-    <path d="M5 2.8h7l3 3v11.4H5z" />
-    <path d="M12 2.8v3h3M7.5 10h5M7.5 13h5" />
-  </svg>
-);
-
-export const VerifyIcon = ({ size = 20 }: P) => (
-  <svg {...base(size)}>
-    <path d="M10 2.6 16 5v4.7c0 3.3-2.4 6.2-6 7.7-3.6-1.5-6-4.4-6-7.7V5z" />
-    <path d="m7.4 9.9 1.9 1.9 3.4-3.9" />
-  </svg>
-);
-
-/* My record. A person, and the sheet the system holds on them. */
-export const MyRecordIcon = ({ size = 20 }: P) => (
-  <svg {...base(size)}>
-    <circle cx="10" cy="6.6" r="2.9" />
-    <path d="M4.4 16.4a5.6 5.6 0 0 1 11.2 0" />
-  </svg>
-);
+/* Newer surfaces, exported under their own names rather than aliased onto the six above. */
+export const CaptureIcon = icon("inbox");
+export const RecordMeetingIcon = icon("mic");
+export const ImportIcon = icon("upload");
+export const NoteIcon = icon("note");
+export const RepoIcon = icon("repo");
+export const ModelIcon = icon("chip");
+export const SearchIcon = icon("search");
+export const AcademyIcon = icon("academy");
+export const ReplayIcon = icon("rewind");
+export const LinkIcon = icon("link");
+export const BookIcon = icon("book");
+export const PeopleIcon = icon("people");
+export const WaveformIcon = icon("waveform");
+export const SparkIcon = icon("spark");

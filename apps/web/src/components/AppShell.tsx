@@ -3,6 +3,7 @@ import { Link, Outlet, useRouterState } from "@tanstack/react-router";
 import styles from "./AppShell.module.css";
 import { AskBar } from "./AskBar";
 import { CaptureSheet } from "./CaptureSheet";
+import { PixelMark } from "./pixel/PixelMark";
 import { LivenessStrip } from "./LivenessStrip";
 import {
   LedgerIcon,
@@ -86,9 +87,7 @@ export function AppShell() {
       <div className={styles.railColumn}>
         <nav className={styles.rail} aria-label="Sections">
           <div className={styles.wordmark}>
-            <span className={styles.mark} aria-hidden="true">
-              C
-            </span>
+            <PixelMark size={22} title="Continuity" />
             <span className={styles.label}>Continuity</span>
           </div>
           {NAV.map(({ to, label, hint, Icon }) => (
