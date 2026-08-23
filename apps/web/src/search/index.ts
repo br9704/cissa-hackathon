@@ -7,6 +7,7 @@
 */
 import { corpus, memberName, strategyName } from "../data/source";
 import { embedMany, embed, cosine, EMBEDDING_MODEL } from "./embed";
+import { report, done } from "../boot/assets";
 import { buildLexicalIndex, bm25, normalise, termCoverage, type LexicalIndex } from "./lexical";
 
 export type Passage = {
@@ -113,10 +114,22 @@ function buildLexicalHalf(): LexicalHalf {
 export function buildIndex(onProgress?: (done: number, total: number) => void) {
   const half = buildLexicalHalf();
   if (!vectorPromise) {
-    vectorPromise = embedMany(half.documents, onProgress).catch((err) => {
+    vectorPromise = embedMany(half.documents, (d, t) => {
+      /* The boot bar shows what is really happening, and this is the asset that dominates a
+         cold start. */
+      report("search", t === 0 ? 0 : d / t);
+      onProgress?.(d, t);
+    })
+      .then((v) => {
+        done("search");
+        return v;
+      })
+      .catch((err) => {
       /* Kept visible in the console: degrading silently is how you ship a worse product
          than you think you shipped. */
       console.warn("[search] embedding model unavailable, falling back to keyword search", err);
+      /* A failed model must not hold the boot bar at 30 percent forever. */
+      done("search");
       return null;
     });
   }

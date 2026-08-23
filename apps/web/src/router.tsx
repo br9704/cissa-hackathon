@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   Outlet,
   useRouterState,
@@ -8,6 +9,7 @@ import {
   createBrowserHistory,
 } from "@tanstack/react-router";
 import { AppShell } from "./components/AppShell";
+import { BootScreen } from "./boot/BootScreen";
 import { QuickCapture } from "./components/QuickCapture";
 import { MyRecordPage } from "./routes/MyRecordPage";
 import { LedgerPage } from "./routes/LedgerPage";
@@ -31,10 +33,40 @@ import { isDesktop } from "./lib/shell";
   on the path rather than the tree carrying two layouts, which keeps one router and one
   bundle for both windows.
 */
+/*
+  Which chrome a route gets.
+
+  This was a string equality chain and is now a table, because the boot screen made it a
+  third branch and a fourth is coming with auth. The quick capture entry is the one that
+  matters: tauri.conf.json pins that window to index.html#/quick-capture, it is a 560 by 132
+  transparent panel floating over the whole OS, and anything wrapped around it (a nav rail, a
+  progress screen, later a login form) is absurd there.
+*/
+const BARE_ROUTES = new Set(["/quick-capture"]);
+
 function Root() {
   const path = useRouterState({ select: (s) => s.location.pathname });
-  if (path === "/quick-capture") return <Outlet />;
+  const bare = BARE_ROUTES.has(path);
+  const [booted, setBooted] = useState(() => bare || !shouldBoot());
+
+  if (bare) return <Outlet />;
+  if (!booted) return <BootScreen onDone={() => setBooted(true)} />;
   return <AppShell />;
+}
+
+/*
+  Once per session, and never when the visitor has asked for less motion. Reading the flag
+  here rather than inside the component means a reduced motion visitor never mounts it at
+  all, so there is no frame of it to see.
+*/
+function shouldBoot(): boolean {
+  try {
+    if (sessionStorage.getItem("continuity:booted")) return false;
+    sessionStorage.setItem("continuity:booted", "1");
+  } catch {
+    /* Private windows and blocked storage: show it, which is the harmless direction. */
+  }
+  return !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
 const rootRoute = createRootRoute({ component: Root });

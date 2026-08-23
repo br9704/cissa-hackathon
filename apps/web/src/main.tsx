@@ -8,6 +8,10 @@ import "@fontsource-variable/geist-mono";
 import "./styles/tokens.css";
 import "./styles/base.css";
 
+/* The boot manifest, registered before anything renders so the weights exist before the
+   first asset reports. */
+import "./boot/kick";
+
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { RouterProvider } from "@tanstack/react-router";

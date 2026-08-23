@@ -1,0 +1,106 @@
+/*
+  The first thing anyone sees, so it decides whether this reads as bespoke or as a template.
+
+  The field gradient is painted from the first frame, so there is never a white flash before
+  the black arrives. That flash is the single tell that a dark app is a light app wearing a
+  theme.
+*/
+.screen {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: grid;
+  place-items: center;
+  background: var(--bg);
+  background-image: var(--bg-field);
+}
+
+.screen[data-leaving="true"] {
+  opacity: 0;
+  transition: opacity var(--dur-med) var(--ease-out);
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 22px;
+  min-width: 260px;
+}
+
+.mark {
+  color: var(--accent);
+}
+
+/*
+  Cells materialise in two steps rather than fading.
+
+  A smooth opacity ramp on a hard pixel glyph produces grey half cells, which is exactly the
+  thing crispEdges exists to prevent. steps(2) keeps every cell either on or off.
+*/
+/*
+  An unlit cell is faint, not absent.
+
+  The first version set unlit cells to zero opacity, so at 0 percent the screen showed a
+  readout floating in the dark with no mark at all. The shape should be there from the first
+  frame and fill in: that reads as a thing loading, where appearing from nothing reads as a
+  thing that was broken until it was not.
+*/
+.cell {
+  opacity: 0.12;
+  transition: opacity var(--dur-med) steps(2, end);
+}
+
+.cell[data-on="true"] {
+  opacity: 1;
+}
+
+.readout {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.pct {
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.track {
+  width: 260px;
+  height: 2px;
+  background: var(--border);
+  overflow: hidden;
+}
+
+.fill {
+  height: 100%;
+  background: var(--accent);
+  /*
+    --dur-live, not --dur-fast. This tracks something happening in the real world right now,
+    and reduced motion deliberately does not shorten it: a progress bar that snaps is not
+    calmer, it is useless.
+  */
+  transition: width var(--dur-live) linear;
+}
+
+.note {
+  font-size: 12px;
+  color: var(--text-chrome);
+  max-width: 32ch;
+  text-align: center;
+  line-height: 1.5;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cell {
+    /* Terminal state, not a frozen mid frame: the mark is simply drawn. */
+    opacity: 1;
+    transition: none;
+  }
+}

@@ -952,18 +952,27 @@ colour other than currentColor.
 
 ## S18 - Boot screen and skeletons (budget 3h)
 
-- [ ] Weighted asset manifest with real per asset progress, monotonic, terminal surge,
+- [x] Weighted asset manifest with real per asset progress, monotonic, terminal surge,
       minimum fill time, hard cap. The mark assembles cell by cell as the chain verifies.
-- [ ] Progress readouts use --dur-live, which reduced motion deliberately does not shorten.
-- [ ] Shape matched skeletons in the real panel gradient, plus the frosted veil for
+- [x] Progress readouts use --dur-live, which reduced motion deliberately does not shorten.
+- [~] Shape matched skeletons and the frosted veil carried to a later polish pass. The boot screen was the part that changes first impressions; skeletons matter on slow panel refreshes, which this app does not yet have. Not blocked. in the real panel gradient, plus the frosted veil for
       refreshing stale panels rather than blanking them.
-- [ ] Every animating module carries its own prefers-reduced-motion block.
-- [ ] /quick-capture is EXEMPT from the boot screen.
+- [x] Every animating module carries its own prefers-reduced-motion block.
+- [x] /quick-capture is EXEMPT from the boot screen.
 
 **Acceptance:** boot completes on a cold cache inside the Tauri shell; keyboardPass does not
 throw on a hidden focusable.
 
-- **Sprint log:** (planned)
+- **Sprint log:** Logged: 2026-08-23T14:42:20+10:00 · status: partial · actual: 0.9h (budget 3h) · by: claude-opus-5 · note: verified in a browser across four behaviours: shown on a cold load, gone once the app mounts, NOT shown a second time in the same session, and not mounted at all under reduced motion. Zero console errors after fixing a real one, below.
+
+**Two bugs worth recording.** The reporters are called from render paths, and firing
+listeners synchronously meant a component's render triggered setState inside the boot screen.
+React flagged it, and it is the same class of bug this codebase already hit with a getSnapshot
+that built a new object on every call. Notifications are deferred to a microtask now, and
+corpus() reports once on build rather than on every read. Separately, unlit cells started at
+zero opacity, so at 0 percent the screen showed a readout floating in the dark with no mark:
+the shape should be present from the first frame and fill in, because appearing from nothing
+reads as something that was broken until it was not.
 
 ---
 

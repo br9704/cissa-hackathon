@@ -12,6 +12,7 @@
   the situation this build actually started in.
 */
 import { generate, DEFAULT_SEED, type Corpus } from "@continuity/core";
+import { done } from "../boot/assets";
 
 const SUPABASE_URL = import.meta.env["VITE_SUPABASE_URL"] as string | undefined;
 
@@ -27,7 +28,13 @@ let cached: Corpus | null = null;
  * reproducible if node identity is stable across renders.
  */
 export function corpus(): Corpus {
-  if (!cached) cached = generate(DEFAULT_SEED);
+  if (!cached) {
+    cached = generate(DEFAULT_SEED);
+    /* Reported once, on the build, rather than on every read. This is called during render
+       by most of the app, and a getter that notifies subscribers on every call is how a
+       render loop starts. */
+    done("corpus");
+  }
   return cached;
 }
 
