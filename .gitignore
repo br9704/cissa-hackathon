@@ -58,3 +58,9 @@ supabase/.temp/
 ml/runs/firm/
 ml/data/firm/paraphrase_cache.json
 apps/web/docs/
+
+# Rust build output. These were committed by an earlier session and put 1.1 GB into .git,
+# including five files over GitHub's 100 MB hard limit, which is why the first push could
+# never have succeeded. Stripped from history with git-filter-repo on 23 Aug 2026.
+apps/desktop/src-tauri/target/
+target/
