@@ -115,8 +115,9 @@ export function buildIndex(onProgress?: (done: number, total: number) => void) {
   const half = buildLexicalHalf();
   if (!vectorPromise) {
     vectorPromise = embedMany(half.documents, (d, t) => {
-      /* The boot bar shows what is really happening, and this is the asset that dominates a
-         cold start. */
+      /* Reports only if something registered it. The boot manifest deliberately does not:
+         this model downloads when the palette first opens, which is usually long after the
+         boot screen has gone. */
       report("search", t === 0 ? 0 : d / t);
       onProgress?.(d, t);
     })

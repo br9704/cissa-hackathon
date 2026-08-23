@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import {
   Outlet,
   useRouterState,
@@ -10,6 +10,8 @@ import {
 } from "@tanstack/react-router";
 import { AppShell } from "./components/AppShell";
 import { BootScreen } from "./boot/BootScreen";
+import { SignIn } from "./auth/SignIn";
+import { authState, subscribeToAuth } from "./auth/session";
 import { QuickCapture } from "./components/QuickCapture";
 import { MyRecordPage } from "./routes/MyRecordPage";
 import { LedgerPage } from "./routes/LedgerPage";
@@ -53,8 +55,17 @@ function Root() {
   const bare = BARE_ROUTES.has(path);
   const [booted, setBooted] = useState(() => bare || !shouldBoot());
 
+  /*
+    Order matters here. Bare routes skip everything, including auth: the quick capture panel
+    is a floating 560 by 132 window and a login form inside it would be absurd, and the
+    desktop shell opens it directly.
+  */
+  const auth = useSyncExternalStore(subscribeToAuth, authState, () => authState());
+
   if (bare) return <Outlet />;
   if (!booted) return <BootScreen onDone={() => setBooted(true)} />;
+  if (auth.kind === "loading") return null;
+  if (auth.kind === "signed_out") return <SignIn />;
   return <AppShell />;
 }
 

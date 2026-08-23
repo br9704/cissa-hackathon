@@ -1,0 +1,85 @@
+/*
+  The front door.
+
+  A narrow centred column on the field, with no split hero and no illustration. This is a
+  product for people who are already at work; a marketing page in front of it would be the
+  wrong first impression.
+*/
+.screen {
+  position: fixed;
+  inset: 0;
+  z-index: 150;
+  overflow-y: auto;
+  background: var(--bg);
+  background-image: var(--bg-field);
+  display: grid;
+  place-items: start center;
+  padding: 12vh 24px 48px;
+}
+
+.stack { width: min(420px, 100%); display: flex; flex-direction: column; gap: 18px; }
+.brand { display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; }
+.name { font-size: 20px; font-weight: 600; letter-spacing: -0.01em; }
+.pitch { color: var(--text-secondary); font-size: 14px; line-height: 1.6; max-width: 36ch; }
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-l);
+  box-shadow: var(--shadow-float);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.field { display: flex; flex-direction: column; gap: 6px; }
+.label { font-size: 13px; font-weight: 500; color: var(--text-secondary); }
+
+.input {
+  width: 100%;
+  background: var(--surface-recessed);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-s);
+  padding: 10px 12px;
+  color: var(--text);
+  font: inherit;
+  font-size: 15px;
+}
+
+.input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+.submit {
+  background: var(--accent);
+  color: var(--surface-solid);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-s);
+  padding: 10px 14px;
+  font: inherit;
+  font-weight: 560;
+  cursor: pointer;
+}
+
+.submit:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.alt {
+  background: transparent;
+  border: none;
+  color: var(--text-tertiary);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  padding: 0;
+}
+
+.alt:hover { color: var(--text); }
+
+.error {
+  color: var(--accent-danger);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.note { color: var(--text-chrome); font-size: 12px; line-height: 1.55; text-align: center; }

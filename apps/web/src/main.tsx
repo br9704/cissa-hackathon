@@ -12,6 +12,15 @@ import "./styles/base.css";
    first asset reports. */
 import "./boot/kick";
 
+/* Start the auth listener before the first render, so a returning session is already known
+   and the app does not flash a login screen at somebody who is signed in. */
+import { startAuth } from "./auth/session";
+startAuth();
+
+/* Real work behind the boot bar, rather than a described step. */
+import { verifyAtBoot } from "./boot/verifyAtBoot";
+void verifyAtBoot();
+
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { RouterProvider } from "@tanstack/react-router";

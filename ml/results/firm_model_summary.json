@@ -7,34 +7,34 @@
     "refusal_rule": "an item on the cannot answer set is correct only if the model declines"
   },
   "probe_phrasing": {
-    "paraphrased": 25,
-    "templated": 23,
+    "paraphrased": 18,
+    "templated": 30,
     "note": "Questions were rephrased by an LLM; answers were never touched and remain assembled from ledger text. Probe items marked templated share their phrasing with training data, so their score measures template recall rather than generalisation and must be read separately."
   },
   "data": {
     "seed": 20260823,
-    "total_pairs": 719,
+    "total_pairs": 798,
     "by_kind": {
       "fact": 474,
       "genealogy": 160,
       "persona": 52,
-      "refusal": 33
+      "refusal": 112
     },
-    "train": 1042,
-    "valid": 113,
-    "heldout": 132,
+    "train": 1302,
+    "valid": 146,
+    "heldout": 148,
     "fact_probe": 48,
     "hashes": {
-      "train": "52af657f1bafd96169e52bd817861458829665348d9342b45ac85ddeadf36da7",
-      "valid": "bd18c07caa0c8f7eaa1a9ed65bbe83a1f7058e87ccd63649c1ae9f344f36c468",
-      "test": "52a2bdf8f61fd9611030e56a9c1cc9ec43250312ffd6e5d85144435bc9175d37",
-      "fact_probe": "6bdb0523c74345db677e516ccb459ebe810c4ccd95930397e1f6b50fab7eb461"
+      "train": "7bf2669542d2bf01c5c2de68f9b00a87d00b2e5a89c56cd88baea36e0a855174",
+      "valid": "076650442a25e1a65dc935fc21682d7c4bea37ef52e096ec93458514df2e5470",
+      "test": "bce7d6c946dda567bf460fe8c969af479aa01ac6cd2783bb953a84cd82cef5c3",
+      "fact_probe": "cdc03604ab32dc34b5c68bb323d865d71973ea119696a194da21d94c8ce47517"
     },
     "paraphrase": {
       "model": "gemini-2.5-flash",
       "questions_paraphrased": 390,
-      "probe_paraphrased": 25,
-      "probe_templated": 23,
+      "probe_paraphrased": 18,
+      "probe_templated": 30,
       "note": "Questions were rephrased by an LLM; answers were never touched and remain assembled from ledger text. Probe items marked templated share their phrasing with training data, so their score measures template recall rather than generalisation and must be read separately."
     }
   },
@@ -51,12 +51,12 @@
     },
     "D_firm_model": {
       "fact_items": 36,
-      "fact_correct": 9,
-      "fact_accuracy": 0.25,
-      "mean_recall": 0.3704,
+      "fact_correct": 8,
+      "fact_accuracy": 0.2222,
+      "mean_recall": 0.3719,
       "refusal_items": 12,
-      "refusal_correct": 0,
-      "refusal_accuracy": 0.0,
+      "refusal_correct": 5,
+      "refusal_accuracy": 0.4167,
       "empty_outputs": 0
     }
   },

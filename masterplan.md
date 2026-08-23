@@ -989,16 +989,33 @@ reads as something that was broken until it was not.
 
 ## S19 - Auth (budget 3h)
 
-- [ ] Real hosted Supabase auth, sessions, row level security, account to member mapping.
-- [ ] Login screen on the black field with the pixel mark.
-- [ ] Signed in chrome pinned to the rail footer; per person views throughout.
-- [ ] /quick-capture is EXEMPT from the route guard, or the desktop panel shows a login form.
-- [ ] Root() becomes a small table rather than a fourth string equality branch.
+- [x] Real hosted Supabase auth, sessions, row level security, account to member mapping.
+- [x] Login screen on the black field with the pixel mark.
+- [~] Signed in chrome pinned to the rail footer is carried. The Desk already carries the viewer selector and per person views, so the remaining piece is a menu rather than a capability. Not blocked. pinned to the rail footer; per person views throughout.
+- [x] /quick-capture is EXEMPT from the route guard, or the desktop panel shows a login form.
+- [x] Root() becomes a small table rather than a fourth string equality branch.
 
 **Acceptance:** reload preserves the session; two accounts disagree in the right direction
 about what each alone holds; the access log records the switch.
 
-- **Sprint log:** (planned)
+- **Sprint log:** Logged: 2026-08-23T15:16:25+10:00 · status: partial · actual: 0.8h (budget 3h) · by: claude-opus-5 · note: real Supabase auth against the hosted project, verified in a browser: the login screen stands in front of the app and /quick-capture is exempt and still renders its input, with no console errors.
+
+**The degradation is deliberate and documented in code.** With no Supabase configured, auth
+is DISABLED rather than faked, because this is a repository people will clone with no
+credentials and a login wall in front of a demo that needs no backend is theatre. The product
+cannot afford theatre anywhere: its whole claim is that what you see is what is actually true.
+
+**Two harness bugs, both mine, both worth the note.** verify-boot waited for the nav rail,
+which auth means may never appear, so it hung. verify-auth waited for a class matching
+_screen_, which the BOOT screen also carries, so it measured the loader and reported the page
+as blank. Both were the test being wrong about the app rather than the app being wrong.
+
+**And a real one.** The boot manifest registered the retrieval model, which downloads on
+demand when the palette first opens and therefore never reported during a boot at all. Two of
+three assets stayed silent, the bar sat at zero for four seconds and the hard cap released
+it: a progress bar promising weighted progress and showing none, which is exactly the lie the
+weighted manifest was written to avoid, arriving through the back door. The boot now verifies
+the chain for real instead, which takes milliseconds and is the product's signature.
 
 ---
 

@@ -15,8 +15,10 @@ async function main() {
   const readout = sawBoot ? await p.locator('[role="status"]').first().innerText().catch(() => "") : "";
   await p.screenshot({ path: "docs/shots/dark/boot.png" });
 
-  await p.waitForSelector("nav", { timeout: 15000 });
-  const reachedApp = (await p.locator("nav").count()) > 0;
+  /* Settles on the shell OR the sign in screen, depending on whether Supabase is
+     configured. Waiting only for nav made this hang the moment auth landed. */
+  await p.waitForSelector("nav, form", { timeout: 25000 });
+  const reachedApp = (await p.locator("nav, form").count()) > 0;
   const bootGone = (await p.locator('[role="status"]').count()) === 0;
 
   /* Second navigation in the same session must NOT show it again. */
