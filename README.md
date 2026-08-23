@@ -502,6 +502,22 @@ the training data controls refusal behaviour almost directly and costs very litt
 Run 1 is kept at `ml/results/firm_model_summary_run1.json`. A negative result that gets
 deleted teaches nobody anything.
 
+### The model is not allowed to outrank the record, and here is it losing
+
+Asked "why is the expiry window capped", retrieval returns five real passages, the best at
+0.93, including the decision that answers it. The fine tuned model replies:
+
+> I cannot answer this question because the provided desk record does not contain
+> information regarding the "expiry window" or its capping.
+
+That is wrong, and the product shows it as wrong: the sentence is struck through and
+labelled **not found in the record**, above the passages that do answer the question.
+
+Two things worth taking from that. The grounding works, sentence by sentence, and it is not
+decorative. And the refusal rebalance has a cost that the fact score alone does not show:
+the model is now more willing to decline, including on questions it should answer. Both
+directions of that failure are in this repository rather than only the flattering one.
+
 ### What is not measured
 
 Two planned comparison arms, Gemini with the ledger and Gemini without it, were not run: the

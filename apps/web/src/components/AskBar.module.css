@@ -139,3 +139,67 @@
   height: 2px;
   background: var(--accent);
 }
+
+/*
+  The firm model's answer, and the grounding that keeps it honest.
+
+  It sits BELOW the retrieved passages rather than above them, deliberately. The record is
+  the answer; the model is a reading of the record, and putting the reading first would
+  invert the thing this product exists to assert.
+*/
+.modelAnswer {
+  border-top: 1px solid var(--border);
+  padding: 14px 16px;
+}
+
+.modelBanner {
+  font-size: 12px;
+  color: var(--text-tertiary);
+  line-height: 1.55;
+  margin-bottom: 10px;
+}
+
+.claim {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--text);
+  margin: 0 0 6px;
+}
+
+/*
+  An unsupported sentence is struck through and labelled, never removed. Removing it would
+  hide that the model said it, which is the fact a reader most needs.
+*/
+.claim[data-grounded="false"] {
+  color: var(--text-tertiary);
+  text-decoration: line-through;
+  /*
+    Danger, not amber. The audit was right to stop this: amber is reserved for knowledge
+    risk, which is a fact about the desk. An ungrounded claim is a CORRECTNESS problem, which
+    is a different thing, and borrowing the risk colour for it would make both mean less.
+  */
+  text-decoration-color: var(--accent-danger);
+}
+
+.unsupported {
+  text-decoration: none;
+  color: var(--accent-danger);
+  font-size: 12px;
+  margin-left: 6px;
+}
+
+.modelButton {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-s);
+  color: var(--text-secondary);
+  font: inherit;
+  font-size: 12px;
+  padding: 3px 9px;
+  cursor: pointer;
+}
+
+.modelButton:hover {
+  border-color: var(--border-strong);
+  color: var(--text);
+}

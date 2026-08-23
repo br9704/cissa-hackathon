@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { SearchMode } from "../search";
+import { groundAnswer, type GroundedClaim } from "../search/ground";
 import { useNavigate } from "@tanstack/react-router";
 import { motion, AnimatePresence, useReducedMotion } from "motion/react";
 import styles from "./AskBar.module.css";
@@ -55,6 +56,17 @@ export function AskBar({ open, onClose }: { open: boolean; onClose: () => void }
   const [selected, setSelected] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [mode, setMode] = useState<SearchMode>("hybrid");
+  /*
+    The firm model answer, kept beside the retrieved passages rather than instead of them.
+
+    The model is never allowed to outrank the ledger, so its answer is checked sentence by
+    sentence against the passages retrieval found, and anything the record cannot support is
+    struck through and labelled. Deleting an unsupported sentence would hide that the model
+    said it; keeping it unmarked would let a fluent invention pass as a record.
+  */
+  const [modelAnswer, setModelAnswer] = useState<GroundedClaim[] | null>(null);
+  const [modelBusy, setModelBusy] = useState(false);
+  const [modelAvailable, setModelAvailable] = useState<boolean | null>(null);
 
   /* One token per keystroke, so a slow search for an old query cannot land after a fast
      one for a newer query and overwrite it. */
@@ -76,6 +88,49 @@ export function AskBar({ open, onClose }: { open: boolean; onClose: () => void }
     }
   }, [open]);
 
+  /* Probed once per open, so the footer can offer the model only when there is one. */
+  useEffect(() => {
+    if (!open || modelAvailable !== null) return;
+    let live = true;
+    void fetch("/api/firm-model")
+      .then((r) => r.json())
+      .then((b: { available?: boolean }) => {
+        if (live) setModelAvailable(Boolean(b.available));
+      })
+      .catch(() => {
+        if (live) setModelAvailable(false);
+      });
+    return () => {
+      live = false;
+    };
+  }, [open, modelAvailable]);
+
+  async function askTheModel() {
+    const q = query.trim();
+    if (!q || !hits) return;
+    setModelBusy(true);
+    setModelAnswer(null);
+    try {
+      const res = await fetch("/api/firm-model", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question: q }),
+      });
+      const body = (await res.json()) as { answer?: string };
+      if (!body.answer) {
+        setModelAnswer([]);
+        return;
+      }
+      /* Grounded against the passages retrieval ALREADY found for this question, so the
+         check uses the record rather than the model's own account of the record. */
+      setModelAnswer(groundAnswer(body.answer, hits.map((h) => h.body)));
+    } catch {
+      setModelAnswer([]);
+    } finally {
+      setModelBusy(false);
+    }
+  }
+
   useEffect(() => {
     if (!open) return;
     const trimmed = query.trim();
@@ -92,6 +147,7 @@ export function AskBar({ open, onClose }: { open: boolean; onClose: () => void }
         const { hits: results, mode: usedMode } = await searchDetailed(trimmed);
         if (searchToken.current !== token) return;
         setHits(results);
+        setModelAnswer(null);
         setMode(usedMode);
         setError(null);
       } catch (err) {
@@ -316,7 +372,37 @@ export function AskBar({ open, onClose }: { open: boolean; onClose: () => void }
               )}
             </div>
 
+            {modelAnswer ? (
+              <div className={styles.modelAnswer}>
+                <div className={styles.modelBanner}>
+                  Answered by Meridian's own model, fine tuned on this ledger, running on this
+                  machine. Every sentence is checked against the record below.
+                </div>
+                {modelAnswer.length === 0 ? (
+                  <p className={styles.empty}>The model returned nothing usable.</p>
+                ) : (
+                  modelAnswer.map((claim) => (
+                    <p
+                      key={claim.text}
+                      className={styles.claim}
+                      data-grounded={claim.grounded}
+                    >
+                      {claim.text}
+                      {claim.grounded ? null : (
+                        <span className={styles.unsupported}> not found in the record</span>
+                      )}
+                    </p>
+                  ))
+                )}
+              </div>
+            ) : null}
+
             <div className={styles.footer}>
+              {modelAvailable && hits && hits.length > 0 ? (
+                <button type="button" className={styles.modelButton} onClick={askTheModel}>
+                  {modelBusy ? "asking the firm model" : "ask the firm model too"}
+                </button>
+              ) : null}
               <span>
                 <span className={styles.kbd}>up</span> <span className={styles.kbd}>down</span> to move
               </span>
