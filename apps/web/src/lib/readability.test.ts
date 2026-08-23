@@ -8,12 +8,20 @@
 
   Two things about the method are load bearing.
 
-  First, it measures against the WORST surface, not the lightest. Dark ink on a light
-  field gets harder to read as the background darkens, so the binding case is the
-  darkest pane body copy ever sits on, which is --surface-recessed. design.md originally
-  said "the lightest surface they appear on", and that is how --text-secondary at alpha
-  0.72 came to look compliant at 7.10 while actually measuring 6.87 inside a recessed
-  pane. The bar did not change. The measurement got honest.
+  First, it measures against the WORST surface, whichever that turns out to be, rather than
+  against a named one. That distinction saved the file when the theme flipped.
+
+  On the old light theme, dark ink got harder to read as the background darkened, so the
+  binding case was --surface-recessed, the darkest pane body copy sits on. design.md
+  originally said "the lightest surface they appear on", and that is how --text-secondary at
+  alpha 0.72 came to look compliant at 7.10 while actually measuring 6.87 inside a recessed
+  pane.
+
+  On the black theme the polarity inverts: light ink gets harder to read as the background
+  LIGHTENS, so the binding case is now --surface-hover. Because worstRatio() takes the
+  minimum across every surface rather than trusting a name, the assertions kept measuring the
+  right thing through the swap. Only this comment was wrong, and a comment that explains the
+  method incorrectly is how the next person "fixes" the method.
 
   Second, it reads the CSS rather than a rendered page: no browser, no flake, runs in
   milliseconds. It cannot catch a component that overrides a token inline, which is what

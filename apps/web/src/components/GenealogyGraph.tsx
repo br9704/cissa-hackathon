@@ -49,24 +49,6 @@ export function GenealogyGraph({
 }) {
   const reduced = useReducedMotion();
 
-  /*
-    Which nodes get a visible label: highest degree first, plus everything risk flagged.
-    Degree is a decent proxy for "this decision is load bearing", because a node with many
-    parents and children is one the desk kept revisiting.
-  */
-  const labelled = useMemo(() => {
-    const degree = new Map<string, number>();
-    for (const e of edges) {
-      degree.set(e.source, (degree.get(e.source) ?? 0) + 1);
-      degree.set(e.target, (degree.get(e.target) ?? 0) + 1);
-    }
-    const ranked = [...nodes]
-      .sort((a, b) => (degree.get(b.id) ?? 0) - (degree.get(a.id) ?? 0) || a.id.localeCompare(b.id))
-      .slice(0, nodes.length > 40 ? 6 : 10)
-      .map((n) => n.id);
-    const flagged = nodes.filter((n) => n.riskFlag).map((n) => n.id);
-    return new Set([...ranked, ...flagged]);
-  }, [nodes, edges]);
 
   /*
     useMemo is safe here precisely because computeLayout is pure and mutates nothing:
@@ -77,6 +59,47 @@ export function GenealogyGraph({
     () => computeLayout(nodes, edges, { width: WIDTH, height: HEIGHT }),
     [nodes, edges],
   );
+
+  /*
+    Which nodes get a visible label.
+
+    Ranked by degree, because a node with many parents and children is one the desk kept
+    revisiting, plus everything risk flagged. Then filtered for collisions against the
+    ACTUAL laid out positions: the first version ranked by degree alone and the departure
+    simulation rendered three labels on top of each other, which is less readable than no
+    labels at all and looks like a rendering bug rather than a dense graph.
+  */
+  const labelled = useMemo(() => {
+    const degree = new Map<string, number>();
+    for (const e of edges) {
+      degree.set(e.source, (degree.get(e.source) ?? 0) + 1);
+      degree.set(e.target, (degree.get(e.target) ?? 0) + 1);
+    }
+    const candidates = [...layout.nodes].sort(
+      (a, b) =>
+        Number(b.riskFlag) - Number(a.riskFlag) ||
+        (degree.get(b.id) ?? 0) - (degree.get(a.id) ?? 0) ||
+        a.id.localeCompare(b.id),
+    );
+
+    /* Greedy: keep a label only if it clears every label already placed. Cheap at this
+       node count and deterministic, which the screenshot harness depends on. */
+    const MIN_X = 120;
+    const MIN_Y = 22;
+    const placed: { x: number; y: number }[] = [];
+    const keep = new Set<string>();
+    const budget = layout.nodes.length > 40 ? 8 : 12;
+    for (const n of candidates) {
+      if (keep.size >= budget) break;
+      const clash = placed.some(
+        (p) => Math.abs(p.x - n.x) < MIN_X && Math.abs(p.y - n.y) < MIN_Y,
+      );
+      if (clash) continue;
+      placed.push({ x: n.x, y: n.y });
+      keep.add(n.id);
+    }
+    return keep;
+  }, [layout, edges]);
 
   const positions = useMemo(
     () => new Map(layout.nodes.map((n) => [n.id, n])),

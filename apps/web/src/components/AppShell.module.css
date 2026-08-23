@@ -176,8 +176,15 @@
 }
 
 .askTrigger {
-  flex: 1;
-  max-width: 420px;
+  /*
+    Shrinkable but never squeezed into wrapping. The top bar gained the capture button and
+    the liveness strip, and with `flex: 1` alone this collapsed until "Ask the ledger" broke
+    across two lines and the bar looked broken rather than full.
+  */
+  flex: 1 1 220px;
+  min-width: 168px;
+  max-width: 360px;
+  white-space: nowrap;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -195,6 +202,7 @@
 }
 
 .kbd {
+  flex: none;
   font-family: var(--font-mono);
   font-size: 12px;
   color: var(--text-tertiary);

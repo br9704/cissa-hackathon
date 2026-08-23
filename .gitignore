@@ -57,3 +57,4 @@ AGENTS.md
 supabase/.temp/
 ml/runs/firm/
 ml/data/firm/paraphrase_cache.json
+apps/web/docs/

@@ -665,25 +665,25 @@ matching with a visible notice rather than dying.
 Source: ENGINEERPROMPT2.md Mission 1, P1 tier. Every item here is structural or behavioural
 rather than visual, so none of it is thrown away by the black theme that follows.
 
-- [ ] "+ New record" capture sheet reachable from the record page header, three tabs: note,
+- [x] "+ New record" capture sheet reachable from the record page header, three tabs: note,
       record a meeting, import transcript. The inputs currently sit below 184 ledger rows.
-- [ ] Quick capture on the web and as a palette action. It exists only as the Tauri window
+- [x] Quick capture on the web and as a palette action. It exists only as the Tauri window
       route today, so web visitors never see it.
-- [ ] My Record in the nav. The page exists and the transparency principle D13 is invisible
+- [x] My Record in the nav. The page exists and the transparency principle D13 is invisible
       without it.
-- [ ] The liveness strip: last capture, tagger state, chain verified at.
-- [ ] Graph node labels, hover tooltips, and click through to the decision.
-- [ ] Strategy cards as real controls with a selected state driving the graph.
-- [ ] Time Machine above the graph rather than below it.
+- [x] The liveness strip: last capture, tagger state, chain verified at.
+- [x] Graph node labels, hover tooltips, and click through to the decision.
+- [x] Strategy cards as real controls with a selected state driving the graph.
+- [x] Time Machine above the graph rather than below it.
 - [x] Supabase provisioned, linked, migrated and seeded. Chain verified on hosted Postgres:
       184 events, no breaks.
 - [x] Gemini key health checked and stored in the environment.
-- [ ] Re-run the critique verification checklist and record the result here.
+- [x] Re-run the critique verification checklist and record the result here.
 
 **Acceptance:** a stranger given the app cold can file a note, record or import something,
 and find what the system holds about them, without scrolling past instructions.
 
-- **Sprint log:** (open)
+- **Sprint log:** Logged: 2026-08-23T13:37:58+10:00 · status: done · actual: 1.4h (budget 4h) · by: claude-opus-5 · note: verified in a real browser, 12 of 12 checks green with no console errors. Two early failures were the harness rather than the app: an unscoped textarea locator hit the importer behind the overlay, and an unscoped svg locator hit a nav icon.
 
 ---
 
@@ -810,18 +810,18 @@ is refused.
 
 ## S15 - tokens.css goes black, in place (budget 3h)
 
-- [ ] Rewrite values under the SAME token names. Renaming and revaluing at once produces
+- [x] Rewrite values under the SAME token names. Renaming and revaluing at once produces
       dozens of simultaneous guard offences across 25 CSS modules and the signal is lost.
-- [ ] Re-pick all four accents to clear 4.5:1 on near black. --accent #0a58ca measures about
+- [x] Re-pick all four accents to clear 4.5:1 on near black. --accent #0a58ca measures about
       1.9:1 there, so this fails the build on the first commit if skipped.
-- [ ] Composed --elev-* shadow tokens so no component ever writes a shadow literal.
-- [ ] Keep hex stops in --bg-field, alpha based text tiers, and the three a11y media queries.
-- [ ] Pill as the 999px literal, keeping exactly three --radius-* rungs.
+- [x] Composed --elev-* shadow tokens so no component ever writes a shadow literal.
+- [x] Keep hex stops in --bg-field, alpha based text tiers, and the three a11y media queries.
+- [x] Pill as the 999px literal, keeping exactly three --radius-* rungs.
 
 **Acceptance:** pnpm check green with ZERO edits to any component CSS. If a component has to
 change to survive, that is a token bug: fix the token.
 
-- **Sprint log:** (planned)
+- **Sprint log:** Logged: 2026-08-23T13:44:16+10:00 · status: done · actual: 0.7h (budget see header) · by: claude-opus-5 · note: the accents were the whole risk and it landed first try: all nine readability assertions passed with zero edits to any component CSS, which was the acceptance bar. The old ink blue measured about 1.9:1 on a near black pane. Also corrected the doctrine comment in readability.test.ts, which still said the binding surface is the darkest pane; on light ink that inverts to the lightest, and worstRatio was already right so only the explanation was wrong.
 
 ---
 
@@ -1184,12 +1184,12 @@ Nothing at or below S25 is cuttable. That tier is what answers the actual compla
 
 ## CURRENT SPRINT
 
-**Current sprint:** S13
+**Current sprint:** S14
 
-S12 is closed. S13 is P1 from docs/critique.md plus the live infrastructure: the capture
-sheet reachable without scrolling, quick capture on the web and in the palette, My Record in
-the nav, the liveness strip, graph labels and tooltips, strategy card selection states, and
-the Time Machine above the graph. Supabase is provisioned, migrated and seeded already.
+S12 and S13 are closed, so the P0 and P1 gate that ENGINEERPROMPT2 sets on Mission 2 is
+satisfied. S14 is the Firm Model, and its training run is already going against
+ml/configs/lora_firm.yaml on a separate adapter path. The front end sprints from S15 proceed
+while it trains, which is the whole reason the run was started first.
 
 ---
 

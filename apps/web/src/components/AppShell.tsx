@@ -33,7 +33,7 @@ const NAV = [
     (D13, let the captured see the ledger) was invisible to anyone who did not think to
     click their own initials. A promise nobody can find is not a promise.
   */
-  { to: "/my-record", label: "My record", hint: "what this system holds about you", Icon: MyRecordIcon },
+  { to: "/my-record", label: "My record", hint: "what we hold about you", Icon: MyRecordIcon },
 ] as const;
 
 export function AppShell() {
