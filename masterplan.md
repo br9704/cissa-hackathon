@@ -620,6 +620,46 @@ The arc is the meal; this list is garnish. The build model may not reorder it.
 
 ---
 
+## S12 — Input integrity and guard truth (budget 2.5h)
+
+Source: ENGINEERPROMPT2.md Mission 1, P0 tier, plus the guard audit that preceded it. The
+P0 items come from docs/critique.md.
+
+- [x] Hotkey target guard. The draft card bound a, e and r on the window with no check of
+      where the caret was, so typing "hello" anywhere triggered Edit and put "llo" inside
+      the record, and typing into the ask palette leaked half a sentence into a draft. New
+      shared module apps/web/src/lib/hotkeys.ts, `bareKeyAllowed`, refusing on a handled
+      event, any modifier, IME composition, a typing target, or any open dialog.
+- [x] Lexical search fallback. buildIndex awaited embedMany inside one cached promise, so a
+      blocked model CDN rejected the whole index and cached the rejection, killing every
+      later query. The comment claimed lexical would survive; it could not. Index split into
+      a synchronous lexical half that cannot fail and an optional vector half.
+      `searchDetailed` reports which mode answered and the palette says so on screen.
+- [x] Ask palette focus race. Focus moved from requestAnimationFrame to useLayoutEffect, so
+      there is no frame where the dialog is visible and the input is not focused.
+- [x] Wire the two dormant guards. guard-claims.mjs and guard-masterplan.mjs had no npm
+      script and were invoked by nothing, so honest claims and sprint logging, the two rules
+      claude.md cares most about, were unenforced by the only command anyone runs.
+- [x] Add guard-emdash.mjs. D8 calls the rule non-negotiable and the S10 log recorded it as
+      verified by script. There was no script.
+- [x] Fix two dead scan roots. guard-hex and guard-css-vars both scanned apps/desktop/src,
+      which does not exist; the crate is at apps/desktop/src-tauri/src.
+- [x] Extend guard-hex to index.html and public/, and to .html and .svg. A favicon colour or
+      a theme-color meta was unreachable by the guard.
+- [x] Widen guard-claims from a fixed three file list to a scan of apps/web/src, so moving
+      the tagger figures cannot make it pass vacuously.
+- [x] Tests for both fixes: 8 assertions on the hotkey guard, 3 on search degradation
+      including that a degraded search still refuses an unanswerable question.
+
+**Acceptance:** pnpm check green with six guards and the full suite. 191 tests, up from 180.
+Zero visual change. Verified: typing with a draft on screen mutates nothing, an open dialog
+suppresses bare letters, Cmd+K never reads as a bare k, and search degrades to keyword
+matching with a visible notice rather than dying.
+
+- **Sprint log:** Logged: 2026-08-23T12:43:01+10:00 · status: done · actual: 0.6h (budget 2.5h) · by: claude-opus-5 · note: the two P0 bugs were both single causes with wide blast radius, and three of the five guards turned out to be unenforced or scanning dead paths.
+
+---
+
 ## OPEN QUESTIONS (build model appends here instead of inventing scope)
 
 - (Stage 1 close) none pending; engineerprompt.md instructs the next session to ask
@@ -676,5 +716,19 @@ The arc is the meal; this list is garnish. The build model may not reorder it.
 ---
 
 ## AMENDMENTS (append-only; date + why for any change to a locked decision)
+
+- 2026-08-23T12:43:01+10:00, S12 numbering. ENGINEERPROMPT2.md calls the Firm Model sprint "S12". S0 to S11 were
+  already committed and logged, and the critique tiers need sprints of their own, so the
+  Firm Model lands as S14 with P0 as S12 and P1 as S13. The prompt is the source of the
+  block either way.
+- 2026-08-23T12:43:01+10:00, critique P2 superseded. docs/critique.md item 11 says to paint the glass field and
+  pane depth from the existing tokens. That was written before the black dashboard was
+  requested. Painting the white theme and then replacing it a sprint later is a sprint of
+  work with a known expiry date, so P2's finding, that the tokens exist and are not applied,
+  is answered by the black elevation model instead. P2 items 13, 14 and 15 still apply.
+- 2026-08-23T12:43:01+10:00, em dash guard scope. Sprint headings in this file use an em dash as a structural
+  delimiter that guard-masterplan.mjs parses, and twelve are already committed under the
+  append-only rule. guard-emdash exempts that one heading pattern in this file only. Prose
+  in masterplan is still checked.
 
 - (none yet)

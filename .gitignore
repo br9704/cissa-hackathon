@@ -52,3 +52,4 @@ ml/runs/*/train.log
 docs/beats/*.png
 .vercel
 .env*
+ENGINEERPROMPT2.md

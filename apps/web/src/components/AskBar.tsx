@@ -1,8 +1,9 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import type { SearchMode } from "../search";
 import { useNavigate } from "@tanstack/react-router";
 import { motion, AnimatePresence, useReducedMotion } from "motion/react";
 import styles from "./AskBar.module.css";
-import { search, type Hit } from "../search";
+import { searchDetailed, type Hit } from "../search";
 import { buildIndex } from "../search";
 import { strategyName } from "../data/source";
 
@@ -28,16 +29,25 @@ export function AskBar({ open, onClose }: { open: boolean; onClose: () => void }
   const [indexProgress, setIndexProgress] = useState<number | null>(null);
   const [selected, setSelected] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  const [mode, setMode] = useState<SearchMode>("hybrid");
 
   /* One token per keystroke, so a slow search for an old query cannot land after a fast
      one for a newer query and overwrite it. */
   const searchToken = useRef(0);
 
-  useEffect(() => {
+  /*
+    Focus BEFORE paint, not after.
+
+    The previous version focused inside requestAnimationFrame, which leaves a frame where
+    the dialog is on screen and the input is not focused. Typing straight after Cmd+K split
+    the sentence between the palette and the page, and half of it ended up inside whatever
+    draft was open. useLayoutEffect runs synchronously once the dialog is in the document,
+    so there is no such window.
+  */
+  useLayoutEffect(() => {
     if (open) {
       setSelected(0);
-      /* Focus after paint, or the dialog is not in the document yet. */
-      requestAnimationFrame(() => inputRef.current?.focus());
+      inputRef.current?.focus();
     }
   }, [open]);
 
@@ -54,9 +64,10 @@ export function AskBar({ open, onClose }: { open: boolean; onClose: () => void }
     setBusy(true);
     const timer = setTimeout(async () => {
       try {
-        const results = await search(trimmed);
+        const { hits: results, mode: usedMode } = await searchDetailed(trimmed);
         if (searchToken.current !== token) return;
         setHits(results);
+        setMode(usedMode);
         setError(null);
       } catch (err) {
         if (searchToken.current !== token) return;
@@ -205,6 +216,17 @@ export function AskBar({ open, onClose }: { open: boolean; onClose: () => void }
                 </div>
               ) : hits && hits.length > 0 ? (
                 <>
+                  {mode === "lexical" ? (
+                    /*
+                      Say which retrieval answered. A keyword match and a meaning match are
+                      different products, and a reader who thinks they got the second when
+                      they got the first will misjudge what the absence of a result means.
+                    */
+                    <div className={styles.empty}>
+                      The meaning-search model could not be reached, so these are keyword
+                      matches only. Ranking is less forgiving of rephrasing than usual.
+                    </div>
+                  ) : null}
                   <div className={styles.group}>
                     {hits.length} passage{hits.length === 1 ? "" : "s"} from the ledger
                   </div>

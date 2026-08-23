@@ -8,12 +8,15 @@
     "build": "pnpm --filter @continuity/web build",
     "test": "pnpm -r test",
     "typecheck": "pnpm -r typecheck",
-    "check": "pnpm run guard:hex && pnpm run guard:vars && pnpm run guard:design && pnpm -r test",
+    "check": "pnpm run guard:hex && pnpm run guard:vars && pnpm run guard:design && pnpm run guard:emdash && pnpm run guard:claims && pnpm run guard:masterplan && pnpm -r test",
     "guard:hex": "node scripts/guard-hex.mjs",
     "guard:vars": "node scripts/guard-css-vars.mjs",
     "guard:design": "node scripts/design-audit.mjs",
     "shots": "pnpm --filter @continuity/web exec tsx ../../scripts/shots.ts",
-    "bridge": "node tools/claude-bridge/server.mjs"
+    "bridge": "node tools/claude-bridge/server.mjs",
+    "guard:emdash": "node scripts/guard-emdash.mjs",
+    "guard:claims": "node scripts/guard-claims.mjs",
+    "guard:masterplan": "node scripts/guard-masterplan.mjs"
   },
   "devDependencies": {
     "typescript": "5.9.3"

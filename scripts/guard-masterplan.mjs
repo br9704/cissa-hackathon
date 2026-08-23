@@ -25,8 +25,19 @@ const rows = [];
 
 for (let i = 1; i < parts.length; i += 2) {
   const header = parts[i];
-  const body = parts[i + 1] ?? "";
   const id = header.split(/\s+/)[1];
+  /*
+    A sprint body ends at the next heading of ANY kind, not at the next sprint heading.
+
+    The split only breaks on `## S<n>`, so the final sprint used to swallow everything after
+    it, which in this file means OPEN QUESTIONS and MANUAL TASKS. Those sections are full of
+    open boxes by design, and the guard counted them against whichever sprint happened to be
+    last. That is how the previous last sprint came to report eighteen untouched tasks it
+    had never owned.
+  */
+  const rawBody = parts[i + 1] ?? "";
+  const nextHeading = rawBody.search(/^## /m);
+  const body = nextHeading === -1 ? rawBody : rawBody.slice(0, nextHeading);
 
   const statuses = [...body.matchAll(/status:\s*(\w+)/g)].map((m) => m[1]);
 

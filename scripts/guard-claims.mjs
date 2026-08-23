@@ -14,10 +14,40 @@
   checker, because a guard that pretends to check more than it does is worse than one with
   a stated scope.
 */
-import { readFileSync, existsSync } from "node:fs";
+import { readFileSync, existsSync, readdirSync, statSync } from "node:fs";
+import { join } from "node:path";
 
 const SUMMARY = "ml/results/summary.json";
-const DOCUMENTS = ["README.md", "ml/README.md", "apps/web/src/components/TaggerBadge.tsx"];
+/*
+  Discovered, not listed.
+
+  This was a fixed three item list naming TaggerBadge.tsx. The moment those figures move to
+  another component, and the rebuild moves them onto the capture surface, the guard would
+  keep checking a file that no longer carries a claim and pass for the wrong reason. A guard
+  that passes vacuously is worse than no guard, because it is trusted.
+*/
+function scan(target, out = []) {
+  let stat;
+  try {
+    stat = statSync(target);
+  } catch {
+    return out;
+  }
+  if (!stat.isDirectory()) {
+    if (/\.(tsx?|jsx?|md)$/.test(target)) out.push(target);
+    return out;
+  }
+  for (const entry of readdirSync(target)) {
+    if (["node_modules", "dist", "target", ".turbo", "gen", ".venv"].includes(entry)) continue;
+    scan(join(target, entry), out);
+  }
+  return out;
+}
+
+const DOCUMENTS = [
+  ...scan("apps/web/src"),
+  ...["README.md", "ml/README.md"].filter((f) => existsSync(f)),
+];
 
 if (!existsSync(SUMMARY)) {
   /*

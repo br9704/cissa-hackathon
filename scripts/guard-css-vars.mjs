@@ -22,7 +22,7 @@
 import { readdirSync, statSync, readFileSync } from "node:fs";
 import { join, relative } from "node:path";
 
-const ROOTS = ["apps/web/src", "apps/desktop/src"];
+const ROOTS = ["apps/web/src", "apps/desktop/src-tauri/src"];
 const SKIP = new Set(["node_modules", "dist", "target", "gen"]);
 
 const DECL = /(^|[^\w-])(--[a-zA-Z0-9-]+)\s*:/g;

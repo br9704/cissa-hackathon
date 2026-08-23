@@ -67,38 +67,60 @@ export function passages(): Passage[] {
   return out;
 }
 
-let indexPromise: Promise<{
-  passages: Passage[];
-  vectors: Float32Array[];
-  lexical: LexicalIndex;
-}> | null = null;
+/*
+  The index is deliberately in two halves, and they fail independently.
+
+  The previous version built both inside one cached promise and the comment claimed that
+  lexical would still work if the model failed to load. It would not: `embedMany` was
+  awaited inside that same promise, so a blocked CDN rejected the whole thing, and because
+  the rejected promise stayed cached, every later search failed too. On conference wifi
+  that turned the hero feature into a dead end reading "Failed to fetch" while a complete
+  BM25 index sat unused three lines above.
+
+  So: lexical is synchronous and cannot fail, vectors are optional, and search degrades to
+  keyword matching rather than dying.
+*/
+type LexicalHalf = { passages: Passage[]; documents: string[]; lexical: LexicalIndex };
+
+let lexicalHalf: LexicalHalf | null = null;
+let vectorPromise: Promise<Float32Array[] | null> | null = null;
+
+function buildLexicalHalf(): LexicalHalf {
+  if (!lexicalHalf) {
+    const items = passages();
+    /*
+      The strategy name goes into the indexed text as well as the title. Somebody asking
+      about "the India book" is asking about a strategy by name, and without it in the
+      text neither half of retrieval can see the connection.
+    */
+    const documents = items.map(
+      (p) => `${p.title}. ${strategyName(p.strategyId)}. ${p.body}`,
+    );
+    lexicalHalf = { passages: items, documents, lexical: buildLexicalIndex(documents) };
+  }
+  return lexicalHalf;
+}
 
 /**
  * Build the index once per session.
  *
  * In the deployed demo this work happens once at seed time and lives in the pgvector
  * column; here it runs in the tab, which is slower to start and is the same arithmetic.
+ *
+ * Resolves to null for the vector half when the model cannot load. That is a degraded
+ * search, not an error, so it is reported rather than thrown.
  */
 export function buildIndex(onProgress?: (done: number, total: number) => void) {
-  if (!indexPromise) {
-    indexPromise = (async () => {
-      const items = passages();
-      /*
-        The strategy name goes into the indexed text as well as the title. Somebody asking
-        about "the India book" is asking about a strategy by name, and without it in the
-        text neither half of retrieval can see the connection.
-      */
-      const documents = items.map(
-        (p) => `${p.title}. ${strategyName(p.strategyId)}. ${p.body}`,
-      );
-      /* Lexical first: it is instant, so if the model fails to load there is still a
-         working search rather than a broken one. */
-      const lexical = buildLexicalIndex(documents);
-      const vectors = await embedMany(documents, onProgress);
-      return { passages: items, vectors, lexical };
-    })();
+  const half = buildLexicalHalf();
+  if (!vectorPromise) {
+    vectorPromise = embedMany(half.documents, onProgress).catch((err) => {
+      /* Kept visible in the console: degrading silently is how you ship a worse product
+         than you think you shipped. */
+      console.warn("[search] embedding model unavailable, falling back to keyword search", err);
+      return null;
+    });
   }
-  return indexPromise;
+  return vectorPromise.then((vectors) => ({ ...half, vectors }));
 }
 
 /*
@@ -138,12 +160,52 @@ export const RELEVANCE_FLOOR = 0.6;
  * the honest answer is that it is not in the corpus, and returning the five least bad
  * passages would dress that up as an answer. No source, no claim.
  */
-export async function search(query: string, limit = 5, floor = RELEVANCE_FLOOR): Promise<Hit[]> {
+export type SearchMode = "hybrid" | "lexical";
+export type SearchResult = { hits: Hit[]; mode: SearchMode };
+
+/*
+  The lexical only floor, and why it is a different number.
+
+  In hybrid mode a passage scores SEMANTIC_WEIGHT * semantic + LEXICAL_WEIGHT * lexical, so
+  a perfect keyword match alone tops out at 0.38 and every result would fall under the 0.60
+  blended floor. Degraded mode therefore scores on the normalised BM25 value directly.
+
+  Unlike RELEVANCE_FLOOR this number is CHOSEN, not measured, and the UI says so. What it
+  keeps is the property that matters: BM25 returns exactly zero when no query term appears
+  anywhere, so "not in the corpus" still returns nothing rather than the five least bad
+  passages dressed up as an answer.
+*/
+export const LEXICAL_FLOOR = 0.35;
+
+/**
+ * Retrieve, hybrid when the model is available and keyword only when it is not.
+ *
+ * A floor rather than a fixed top k. If nothing in the corpus is close to the question,
+ * the honest answer is that it is not in the corpus, and returning the five least bad
+ * passages would dress that up as an answer. No source, no claim.
+ */
+export async function searchDetailed(
+  query: string,
+  limit = 5,
+  floor = RELEVANCE_FLOOR,
+): Promise<SearchResult> {
   const { passages: items, vectors, lexical } = await buildIndex();
-  const q = await embed(query);
   const lex = normalise(bm25(lexical, query));
 
-  return items
+  if (!vectors) {
+    const hits = items
+      .map((p, i) => {
+        const lexicalScore = lex.get(i) ?? 0;
+        return { ...p, semantic: 0, lexical: lexicalScore, similarity: lexicalScore };
+      })
+      .filter((h) => h.similarity >= LEXICAL_FLOOR)
+      .sort((a, b) => b.similarity - a.similarity)
+      .slice(0, limit);
+    return { hits, mode: "lexical" };
+  }
+
+  const q = await embed(query);
+  const hits = items
     .map((p, i) => {
       const semantic = cosine(q, vectors[i]!);
       const lexicalScore = lex.get(i) ?? 0;
@@ -157,4 +219,10 @@ export async function search(query: string, limit = 5, floor = RELEVANCE_FLOOR):
     .filter((h) => h.similarity >= floor)
     .sort((a, b) => b.similarity - a.similarity)
     .slice(0, limit);
+  return { hits, mode: "hybrid" };
+}
+
+/** The shape every existing caller and test expects. */
+export async function search(query: string, limit = 5, floor = RELEVANCE_FLOOR): Promise<Hit[]> {
+  return (await searchDetailed(query, limit, floor)).hits;
 }

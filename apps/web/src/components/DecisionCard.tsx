@@ -4,6 +4,7 @@ import styles from "./DecisionCard.module.css";
 import { StatusChip } from "./StatusChip";
 import { memberName, strategyName, TYPE_LABEL } from "../data/source";
 import type { Decision } from "@continuity/core";
+import { bareKeyAllowed } from "../lib/hotkeys";
 
 /*
   The approve step is the feature, not a workaround.
@@ -55,6 +56,12 @@ export function DecisionCard({
         }
         return;
       }
+      /*
+        The editing branch above only knows about THIS card's textarea. Every other input
+        on the page, the ask palette, quick capture, the transcript importer, was invisible
+        to it, which is how typing a question could end up inside a decision record.
+      */
+      if (!bareKeyAllowed(e)) return;
       const key = e.key.toLowerCase();
       if (key === "a") {
         e.preventDefault();

@@ -11,7 +11,7 @@
 import { readdirSync, statSync, readFileSync } from "node:fs";
 import { join, relative } from "node:path";
 
-const ROOTS = ["apps/web/src", "apps/desktop/src", "packages"];
+const ROOTS = ["apps/web/src", "apps/desktop/src-tauri/src", "packages", "apps/web/index.html", "apps/web/public"];
 const SKIP = new Set(["node_modules", "dist", "target", ".turbo", "gen"]);
 const ALLOW = new Set(["apps/web/src/styles/tokens.css"]);
 
@@ -34,18 +34,29 @@ function blankComments(text, isCss) {
   return out;
 }
 
-function walk(dir, out = []) {
-  let entries;
+/*
+  Scannable file types. .html and .svg were added because the favicon and the theme-color
+  meta live there, and neither was reachable before: index.html was not a root, public/ did
+  not exist, and this filter would have skipped both anyway. A colour that ships in the tab
+  icon is exactly as forked from the design system as one in a stylesheet.
+*/
+const SCANNABLE = /\.(css|tsx?|jsx?|html|svg)$/;
+
+/* A root may be a single file, not only a directory. */
+function walk(target, out = []) {
+  let stat;
   try {
-    entries = readdirSync(dir);
+    stat = statSync(target);
   } catch {
     return out;
   }
-  for (const entry of entries) {
+  if (!stat.isDirectory()) {
+    if (SCANNABLE.test(target)) out.push(target);
+    return out;
+  }
+  for (const entry of readdirSync(target)) {
     if (SKIP.has(entry)) continue;
-    const full = join(dir, entry);
-    if (statSync(full).isDirectory()) walk(full, out);
-    else if (/\.(css|tsx?|jsx?)$/.test(full)) out.push(full);
+    walk(join(target, entry), out);
   }
   return out;
 }
