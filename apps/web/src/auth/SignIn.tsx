@@ -1,7 +1,7 @@
 import { useState } from "react";
 import styles from "./SignIn.module.css";
 import { PixelMark } from "../components/pixel/PixelMark";
-import { signIn, signUp } from "./session";
+import { signIn, signUp, enterDemo } from "./session";
 
 /*
   The login screen.
@@ -80,6 +80,25 @@ export function SignIn() {
             {mode === "in" ? "No account yet? Create one." : "Already have an account? Sign in."}
           </button>
         </form>
+
+        {/*
+          The way in for somebody who just wants to look.
+
+          A portfolio project that demands a signup before showing anything is one nobody
+          looks at. This is deliberately not dressed up as a session: it reads the seeded
+          corpus in the browser, exactly as the app does with no database configured, and it
+          says so rather than letting a reader think they are seeing live data.
+        */}
+        <div className={styles.demo}>
+          <button type="button" className={styles.demoButton} onClick={enterDemo}>
+            Look around without an account
+          </button>
+          <p className={styles.demoNote}>
+            Everything works except the hosted ledger, which needs a real session because row
+            level security is what protects it. You will be reading the seeded corpus in your
+            own browser.
+          </p>
+        </div>
 
         <p className={styles.note}>
           Every record in this demo is synthetic. Row level security on the database is what

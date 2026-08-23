@@ -1,4 +1,4 @@
-import { useState, useSyncExternalStore } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import styles from "./CapturePage.module.css";
 import { CaptureSheet } from "../components/CaptureSheet";
 import { PixelIcon } from "../components/pixel/PixelIcon";
@@ -71,6 +71,21 @@ const CHANNELS: {
 export function CapturePage() {
   const captures = useSyncExternalStore(subscribeToCaptures, allCaptures, allCaptures);
   const [open, setOpen] = useState(false);
+
+  /*
+    The desktop tray can ask for this room with the recorder open.
+
+    An event rather than a route parameter, because the tray is telling the app to DO
+    something rather than navigate somewhere, and a URL that opens a microphone would be a
+    URL somebody could send you.
+  */
+  useEffect(() => {
+    function onListen() {
+      setOpen(true);
+    }
+    window.addEventListener("continuity:start-listening", onListen);
+    return () => window.removeEventListener("continuity:start-listening", onListen);
+  }, []);
 
   const unfiled = captures.filter((c) => !c.filed);
   const filed = captures.filter((c) => c.filed);

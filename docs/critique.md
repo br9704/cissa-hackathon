@@ -21,7 +21,7 @@ the a/e/r keys on the whole window with no check of where you are typing. Typing
 a question into the ask palette leaked half the sentence into a draft. One guard
 clause fixes the entire feeling (P0.1). A second P0: when the in-browser search model
 cannot download, the ask palette dies with "Failed to fetch" even though a fully
-local keyword index exists in the code and could answer (P0.2). On hackathon wifi
+local keyword index exists in the code and could answer (P0.2). On unreliable wifi
 that is a dead hero feature.
 
 "It doesn't do anything" is discoverability, not absence. The recorder, transcript
@@ -67,7 +67,7 @@ problems below are real but they are fixable in hours, not days.
    a `data-palette-open` attribute on document root and check it). Apply the same
    guard to every other global key listener (AppShell cmd+k is fine; audit any others).
 2. ASK SEARCH DIES INSTEAD OF DEGRADING. When the in-browser embedding model cannot
-   load (offline, blocked CDN, hackathon wifi), the palette renders "Search is
+   load (offline, blocked CDN, unreliable wifi), the palette renders "Search is
    unavailable: Failed to fetch" and the feature is dead, even though a fully local
    BM25 lexical index (`search/lexical.ts`) is already built. Fix: catch the model
    load failure in `search/index.ts` / `recall.ts` and fall back to lexical-only

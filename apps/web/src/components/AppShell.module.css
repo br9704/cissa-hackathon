@@ -261,6 +261,8 @@
   people put into it, and the inputs were previously below 184 rows of output.
 */
 .captureTrigger {
+  flex: none;
+  white-space: nowrap;
   display: inline-flex;
   align-items: center;
   gap: 8px;

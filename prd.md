@@ -270,7 +270,7 @@ softens to "pipeline proven separately" citing the distillation repo's shipped r
 Real auth, real RLS, synthetic data. Secrets live in env vars only; the anon key plus
 RLS is the exposure surface, same posture as hive. No real firm data is ever entered; the
 registration page says so. The LLM calls carry synthetic text only. The desktop build is
-unsigned for the hackathon (documented manual task). Rate limits on write endpoints.
+unsigned (documented manual task). Rate limits on write endpoints.
 The privacy pitch line is architectural, not performative: the on-prem tagger plus the
 self-hostable schema is the path to a zero-egress deployment; the cloud demo is theatre
 over synthetic data and says so in the footer.

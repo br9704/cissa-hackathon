@@ -75,8 +75,25 @@ pub fn run() {
                 true,
                 None::<&str>,
             )?;
+            /*
+                Start listening, from the tray.
+
+                The recorder already exists and works: browser speech to text with speaker
+                separation, and the audio never leaves the tab. What it lacked was a way to
+                start it without first finding the right page, which on a desk means it never
+                gets started at all. A meeting begins, somebody would have to open an app and
+                navigate, and the reasoning in that meeting is lost the same way it always was.
+
+                This opens the main window on the capture surface with recording armed. It
+                does NOT start recording silently: the consent gate in the recorder still
+                runs, and it matters more here rather than less, because a listener reachable
+                from a menu bar is exactly the kind of thing that should never be able to
+                start without somebody choosing it.
+            */
+            let listen_item =
+                MenuItem::with_id(app, "listen", "Record a meeting", true, None::<&str>)?;
             let quit_item = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
-            let menu = Menu::with_items(app, &[&open_item, &capture_item, &quit_item])?;
+            let menu = Menu::with_items(app, &[&open_item, &listen_item, &capture_item, &quit_item])?;
 
             /*
                 A template image is black plus alpha and nothing else. macOS tints it for
@@ -101,6 +118,20 @@ pub fn run() {
                     "capture" => {
                         if let Some(window) = app.get_webview_window(QUICK_CAPTURE) {
                             toggle_quick_capture(&window);
+                        }
+                    }
+                    "listen" => {
+                        if let Some(window) = app.get_webview_window("main") {
+                            let _ = window.show();
+                            let _ = window.set_focus();
+                            /*
+                                Hash routing, because the desktop shell serves from a custom
+                                protocol with no server side rewrites. See router.tsx.
+                            */
+                            let _ = window.eval(
+                                "window.location.hash = '#/capture'; \
+                                 window.dispatchEvent(new CustomEvent('continuity:start-listening'));",
+                            );
                         }
                     }
                     "quit" => app.exit(0),

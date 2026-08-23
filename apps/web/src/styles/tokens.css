@@ -92,18 +92,33 @@
   /*
     ACCENTS.
 
-    Every one of these was re-picked for the dark field. The old ink blue #0a58ca measures
-    about 1.9:1 against a near black pane, so the theme would have failed the contrast test
-    on its first commit. The bar did not move; the colours did.
+    STRUCTURE IS WHITE. COLOUR IS SIGNAL.
 
-    Amber is reserved for knowledge risk and appears nowhere else, ever. The moment amber
-    decorates something, the risk signal is dead. At most one filled --accent per view.
+    --accent is the interactive voice: buttons, focus rings, selected states, links on hover,
+    the mark. It is near white rather than a hue, because a coloured interface teaches a
+    reader that colour is decoration, and this product needs colour to mean something the
+    moment it appears.
+
+    Three signals and one identity colour, and each says exactly one thing:
+
+      --accent-verified  green   this is chained, or this is covered
+      --accent-risk      amber   knowledge risk, and nothing else, ever (D5)
+      --accent-danger    red     wrong, or unsupported by the record
+      --draft            blue    a model wrote this and no person has approved it
+
+    The old ink blue #0a58ca measured about 1.9:1 against a near black pane, so the first
+    version of this theme would have failed the contrast test on its first commit. The bar
+    did not move; the colours did.
   */
-  --accent: #7aa7ff;
+  --accent: #eceef2;
   --accent-verified: #4ec98a;
   --accent-risk: #f0a63c;
   --accent-danger: #ff7b72;
-  --draft: rgba(122, 167, 255, 0.5);
+  /*
+    Blue means one thing: a record a model wrote that no person has approved. It is the only
+    place blue appears, so a blue chip anywhere on screen is that claim and nothing else.
+  */
+  --draft: #7aa7ff;
 
   /*
     SHADOWS: the three cue composition described at the top of this file.

@@ -3,6 +3,8 @@ import styles from "./LivenessStrip.module.css";
 import { ledger, ago, memberName } from "../data/source";
 import { subscribeToCaptures, allCaptures } from "../data/capture";
 import { backend } from "../data/source";
+import { authState } from "../auth/session";
+import { ModelStatus } from "./ModelStatus";
 
 /*
   A heartbeat in the chrome.
@@ -25,8 +27,23 @@ export function LivenessStrip() {
   return (
     <div className={styles.strip}>
       <span className={styles.item}>
-        <span className={styles.dot} data-state={backend} aria-hidden="true" />
-        <span>{backend === "supabase" ? "Live" : "Local"}</span>
+        {/*
+          Says which ledger is being read, rather than implying the hosted one whenever it
+          happens to be configured. Demo mode reads the seeded corpus in this browser, and a
+          reader should know that without having to work it out.
+        */}
+        <span
+          className={styles.dot}
+          data-state={authState().kind === "demo" ? "local" : backend}
+          aria-hidden="true"
+        />
+        <span>
+          {authState().kind === "demo"
+            ? "Demo, seeded corpus"
+            : backend === "supabase"
+              ? "Live"
+              : "Local"}
+        </span>
       </span>
 
       {latest ? (
@@ -42,6 +59,9 @@ export function LivenessStrip() {
         <span>ledger</span>
         <span className={styles.value}>{entries.length} records</span>
       </span>
+
+      {/* Where inference is happening, beside where the data is. */}
+      <ModelStatus />
 
       {unfiled > 0 ? (
         <span className={styles.item}>

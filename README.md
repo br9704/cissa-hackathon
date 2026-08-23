@@ -1,11 +1,16 @@
+<img src="docs/brand/continuity-logo.svg" alt="Continuity" width="420" />
+
 <h1>Continuity</h1>
 
-**The strategy continuity layer for quantitative trading firms.**
+**A strategy continuity layer for quantitative trading desks.**
 
 Quant firms lose strategies when people leave. Continuity captures the reasoning behind
-strategy research at the moment it happens, stores it in an append-only, hash-chained
-decision ledger, and turns that ledger into knowledge-risk analytics, handover packs,
-compliance artifacts, and a queryable memory of the desk.
+strategy research at the moment it happens, hash chains it into an append only ledger, and
+turns that ledger back into knowledge risk analytics, handover packs and a searchable memory
+of the desk.
+
+A 2B model is fine tuned on that ledger so it answers questions about the firm offline, and
+the app ships the screen that shows the model losing to the record when it is wrong.
 
 It is less a dashboard than a database with an opinion. The schema is the product; the
 interfaces exist to feed it and to ask it questions.
@@ -19,10 +24,14 @@ interfaces exist to feed it and to ask it questions.
 
 **https://continuity-nu.vercel.app**
 
-It asks for an account. Create one on the sign in screen: sign up is open, the data behind it
-is entirely synthetic, and row level security is what protects it rather than the key in the
-page. Shared credentials are deliberately not published here, because a public password on a
-writable ledger is a bad idea even when the ledger is invented.
+**Look around without an account.** There is a button for it on the sign in screen. It reads
+the seeded corpus in your own browser, which is the same thing the app does with no database
+configured at all, and the chrome says which mode you are in rather than letting you assume
+the data is live.
+
+If you want the hosted ledger, create an account: sign up is open. Shared credentials are
+deliberately not published here, because a public password on a writable ledger is a bad idea
+even when the ledger is invented.
 
 Two things on the live site need a machine that is not this one and therefore degrade
 honestly rather than pretending:
@@ -35,10 +44,12 @@ honestly rather than pretending:
 
 ## Status
 
-Built for the CISSA hackathon (Fundamentum track) and continued afterwards as a portfolio
-project. It missed the submission deadline, so what follows is written for a reader rather
-than a judge: nothing here is pitched, and the limitations section near the bottom is the
-part worth reading first if you are short of time.
+Built to a fixed external brief with a hard deadline, then continued as a personal project.
+Solo build, and live.
+
+What follows is written for a reader rather than for a pitch. The limitations section near
+the bottom is the part worth reading first if you are short of time, and the number this
+project is proudest of is one where a model gets something wrong in public.
 
 What works today: the append only hash chained ledger against a real hosted Postgres,
 knowledge risk analytics, live meeting transcription that runs entirely inside the browser,
@@ -199,7 +210,7 @@ out split comes from the same generator, so this measures whether a small model 
 forty templates. It cannot measure whether the tagger works on decisions a person wrote,
 because there are no such decisions in a synthetic corpus. The measurement that would
 settle it is a few hundred real records labelled by two people who sometimes disagree, and
-a hackathon cannot produce that. [`ml/README.md`](ml/README.md) says all of this at
+a short build cannot produce that. [`ml/README.md`](ml/README.md) says all of this at
 length, and the caveat travels with the number wherever it goes.
 
 The parser is strict on purpose: anything that is not one line of the expected JSON with a
@@ -279,7 +290,7 @@ flowchart LR
 
   subgraph read["Reading surfaces"]
     rail["Ledger rail"]
-    graph["Genealogy graph"]
+    genealogy["Genealogy graph"]
     risk["Knowledge risk"]
     ask["Ask bar<br/>hybrid retrieval"]
     packs["Handover and compliance"]
@@ -292,7 +303,7 @@ flowchart LR
   transcript --> events
   events --> proj
   proj --> rail
-  proj --> graph
+  proj --> genealogy
   proj --> risk
   proj --> ask
   proj --> packs
@@ -592,4 +603,4 @@ travels with it in that file.
 | [`docs/palantir.md`](docs/palantir.md) | What Palantir teaches this product, and what it warns against |
 | [`docs/scoping.md`](docs/scoping.md) | Verified build recipes, superseded in places by masterplan amendments |
 
-Built for the CISSA hackathon, Fundamentum track.
+Built to a fixed external brief with a hard deadline, then continued as a personal project.

@@ -83,3 +83,32 @@
 }
 
 .note { color: var(--text-chrome); font-size: 12px; line-height: 1.55; text-align: center; }
+
+/*
+  The demo path. Quiet, below the card, so it reads as an alternative rather than as the
+  main action: somebody who has an account should not have to hunt past a bypass to use it.
+*/
+.demo { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+
+.demoButton {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-s);
+  color: var(--text-secondary);
+  font: inherit;
+  font-size: 13px;
+  padding: 9px 16px;
+  cursor: pointer;
+}
+
+.demoButton:hover { border-color: var(--border-strong); color: var(--text); }
+.demoButton:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.demoNote {
+  color: var(--text-chrome);
+  font-size: 12px;
+  line-height: 1.55;
+  text-align: center;
+  max-width: 40ch;
+  margin: 0;
+}

@@ -20,9 +20,35 @@ export type AuthState =
   | { kind: "disabled" }
   | { kind: "loading" }
   | { kind: "signed_out" }
+  /*
+    Looking around without an account.
+
+    A portfolio project that demands a signup before showing anything is a portfolio project
+    nobody looks at. Demo mode skips the door and reads the seeded corpus in the browser,
+    which is the same thing the app does with no Supabase configured at all.
+
+    It is NOT a session and it is not pretending to be one. It cannot read the hosted ledger,
+    because row level security is doing its job, and the app says which mode it is in rather
+    than letting somebody believe they are looking at live data.
+  */
+  | { kind: "demo" }
   | { kind: "signed_in"; user: User };
 
-let state: AuthState = isConfigured ? { kind: "loading" } : { kind: "disabled" };
+const DEMO_KEY = "continuity:demo";
+
+function demoWanted(): boolean {
+  try {
+    return sessionStorage.getItem(DEMO_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
+let state: AuthState = !isConfigured
+  ? { kind: "disabled" }
+  : demoWanted()
+    ? { kind: "demo" }
+    : { kind: "loading" };
 const listeners = new Set<() => void>();
 
 function set(next: AuthState): void {
@@ -42,14 +68,39 @@ export function subscribeToAuth(fn: () => void): () => void {
 }
 
 /** Called once from main. Safe to call when Supabase is absent: it does nothing. */
+/** Look around without an account. Session scoped, so closing the tab ends it. */
+export function enterDemo(): void {
+  try {
+    sessionStorage.setItem(DEMO_KEY, "1");
+  } catch {
+    /* Private windows: demo mode still applies for this page. */
+  }
+  set({ kind: "demo" });
+}
+
+export function leaveDemo(): void {
+  try {
+    sessionStorage.removeItem(DEMO_KEY);
+  } catch {
+    /* Nothing to clear. */
+  }
+  set({ kind: "signed_out" });
+}
+
 export function startAuth(): void {
   if (!isConfigured) return;
+  /* A real session always wins over demo mode, so a returning user is not sent to a demo. */
   const client = supabase();
 
   void client.auth
     .getSession()
     .then(({ data }) => {
-      set(sessionToState(data.session));
+      if (data.session?.user) {
+        set(sessionToState(data.session));
+        return;
+      }
+      /* No session. Respect a demo choice made before the check finished. */
+      set(demoWanted() ? { kind: "demo" } : { kind: "signed_out" });
     })
     .catch(() => {
       /*
@@ -62,8 +113,22 @@ export function startAuth(): void {
     });
 
   client.auth.onAuthStateChange((_event, session) => {
-    set(sessionToState(session));
+    if (session?.user) {
+      leaveDemoQuietly();
+      set(sessionToState(session));
+      return;
+    }
+    /* Signing out of a real session should not silently drop somebody into demo mode. */
+    if (state.kind !== "demo") set({ kind: "signed_out" });
   });
+}
+
+function leaveDemoQuietly(): void {
+  try {
+    sessionStorage.removeItem(DEMO_KEY);
+  } catch {
+    /* Nothing to clear. */
+  }
 }
 
 function sessionToState(session: Session | null): AuthState {

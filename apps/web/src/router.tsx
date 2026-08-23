@@ -66,6 +66,7 @@ function Root() {
   if (!booted) return <BootScreen onDone={() => setBooted(true)} />;
   if (auth.kind === "loading") return null;
   if (auth.kind === "signed_out") return <SignIn />;
+  /* "demo" and "disabled" both fall through to the app, reading the seeded corpus. */
   return <AppShell />;
 }
 

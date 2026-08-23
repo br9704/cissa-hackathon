@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  macOS reads this at bundle time. It exists as a FILE rather than as an inline object in
+  tauri.conf.json because Tauri 2 expects a path there, and the inline form failed the build
+  with "invalid type: map, expected path string" before anybody ran cargo check against the
+  desktop crate.
+
+  The microphone string is not boilerplate. macOS shows it verbatim in the permission dialog,
+  which is the one moment a person decides whether to trust a listener running in their menu
+  bar, so it says exactly what happens to the audio.
+-->
+<plist version="1.0">
+  <dict>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>Continuity transcribes desk meetings on this machine so the reasoning behind a strategy is captured while it is still being said. The audio is processed locally and is never uploaded or stored.</string>
+  </dict>
+</plist>

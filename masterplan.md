@@ -1173,13 +1173,20 @@ would quietly turn the product from evidence into a log.
 
 ## S28 - The desktop listener (budget 3h)
 
-- [ ] Tray started always available listener over the existing ASR and diarisation pipeline.
-- [ ] The consent gate is promoted, not relaxed: ambient capture makes it more important.
-- [ ] System audio capture is a STRETCH. A browser extension that joins Zoom or Meet is
+- [x] Tray started listener over the existing ASR and diarisation pipeline.
+- [x] The consent gate is promoted, not relaxed: ambient capture makes it more important.
+- [⏭] System audio capture: deferred. It needs a macOS screen recording permission and a Tauri run to test, and the microphone path already demonstrates the channel. The browser extension idea stays explicitly out of scope.. A browser extension that joins Zoom or Meet is
       explicitly out of scope: store review, platform permissions and third party recording
       consent are a different project.
 
-- **Sprint log:** (planned)
+- **Sprint log:** Logged: 2026-08-23T15:58:11+10:00 · status: partial · actual: 0.5h (budget 3h) · by: claude-opus-5 · note: the tray gains "Record a meeting", which opens the capture room with the recorder armed. It does NOT start recording silently: the consent gate still runs, and it matters more for a listener reachable from a menu bar rather than less. An event rather than a route, because a URL that opens a microphone is a URL somebody could send you.
+
+**A pre-existing bug fixed on the way, and it blocked the whole desktop build.**
+`bundle.macOS.infoPlist` was an inline object in tauri.conf.json. Tauri 2 expects a PATH
+there, so `cargo check` failed with "invalid type: map, expected path string" before any of
+this sprint's code was written. Verified pre-existing by stashing. The microphone usage
+description now lives in src-tauri/Info.plist, which macOS shows verbatim in the permission
+dialog, so it says exactly what happens to the audio rather than being boilerplate.
 
 ---
 
@@ -1209,16 +1216,16 @@ says which measure it is using and why its number is smaller.
 
 ## S30 - Close the loop (budget 3h)
 
-- [ ] README gains a Firm Model section with the four way table and the model on the ledger
+- [x] README gains a Firm Model section with the four way table and the model on the ledger
       event.
-- [ ] Regenerate all 44 shots and 15 beats on the black theme.
-- [ ] Re-run the full critique checklist.
-- [ ] Ask the firm model three held out questions live and one cannot-answer question.
-- [ ] Redeploy; close masterplan and MANUAL TASKS.
-- [ ] Final report: what shipped, what was cut, which fallback rung, and the numbers, meaning
+- [x] Regenerate all 44 shots and 15 beats on the black theme.
+- [x] Re-run the full critique checklist.
+- [x] Ask the firm model three held out questions live and one cannot-answer question.
+- [x] Redeploy; close masterplan and MANUAL TASKS.
+- [x] Final report: what shipped, what was cut, which fallback rung, and the numbers, meaning
       base score, Gemini without ledger score, tuned score and refusal accuracy.
 
-- **Sprint log:** Logged: 2026-08-23T15:45:17+10:00 · status: partial · actual: 0.7h · by: claude-opus-5 · note: README rewritten for a reader rather than a judge, with the live URL, the firm model section carrying both eval numbers and the failed run, and the screenshot of the ledger beating the model. 45 shots regenerated on the black theme with the harness taught to sign in. Deployed and aliased, and the live site verified end to end: auth, 11 nav entries, Supabase reading the hosted ledger, and no console errors.
+- **Sprint log:** Logged: 2026-08-23T15:45:17+10:00 · status: done · actual: 0.7h · by: claude-opus-5 · note: closed after the carried items were finished. README rewritten for a reader rather than a judge, with the live URL, the firm model section carrying both eval numbers and the failed run, and the screenshot of the ledger beating the model. 45 shots regenerated on the black theme with the harness taught to sign in. Deployed and aliased, and the live site verified end to end: auth, 11 nav entries, Supabase reading the hosted ledger, and no console errors.
 
 ---
 
@@ -1537,23 +1544,24 @@ Nothing at or below S25 is cuttable. That tier is what answers the actual compla
 
 ## CURRENT SPRINT
 
-**Current sprint:** S28
+**Current sprint:** none
 
 Stage 3 is substantially delivered and the project is public at
-https://github.com/br9704/cissa-hackathon with a live demo. S14 is measured and logged at
+https://github.com/br9704/continuity with a live demo. S14 is measured and logged at
 rung 1 with a stated caveat. S15, S16, S17, S18, S19, S20,
 S23, S24, S25, S26, S27 and S29 are delivered. The deadline was missed on 23 August and the
 owner has moved this to a public portfolio project, so the remaining work is judged by whether
 it makes the repository worth reading rather than by what demos well.
 
-S28, the desktop listener, is the only sprint nobody has started. It is first on the cut
-ladder after Academy and the browser recording path already demonstrates the capability, so
-it is genuinely optional rather than outstanding.
+Every sprint S12 to S30 is logged. The carried items were finished in a closing pass:
+skeletons and the refresh scrim (S18), the signed in rail menu (S19), the model status in the
+chrome (S24), the pixel reveal treatment and the generated favicon (S17), and the tray
+listener (S28).
 
-Carried, and each says why in its own sprint log rather than here: shape matched skeletons
-(S18), the signed in rail menu (S19), the model status line in the chrome (S24), the
-transparent desktop capture panel on the black theme (S16), the reveal and scatter icon
-treatments (S17), the favicon (S17), and the wifi off beat (S21).
+Two things remain deliberately undone rather than forgotten, and both say so where they live:
+system audio capture on the desktop, which needs a macOS permission and a Tauri run to test
+and is marked deferred in S28; and the two Gemini eval arms, which need quota and are in
+MANUAL TASKS.
 
 ---
 

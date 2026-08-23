@@ -34,8 +34,13 @@
 */
 .risk { color: var(--accent-risk); border-color: var(--accent-risk); }
 
+/*
+  A drafted record is the one place blue appears, so the text carries it too rather than
+  borrowing the neutral interactive colour. Blue on screen means exactly one thing here: a
+  model wrote this and nobody has approved it yet.
+*/
 .draft {
-  color: var(--accent);
+  color: var(--draft);
   border-style: dashed;
   border-color: var(--draft);
 }

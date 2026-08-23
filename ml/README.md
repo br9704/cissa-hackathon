@@ -121,7 +121,7 @@ something a prompt cannot express, on this data. What remains unmeasured is whet
 something generalises to text a person wrote rather than text a generator wrote.
 
 The measurement that would settle it is a few hundred real decision records from a real
-desk, labelled by two people who disagree sometimes. That is not something a hackathon
+desk, labelled by two people who disagree sometimes. That is not something a short build
 can produce, and pretending otherwise is worse than saying so.
 
 ## Training was stopped at 300 of 1000 iterations

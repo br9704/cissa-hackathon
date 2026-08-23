@@ -13,6 +13,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { ledger as localLedger, corpus, type LedgerEntry } from "./source";
 import { isConfigured, subscribeToLedger, supabase, type LedgerEventRow } from "./supabase";
+import { authState } from "../auth/session";
 
 export type ConnectionState = "local" | "connecting" | "live" | "dropped";
 
@@ -41,13 +42,24 @@ export function useLiveLedger(): {
   const firmId = corpus().firmId;
 
   const [entries, setEntries] = useState<LedgerEntry[]>(fallback);
+  /*
+    Demo mode reads the seeded corpus, never the hosted ledger.
+
+    Not a shortcut. Without a session, row level security correctly returns nothing, so a
+    visitor who chose to look around without an account was shown an EMPTY ledger and a
+    product that appeared to do nothing. RLS was doing its job and the app was drawing the
+    wrong conclusion from it.
+  */
+  const demo = authState().kind === "demo";
+  const useRemote = isConfigured && !demo;
+
   const [connection, setConnection] = useState<ConnectionState>(
-    isConfigured ? "connecting" : "local",
+    useRemote ? "connecting" : "local",
   );
   const [freshId, setFreshId] = useState<string | undefined>(undefined);
 
   useEffect(() => {
-    if (!isConfigured) return;
+    if (!useRemote) return;
     let live = true;
 
     /* Load the history once, then keep it current from the socket. Polling would work and

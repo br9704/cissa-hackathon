@@ -1,0 +1,20 @@
+/*
+  Two steps, not a ramp. See PixelReveal for why: a smooth opacity on a hard pixel glyph
+  makes grey half cells and reads as a blur.
+*/
+.cell {
+  opacity: 0;
+  transition: opacity var(--dur-med) steps(2, end);
+}
+
+.cell[data-on="true"] {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cell {
+    /* Drawn, not frozen part way through being drawn. */
+    opacity: 1;
+    transition: none;
+  }
+}

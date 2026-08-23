@@ -1,0 +1,19 @@
+.wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  color: var(--text-tertiary);
+  white-space: nowrap;
+}
+
+.label { color: var(--text-tertiary); }
+
+/*
+  Hidden below 1600, not 1400. At 1440, which is the width the screenshot harness uses and a
+  very common laptop, the top bar was one item too wide and this was the item running off the
+  edge. The system page carries the same information with room to say it properly.
+*/
+@media (max-width: 1600px) {
+  .wrap { display: none; }
+}

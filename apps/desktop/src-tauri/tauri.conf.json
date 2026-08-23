@@ -60,10 +60,7 @@
     ],
     "macOS": {
       "signingIdentity": "-",
-      "entitlements": null,
-      "infoPlist": {
-        "NSMicrophoneUsageDescription": "Continuity transcribes desk meetings on this machine so the reasoning behind a strategy is captured while it is still being said. The audio is processed locally and is never uploaded or stored."
-      }
+      "entitlements": null
     }
   }
 }

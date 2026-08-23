@@ -5,6 +5,7 @@ import { AskBar } from "./AskBar";
 import { CaptureSheet } from "./CaptureSheet";
 import { PixelMark } from "./pixel/PixelMark";
 import { PixelBlast } from "./pixel/PixelBlast";
+import { UserMenu } from "../auth/UserMenu";
 import { LivenessStrip } from "./LivenessStrip";
 import {
   LedgerIcon,
@@ -122,6 +123,8 @@ export function AppShell() {
               </span>
             </Link>
           ))}
+          {/* Pinned to the rail footer, which is where people look for their own account. */}
+          <UserMenu />
         </nav>
       </div>
 

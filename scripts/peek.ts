@@ -3,6 +3,14 @@ const ROUTES = process.argv.slice(2).length ? process.argv.slice(2) : ["/", "/st
 async function main() {
   const b = await chromium.launch();
   const p = await b.newPage({ viewport: { width: 1440, height: 900 } });
+  /* Skip the door the same way a visitor can, rather than needing credentials to look. */
+  await p.addInitScript(() => {
+    try {
+      sessionStorage.setItem("continuity:demo", "1");
+    } catch {
+      /* Private window: the app will show the sign in, which is also a valid shot. */
+    }
+  });
   for (const r of ROUTES) {
     await p.goto(`http://localhost:5273${r}`, { waitUntil: "networkidle" });
     /* Wait past the boot screen. It is once per session, but every screenshot here starts a

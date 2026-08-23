@@ -1,0 +1,122 @@
+{
+  "schema": 1,
+  "slug": "continuity",
+  "name": "CONTINUITY",
+  "oneLiner": "An append-only decision ledger that answers questions after the author has left",
+  "status": "live",
+  "role": "SOLO BUILD",
+  "year": "2026",
+  "updated": "2026-08-23",
+  "links": {
+    "github": null,
+    "caseStudy": "https://brunojaamaa.dev/projects/continuity",
+    "live": "https://continuity-nu.vercel.app",
+    "npm": null,
+    "appstore": null
+  },
+  "stack": [
+    "typescript",
+    "react",
+    "vite",
+    "tauri 2",
+    "supabase",
+    "postgresql",
+    "pgvector",
+    "transformers.js",
+    "mlx",
+    "lora",
+    "qwen3.5",
+    "vitest"
+  ],
+  "metrics": [
+    {
+      "value": "38.5 pts",
+      "label": "macro-F1 the fine-tuned tagger gains over few-shot prompting the same 2B base model, on a held-out split",
+      "source": "ml/results/summary.json"
+    },
+    {
+      "value": "0 → 8",
+      "label": "of 36 questions about the firm answered from model weights alone — untuned base, then fine-tuned on the ledger",
+      "source": "ml/results/firm_model_summary.json"
+    },
+    {
+      "value": "3 layers",
+      "label": "of ledger immutability, one of which survives a privileged session disabling every trigger on the table",
+      "source": "supabase/migrations/0005_grants_rls.sql"
+    },
+    {
+      "value": "no key",
+      "label": "semantic search over the whole corpus runs inside the browser tab — no API key, no round trip",
+      "source": "apps/web/src/search/index.ts"
+    }
+  ],
+  "headline": "A decision ledger for quant research desks: every strategy decision is captured at the moment it happens, hash-chained into an append-only record, and turned back into knowledge-risk analytics, handover packs and a searchable memory of the desk. A 2B model fine-tuned on that ledger answers questions about the firm offline, and the product shows it losing to the record when it is wrong.",
+  "honest": "Every row of data is synthetic — the firm, the people, the strategies and the dollar figures are invented, and the product says so in its footer and beside every dollar amount. Database-level immutability is tamper resistance, not proof: the triggers stop mutation, the hash chain evidences it, and an attacker who edits a row and recomputes every hash after it produces an internally consistent chain — which is why the head is meant to be anchored externally, and that anchoring is not live. The tagger's perfect score is measured on a held-out split of a template-generated corpus, so it demonstrates that a 2B model can learn forty templates and cannot show it works on decisions a person wrote; the few-shot arm at 0.6155 is what proves the adapter is doing real work. The firm model's refusal accuracy is 0.4167 — it still invents an answer more often than it declines when asked something the ledger does not hold — and it is measured on a 36-item fact probe and a 12-item refusal set, which are small. Two planned comparison arms against a frontier model were never run because the free-tier quota was exhausted, and they are recorded as omitted rather than reported as zero. The LLM drafting and debrief routes need an API key that is not provisioned, so they return an honest 503 on the deployed site; the on-prem tagger and the firm model run locally by design and the deployed app reports them as unreachable rather than pretending. The desktop build is unsigned, printing from it is disabled because window.print() in the macOS webview produces a blank PDF, and rate limiting on server routes is in-memory per instance, which is not a real rate limit.",
+  "built": {
+    "audit": "The product's whole argument is that the record can be trusted, so the first thing audited was whether the database actually enforces that. It did not, at first, in the way the design assumed. Postgres was granted only select and insert on the events table, with triggers raising on update, delete and separately on truncate — truncate does not fire row-level triggers at all, which is the kind of gap a single trigger looks like it covers and does not. Measured rather than assumed: under `set session_replication_role = replica` every trigger on the table is off, and update, delete and truncate all succeed. So the trigger layer is tamper resistance and nothing more. The layer that survives is a unique constraint on (firm_id, prev_hash) with nulls not distinct, which rejects both a grafted branch and a second genesis row even with every trigger disabled. The honest description that came out of the audit — the triggers are tamper resistance, the chain is tamper evidence — is stronger than the claim it replaced, and it is the one that ships.",
+    "repaired": "The verify page rebuilds every hash from the event's own contents rather than asking the server whether the server is right, and that required reproducing Postgres jsonb rendering exactly in TypeScript: keys ordered by length before byte value, a space after every colon, and a loud refusal for numbers that would not round-trip instead of a hash that silently differs. It is checked against a live Postgres over fifteen deliberately awkward payloads and then recomputes sixty seeded event hashes. Three of the repository's own guard scripts were found mid-build to be passing while the rule they protected was broken, which is why there are now six of them and why `pnpm check` runs all six. Several tests earned their place by failing first: the contrast test caught --text-secondary measuring 6.87:1 inside a recessed pane against a stated 7:1 bar, because the design document had measured against the lightest surface rather than the darkest one text actually sits on; the departure test caught a tag present on every decision in a strategy counting as covered ground, so as soon as one other person touched a book nothing in it looked orphaned; the transcript parser test pins that a sentence containing a colon is not a speaker line, or \"The rule is simple: cut size\" gets attributed to a person named \"The rule is simple\". The first fine-tuning run of the firm model is the largest repair and it is kept in the repository rather than deleted: it scored 9 of 36 on facts and 0 of 12 on refusals. The tuning had worked and the model had still failed, because it learned the ledger and also learned that declining is never the answer. The cause was data design, not training — that run authored 33 refusals against 686 answerable pairs, and the expansion step made it worse because facts had cached paraphrases and refusals did not, so what reached training was 6.6 percent.",
+    "measured": "The tagger is a LoRA fine-tune of a 2B Qwen trained on the same laptop that ran the build, and on a held-out split the training never saw it scores macro-F1 1.0000, accuracy 1.0000, risk accuracy 1.0000 and zero unparseable outputs over 300 rows at 462 ms p50. The number worth quoting is not the 1.0 — a perfect score alone is equally consistent with a good model and a trivial benchmark. It is the 38.5-point gap to the few-shot arm: the same base model, the same parser, the same split, with all seven classes described in the system prompt and two worked examples each, scores 0.6155. So the task is not solvable by prompting, and the adapter has learned something a prompt cannot express. Rebalancing the firm model's training data from 6.6 percent refusals to 20.1 percent moved refusal accuracy from 0.0 to 0.4167 while fact accuracy moved 0.25 to 0.2222, which is inside the noise of a 36-item probe — the share of refusals in the training data controls refusal behaviour almost directly and costs very little accuracy. The untuned base scores 0 of 36 on facts about this desk and a perfect 12 of 12 on refusals by refusing everything, which is exactly why refusal accuracy must never be quoted on its own. Retrieval's relevance floor is measured rather than chosen: questions the corpus can answer score 0.88 to 0.93 blended and questions it cannot top out at 0.47, so the floor sits at 0.60 in the gap — and that gap only exists because of the lexical half, since the embedding model returns a cosine near 0.75 for text with nothing to do with the corpus.",
+    "decisions": [
+      {
+        "decision": "Answers about a departed colleague are extractive, never generated — every line is a sentence they actually typed, quoted, with its source named",
+        "reason": "A generated sentence in a named person's voice is a thing they never said, presented as a thing they said. In a product whose entire argument is that the record is trustworthy, that is not a small problem. It is also stronger this way: what lands with a reader is recognition, not fluency."
+      },
+      {
+        "decision": "A model-drafted decision record looks like a draft until a person approves it, and approval costs one keystroke",
+        "reason": "That keystroke is the difference between a system that documents a desk and one that generates plausible text about a desk, and it costs about ten seconds. A machine-written record visually indistinguishable from a human-approved one is the fastest way to lose the trust the whole product is asking for."
+      },
+      {
+        "decision": "Every score is a property of a strategy, never of a person — there is no per-person score anywhere in the product",
+        "reason": "The analytics answer which books would be orphaned, not who is a liability. There is a top-holder field so the departure simulation can name orphaned work, and any view that would rank individuals is treated as a design bug rather than a feature request."
+      },
+      {
+        "decision": "Reading another desk's strategy and exporting a pack are themselves events on the same ledger, and every member can see what was captured from them and everyone who looked at it",
+        "reason": "Capture that is continuous and ambient is only defensible if the people it captures can see what it holds, and a promise in a contract is not the same thing as a screen. If that view is uncomfortable to show somebody, the capture behind it was wrong, not the view."
+      },
+      {
+        "decision": "The verify page recomputes every hash client-side from the event's own contents instead of calling a server endpoint",
+        "reason": "Asking the server whether the server is right proves nothing. It cost an exact reimplementation of Postgres jsonb rendering in TypeScript, tested against a live database, and that is the price of the page meaning what it says."
+      },
+      {
+        "decision": "The sweep halts on the first broken row rather than running to the end",
+        "reason": "Everything after a rewritten row is unverifiable rather than wrong, and reporting it as wrong would be a stronger claim than the evidence supports."
+      },
+      {
+        "decision": "Semantic search runs entirely in the browser tab, with the embedding model downloaded to the client and a keyword fallback when it cannot load",
+        "reason": "The product's argument is that the reasoning behind a strategy can be searched without leaving the building. Making that true in the demo turns an on-premise slide into a demonstration — and it is why the deployed site works with no API key at all."
+      },
+      {
+        "decision": "Retrieval is hybrid rather than dense-only, and the relevance floor is measured rather than picked",
+        "reason": "Asked why the expiry window is capped, dense embeddings return everything about the expiry book and rank the record that literally answers it below them; BM25 supplies the exactness the vectors lack. The embedding model also returns a cosine around 0.75 for text with nothing to do with the corpus, so a semantic-only threshold has to be set inside the noise."
+      },
+      {
+        "decision": "Unparseable tagger output is counted and excluded from the class metrics rather than coerced to a default class",
+        "reason": "Coercing would import the majority class as a free win, inflate accuracy, and hide exactly the template bugs the strict parser exists to surface."
+      },
+      {
+        "decision": "The fine-tuned model is not allowed to outrank the record, and the product ships a screen showing it losing",
+        "reason": "Asked why the expiry window is capped, retrieval returns five real passages including the one that answers it, and the fine-tuned model replies that it cannot answer. The product strikes that sentence through, labels it not found in the record, and puts the passages above it. Grounding that only ever agrees with the model is decoration."
+      },
+      {
+        "decision": "The failed first training run stays in the repository at ml/results/firm_model_summary_run1.json",
+        "reason": "A negative result that gets deleted teaches nobody anything, and this one carries the finding: refusal share in the training data, not training length or rank, is what controls whether a small model knows how to decline."
+      },
+      {
+        "decision": "Training stopped at 300 of 1000 configured iterations",
+        "reason": "Validation loss was 0.002 at iteration 200 and that checkpoint already scored a perfect validation macro-F1, so the remaining 800 iterations would have taken half an hour to measure nothing."
+      },
+      {
+        "decision": "Compliance documents are pure functions from rows to markdown",
+        "reason": "The same corpus always produces the same bytes, which is what makes a pack hash worth storing at all. Exporting also prompts for a one-line justification recorded on an access event: a justification nobody can see changes nothing, one the subject can see changes quite a lot."
+      },
+      {
+        "decision": "With no credentials the app generates the same corpus in the browser that the seed script loads into Postgres",
+        "reason": "Not a mock — literally the same generator, so what renders with no backend is what the database contains after seeding, and the two cannot drift apart without a test failing."
+      }
+    ]
+  },
+  "ownerGated": [
+    "External anchoring of the chain head through OpenTimestamps is wired but not live — a real receipt is pending for hours before a Bitcoin block confirms it.",
+    "Drafting and debrief need a provisioned API key; the route shapes are settled and the routes return an honest 503 without one."
+  ]
+}
