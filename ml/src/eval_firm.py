@@ -82,31 +82,33 @@ def is_refusal(generated: str) -> bool:
 
 
 # --------------------------------------------------------------------------- local models
-def mlx_generate(prompts: list[dict[str, str]], adapter: Path | None, model: str, revision: str) -> list[str]:
-    """One subprocess per prompt is slow but honest: mlx_lm.generate has no batch chat API,
-    and reusing a loaded model across prompts inside python would need the whole harness to
-    live in one process, which makes a crash halfway through lose the completed work."""
+def mlx_generate(prompts: list[dict[str, str]], adapter: Path | None, model: str) -> list[str]:
+    """Load the model once, then answer every prompt.
+
+    The first version shelled out to `mlx_lm generate` per prompt, which reloads two billion
+    parameters from disk for each of roughly 120 generations. That is half an hour of waiting
+    to produce a number, and a harness slow enough to avoid running is a harness that stops
+    being run.
+    """
+    from mlx_lm import load, generate  # imported here so the module parses without mlx
+    from mlx_lm.sample_utils import make_sampler
+
+    print(f"    loading {'tuned' if adapter else 'base'}")
+    m, tok = load(model, adapter_path=str(adapter) if adapter else None)
+    sampler = make_sampler(temp=0.0)
+
     out: list[str] = []
     for i, p in enumerate(prompts, 1):
-        cmd = [
-            sys.executable, "-m", "mlx_lm", "generate",
-            "--model", model,
-            "--max-tokens", "160",
-            "--temp", "0",
-            "--prompt", p["user"],
-            "--system-prompt", p["system"],
+        messages = [
+            {"role": "system", "content": p["system"]},
+            {"role": "user", "content": p["user"]},
         ]
-        if adapter:
-            cmd += ["--adapter-path", str(adapter)]
+        text = tok.apply_chat_template(messages, add_generation_prompt=True, tokenize=False)
         try:
-            res = subprocess.run(cmd, capture_output=True, text=True, timeout=180, cwd=ROOT / "ml")
-            text = res.stdout
-            # mlx_lm prints the answer between ========== rules.
-            parts = text.split("==========")
-            out.append(parts[1].strip() if len(parts) > 2 else text.strip())
+            out.append(generate(m, tok, prompt=text, max_tokens=160, sampler=sampler, verbose=False).strip())
         except Exception as e:  # noqa: BLE001
+            print(f"      generate failed on {i}: {e}", file=sys.stderr)
             out.append("")
-            print(f"  generate failed on {i}: {e}", file=sys.stderr)
         if i % 10 == 0:
             print(f"    {i}/{len(prompts)}")
     return out
@@ -190,14 +192,14 @@ def main() -> None:
     if "A" not in skip:
         print("arm A: untuned base")
         evaluate("A_base_untuned",
-                 mlx_generate(prompts(facts), None, args.model, args.revision),
-                 mlx_generate(prompts(refusals), None, args.model, args.revision))
+                 mlx_generate(prompts(facts), None, args.model),
+                 mlx_generate(prompts(refusals), None, args.model))
 
     if "D" not in skip:
         print("arm D: tuned adapter")
         evaluate("D_firm_model",
-                 mlx_generate(prompts(facts), adapter_path, args.model, args.revision),
-                 mlx_generate(prompts(refusals), adapter_path, args.model, args.revision))
+                 mlx_generate(prompts(facts), adapter_path, args.model),
+                 mlx_generate(prompts(refusals), adapter_path, args.model))
 
     key = os.environ.get("GEMINI_API_KEY", "")
     if key and "B" not in skip:
