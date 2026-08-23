@@ -33,6 +33,8 @@ export const MyRecordIcon = icon("person");
 
 /* Newer surfaces, exported under their own names rather than aliased onto the six above. */
 export const CaptureIcon = icon("inbox");
+/* The daily surface. A person, because the desk is arranged around who is looking. */
+export const DeskIcon = icon("people");
 export const RecordMeetingIcon = icon("mic");
 export const ImportIcon = icon("upload");
 export const NoteIcon = icon("note");

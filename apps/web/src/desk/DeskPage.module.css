@@ -1,0 +1,77 @@
+.page { max-width: var(--container); margin: 0 auto; padding: 24px var(--gutter) 96px; }
+
+.head { display: flex; align-items: flex-start; gap: 16px; flex-wrap: wrap; margin-bottom: 8px; }
+.title { font-size: 30px; font-weight: 600; letter-spacing: -0.02em; margin: 0; }
+.spacer { flex: 1; }
+
+.who {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text-tertiary);
+}
+
+.select {
+  background: var(--surface-recessed);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-s);
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
+  padding: 6px 9px;
+}
+
+.select:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+.lede {
+  color: var(--text-secondary);
+  max-width: var(--container-prose);
+  line-height: 1.65;
+  margin: 0 0 24px;
+}
+
+.sections { display: flex; flex-direction: column; gap: 20px; }
+
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-l);
+  box-shadow: var(--shadow-pane);
+  padding: 20px;
+}
+
+.panelHead { display: flex; align-items: baseline; gap: 10px; margin-bottom: 12px; }
+.panelTitle { font-size: 15px; font-weight: 600; }
+.panelHint { font-size: 12px; color: var(--text-tertiary); }
+
+.row {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 7px 8px;
+  border-radius: var(--radius-s);
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.row:hover { background: var(--surface-hover); }
+.rowMain { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rowMeta { flex: none; font-size: 12px; color: var(--text-tertiary); font-variant-numeric: tabular-nums; }
+
+.big {
+  font-size: 34px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+
+.bigRisk { color: var(--accent-risk); }
+.bigOk { color: var(--accent-verified); }
+
+.stats { display: flex; gap: 32px; flex-wrap: wrap; }
+.stat { display: flex; flex-direction: column; gap: 4px; }
+.statLabel { font-size: 12px; color: var(--text-tertiary); }
+
+.empty { color: var(--text-tertiary); font-size: 13px; line-height: 1.6; }

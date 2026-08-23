@@ -15,6 +15,7 @@ import {
   VerifyIcon,
   MyRecordIcon,
   AcademyIcon,
+  DeskIcon,
 } from "./icons";
 
 /*
@@ -25,6 +26,7 @@ import {
   jargon; "Debriefs / short interviews" is not.
 */
 const NAV = [
+  { to: "/desk", label: "Desk", hint: "what needs you today", Icon: DeskIcon },
   { to: "/", label: "The record", hint: "every decision, locked", Icon: LedgerIcon },
   { to: "/strategies", label: "Strategies", hint: "how the thinking developed", Icon: StrategyIcon },
   { to: "/risk", label: "Knowledge risk", hint: "who holds a book alone", Icon: RiskIcon },

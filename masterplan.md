@@ -1100,15 +1100,21 @@ not authored.
 The corpus already carries desk_head, researcher and compliance. Role orders the surface, it
 does not gate access, which would fight the My Record transparency principle.
 
-- [ ] desk_head opens on the book: exposure, who holds what, approvals.
-- [ ] researcher opens on their work: open questions, recent captures, lineage.
-- [ ] compliance opens on the record: chain state, unapproved model drafts, unattributed work.
-- [ ] A new joiner opens on Academy, which is what ties problem 2 into daily use.
+- [x] desk_head opens on the book: exposure, who holds what, approvals.
+- [x] researcher opens on their work: open questions, recent captures, lineage.
+- [x] compliance opens on the record: chain state, unapproved model drafts, unattributed work.
+- [x] A new joiner opens on Academy, which is what ties problem 2 into daily use.
 
 **Acceptance:** different roles produce materially different front pages over the same
 ledger, and no surface is access gated by role.
 
-- **Sprint log:** (planned)
+- **Sprint log:** Logged: 2026-08-23T14:57:35+10:00 · status: done · actual: 0.6h (budget 2.5h) · by: claude-opus-5 · note: verified by switching roles in a browser: four genuinely distinct front pages over one ledger, zero console errors. Desk head opens on what is waiting and what would be lost, researcher on what nobody has answered, compliance on the chain and on what a model wrote unread, and somebody new on the curriculum.
+
+**The rule, recorded because it is easy to erode.** Role ORDERS the surface, it never gates
+it. Gating would contradict the transparency principle, and it would be theatre anyway since
+the data is in the browser either way. A test asserts every section is reachable by some role,
+so a future "permission" has to break a test rather than slip in. Until auth lands the choice
+is local and per browser, which the code says plainly: a view selector, not an identity claim.
 
 ---
 

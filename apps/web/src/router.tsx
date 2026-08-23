@@ -25,6 +25,7 @@ import { ArtifactDetail } from "./routes/detail/ArtifactDetail";
 import { DebriefDetail } from "./routes/detail/DebriefDetail";
 import { QuestionDetail } from "./routes/detail/QuestionDetail";
 import { AcademyPage } from "./academy/AcademyPage";
+import { DeskPage } from "./desk/DeskPage";
 import { isDesktop } from "./lib/shell";
 
 /*
@@ -97,6 +98,7 @@ const quickCaptureRoute = createRoute({ getParentRoute: () => rootRoute, path: "
   Singular paths beside the existing plurals on purpose: /strategy/$id sits next to
   /strategies, and the distinct first segment keeps the two from ever being ambiguous.
 */
+const deskRoute = createRoute({ getParentRoute: () => rootRoute, path: "/desk", component: DeskPage });
 const academyRoute = createRoute({ getParentRoute: () => rootRoute, path: "/academy", component: AcademyPage });
 const decisionRoute = createRoute({ getParentRoute: () => rootRoute, path: "/decision/$id", component: DecisionDetail });
 const strategyRoute = createRoute({ getParentRoute: () => rootRoute, path: "/strategy/$id", component: StrategyDetail });
@@ -114,6 +116,7 @@ const routeTree = rootRoute.addChildren([
   verifyRoute,
   myRecordRoute,
   quickCaptureRoute,
+  deskRoute,
   academyRoute,
   decisionRoute,
   strategyRoute,
