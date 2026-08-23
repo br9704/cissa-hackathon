@@ -1,6 +1,7 @@
 import { motion, useReducedMotion } from "motion/react";
 import styles from "./LedgerRow.module.css";
 import { StatusChip } from "./StatusChip";
+import { Link } from "@tanstack/react-router";
 import { ago, memberInitials, memberName, strategyName, TYPE_LABEL, type LedgerEntry } from "../data/source";
 
 export function LedgerRow({
@@ -17,8 +18,16 @@ export function LedgerRow({
 
   return (
     <div className={styles.wrap}>
-      <button
-        type="button"
+      {/*
+        A row is a link, not a button.
+
+        It was a button calling onSelect, and on the ledger page nothing was listening, so
+        every one of 184 rows was a dead end. As a real anchor it also gets middle click,
+        open in new tab, and a status bar preview for free, which a click handler never does.
+      */}
+      <Link
+        to="/decision/$id"
+        params={{ id: entry.id }}
         className={styles.row}
         onClick={() => onSelect?.(entry)}
         aria-label={`${entry.title}, ${strategyName(entry.strategyId)}, by ${memberName(entry.actorMemberId)}`}
@@ -45,7 +54,7 @@ export function LedgerRow({
         <span className={styles.author} title={memberName(entry.actorMemberId)}>
           {memberInitials(entry.actorMemberId)}
         </span>
-      </button>
+      </Link>
 
       {fresh && !entry.draft ? (
         <motion.span

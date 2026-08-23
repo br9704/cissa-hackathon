@@ -893,18 +893,18 @@ about what each alone holds; the access log records the switch.
 
 The drill down. This is the "nothing is clickable" fix.
 
-- [ ] /decision/$id, /strategy/$id, /person/$id, /artifact/$id, /debrief/$id, /question/$id.
+- [x] /decision/$id, /strategy/$id, /person/$id, /artifact/$id, /debrief/$id, /question/$id.
       All six derived synchronously from the memoised corpus, so defaultPreload intent stays
       free across a much denser link graph.
-- [ ] PersonLink, StrategyLink, DecisionLink, ArtifactLink with a LITERAL to plus params,
+- [x] PersonLink, StrategyLink, DecisionLink, ArtifactLink with a LITERAL to plus params,
       never a computed string, or the route literal types that make a rename a compile error
       are lost exactly when the app finally has links worth checking.
-- [ ] Retrofit every existing surface to use them.
+- [x] Retrofit every existing surface to use them.
 
 **Acceptance:** pnpm typecheck clean; every corpus id resolves; an unknown id renders a not
 found state; the six hop click path has no dead ends and back unwinds all six.
 
-- **Sprint log:** (planned)
+- **Sprint log:** Logged: 2026-08-23T14:11:03+10:00 · status: done · actual: 1.2h (budget 4h) · by: claude-opus-5 · note: verified by walking the click path in a browser. Eight hops green with no console errors: ledger row to decision, to author, to a book, to a decision, to a source artifact, back to a citing decision, six steps of history unwind to root, and an unknown id renders a named not found rather than a blank page.
 
 ---
 

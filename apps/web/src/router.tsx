@@ -16,6 +16,12 @@ import { RiskPage } from "./routes/RiskPage";
 import { DebriefsPage } from "./routes/DebriefsPage";
 import { CompliancePage } from "./routes/CompliancePage";
 import { VerifyPage } from "./routes/VerifyPage";
+import { DecisionDetail } from "./routes/detail/DecisionDetail";
+import { StrategyDetail } from "./routes/detail/StrategyDetail";
+import { PersonDetail } from "./routes/detail/PersonDetail";
+import { ArtifactDetail } from "./routes/detail/ArtifactDetail";
+import { DebriefDetail } from "./routes/detail/DebriefDetail";
+import { QuestionDetail } from "./routes/detail/QuestionDetail";
 import { isDesktop } from "./lib/shell";
 
 /*
@@ -47,6 +53,24 @@ const verifyRoute = createRoute({ getParentRoute: () => rootRoute, path: "/verif
 const myRecordRoute = createRoute({ getParentRoute: () => rootRoute, path: "/my-record", component: MyRecordPage });
 const quickCaptureRoute = createRoute({ getParentRoute: () => rootRoute, path: "/quick-capture", component: QuickCapture });
 
+/*
+  The detail routes: the drill down.
+
+  Written out one by one for the same reason as the routes above, and it matters more here.
+  Each of these widens the router's path union globally, so a Link carrying a computed string
+  becomes a compile error rather than a dead link somebody finds during a demo. That is worth
+  the repetition.
+
+  Singular paths beside the existing plurals on purpose: /strategy/$id sits next to
+  /strategies, and the distinct first segment keeps the two from ever being ambiguous.
+*/
+const decisionRoute = createRoute({ getParentRoute: () => rootRoute, path: "/decision/$id", component: DecisionDetail });
+const strategyRoute = createRoute({ getParentRoute: () => rootRoute, path: "/strategy/$id", component: StrategyDetail });
+const personRoute = createRoute({ getParentRoute: () => rootRoute, path: "/person/$id", component: PersonDetail });
+const artifactRoute = createRoute({ getParentRoute: () => rootRoute, path: "/artifact/$id", component: ArtifactDetail });
+const debriefRoute = createRoute({ getParentRoute: () => rootRoute, path: "/debrief/$id", component: DebriefDetail });
+const questionRoute = createRoute({ getParentRoute: () => rootRoute, path: "/question/$id", component: QuestionDetail });
+
 const routeTree = rootRoute.addChildren([
   ledgerRoute,
   strategiesRoute,
@@ -56,6 +80,12 @@ const routeTree = rootRoute.addChildren([
   verifyRoute,
   myRecordRoute,
   quickCaptureRoute,
+  decisionRoute,
+  strategyRoute,
+  personRoute,
+  artifactRoute,
+  debriefRoute,
+  questionRoute,
 ]);
 
 /*

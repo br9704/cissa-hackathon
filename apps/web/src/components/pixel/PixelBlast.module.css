@@ -1,0 +1,54 @@
+/*
+  A dither of pixels in the far corner of the field.
+
+  Purpose, so it does not creep: this is the only decorative element in the product, it lives
+  behind everything at low opacity, and it exists to stop a large black page reading as an
+  empty void. It is the same cell size as the icon grid, so the texture belongs to the same
+  system rather than looking like a stock background.
+
+  Pure CSS, no canvas and no WebGL. A shader for a corner texture costs a GPU context, a
+  fallback path and a teardown, and this is a two line gradient that cannot fail.
+*/
+.blast {
+  position: fixed;
+  pointer-events: none;
+  z-index: 0;
+  width: 42vw;
+  height: 42vh;
+  max-width: 620px;
+  max-height: 520px;
+  opacity: 0.5;
+  /* Cells on a 6px grid, faded out along both axes so it dissolves rather than ending. */
+  background-image: radial-gradient(var(--border-medium) 1px, transparent 1.2px);
+  background-size: 6px 6px;
+  mask-image: radial-gradient(ellipse at var(--blast-origin, 100% 0%), black 0%, transparent 72%);
+  -webkit-mask-image: radial-gradient(ellipse at var(--blast-origin, 100% 0%), black 0%, transparent 72%);
+}
+
+.topRight {
+  top: 0;
+  right: 0;
+  --blast-origin: 100% 0%;
+}
+
+.bottomLeft {
+  bottom: 0;
+  left: 0;
+  --blast-origin: 0% 100%;
+}
+
+/*
+  Under reduced transparency the texture is the first thing to go: it is decoration, and the
+  setting is a request for less of exactly this.
+*/
+@media (prefers-reduced-transparency: reduce) {
+  .blast {
+    display: none;
+  }
+}
+
+@media (max-width: 900px) {
+  .blast {
+    display: none;
+  }
+}

@@ -1,0 +1,187 @@
+/*
+  One layout for all six detail routes.
+
+  They show different entities and the shape of the page is the same every time: a back
+  link, a title, a row of facts, then sections. Six bespoke layouts would drift apart within
+  a week and give a reader six things to learn instead of one.
+*/
+.page {
+  max-width: var(--container);
+  margin: 0 auto;
+  padding: 24px var(--gutter) 96px;
+}
+
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-tertiary);
+  text-decoration: none;
+  margin-bottom: 18px;
+}
+
+.back:hover {
+  color: var(--text);
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+  margin-bottom: 8px;
+}
+
+.title {
+  font-size: 30px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  color: var(--text);
+  margin: 0 0 12px;
+  max-width: 22ch;
+}
+
+.titleWide {
+  max-width: 34ch;
+}
+
+.lede {
+  color: var(--text-secondary);
+  max-width: var(--container-prose);
+  margin: 0 0 20px;
+  line-height: 1.6;
+}
+
+.facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  padding: 14px 0 20px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 24px;
+  font-size: 13px;
+  color: var(--text-tertiary);
+}
+
+.fact {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.factValue {
+  color: var(--text-secondary);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  gap: 28px;
+  align-items: start;
+}
+
+@media (max-width: 980px) {
+  .grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-l);
+  box-shadow: var(--shadow-pane);
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.sectionHead {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.sectionTitle {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.sectionHint {
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+
+.body {
+  color: var(--text-secondary);
+  line-height: 1.65;
+  white-space: pre-wrap;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.row {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 7px 8px;
+  border-radius: var(--radius-s);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.row:hover {
+  background: var(--surface-hover);
+}
+
+.rowMain {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rowMeta {
+  flex: none;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-tertiary);
+  font-size: 12px;
+}
+
+.alt {
+  color: var(--text-secondary);
+  line-height: 1.6;
+  padding: 6px 0 6px 14px;
+  border-left: 2px solid var(--border-medium);
+  margin-bottom: 8px;
+}
+
+.hash {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-tertiary);
+  word-break: break-all;
+  line-height: 1.6;
+}
+
+.empty {
+  color: var(--text-tertiary);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.notFound {
+  padding: 64px 0;
+  text-align: center;
+  color: var(--text-secondary);
+}

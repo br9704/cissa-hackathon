@@ -1,0 +1,54 @@
+/*
+  Four states, and only one of them moves.
+
+  Motion here means "a request is in flight" and nothing else. An idle face that blinks is
+  decoration, and decoration next to a provenance label is how a reader stops trusting the
+  label.
+*/
+.wrap {
+  display: inline-flex;
+  align-items: center;
+  flex: none;
+  color: var(--accent);
+}
+
+.wrap[data-state="idle"] {
+  color: var(--text-tertiary);
+}
+
+.wrap[data-state="spoke"] {
+  color: var(--accent);
+}
+
+.wrap[data-state="offline"] {
+  color: var(--text-chrome);
+}
+
+.eyes {
+  fill: var(--bg);
+}
+
+.wrap[data-state="thinking"] .eyes {
+  animation: scan var(--dur-slow) steps(3, end) infinite alternate;
+}
+
+/*
+  steps() rather than a smooth translate, because a pixel face that slides between cells is
+  no longer a pixel face. Three steps across one cell of travel.
+*/
+@keyframes scan {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(1px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wrap[data-state="thinking"] .eyes {
+    animation: none;
+    /* The terminal state, not a frozen mid frame: eyes centred and still. */
+    transform: none;
+  }
+}

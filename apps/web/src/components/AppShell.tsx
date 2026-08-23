@@ -4,6 +4,7 @@ import styles from "./AppShell.module.css";
 import { AskBar } from "./AskBar";
 import { CaptureSheet } from "./CaptureSheet";
 import { PixelMark } from "./pixel/PixelMark";
+import { PixelBlast } from "./pixel/PixelBlast";
 import { LivenessStrip } from "./LivenessStrip";
 import {
   LedgerIcon,
@@ -84,6 +85,7 @@ export function AppShell() {
 
   return (
     <div className={styles.shell}>
+      <PixelBlast />
       <div className={styles.railColumn}>
         <nav className={styles.rail} aria-label="Sections">
           <div className={styles.wordmark}>

@@ -5,6 +5,7 @@ import { StatusChip } from "./StatusChip";
 import { memberName, strategyName, TYPE_LABEL } from "../data/source";
 import type { Decision } from "@continuity/core";
 import { bareKeyAllowed } from "../lib/hotkeys";
+import { PixelAgent } from "./pixel/PixelAgent";
 
 /*
   The approve step is the feature, not a workaround.
@@ -105,7 +106,15 @@ export function DecisionCard({
       <div className={styles.head}>
         <span className={styles.title}>{decision.title}</span>
         <span className={styles.chips}>
-          <StatusChip variant="draft">Drafted by model</StatusChip>
+          {/*
+            The face sits beside the words rather than replacing them. "Drafted by model" is
+            the claim; the face is what stops a reader skimming past it. Both, because a
+            provenance label that only a careful reader notices is not doing its job.
+          */}
+          <StatusChip variant="draft">
+            <PixelAgent state="spoke" size={12} label="A model wrote this" />
+            Drafted by model
+          </StatusChip>
           {decision.riskFlag ? <StatusChip variant="risk">Risk</StatusChip> : null}
           <StatusChip>
             {TYPE_LABEL[decision.decisionType] ?? decision.decisionType}
