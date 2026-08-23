@@ -63,5 +63,27 @@
   "arms_omitted": [
     "B",
     "C"
-  ]
+  ],
+  "runs": {
+    "run_1": {
+      "refusal_share_of_training": 0.066,
+      "fact_accuracy": 0.25,
+      "refusal_accuracy": 0.0,
+      "note": "Kept at firm_model_summary_run1.json. Facts worked and refusals collapsed to zero."
+    },
+    "run_2": {
+      "refusal_share_of_training": 0.201,
+      "fact_accuracy": 0.2222,
+      "refusal_accuracy": 0.4167,
+      "note": "This file. Refusals recovered at almost no cost to facts."
+    },
+    "finding": "The share of refusals in the TRAINING data controls refusal behaviour almost directly, and trades against fact accuracy very little. Going from 6.6 percent to 20.1 percent moved refusal accuracy from 0.0 to 0.42 while fact accuracy moved from 0.25 to 0.22, which is inside the noise of a 36 item probe."
+  },
+  "honest_reading": {
+    "headline": "The untuned base scores 0 of 36 on facts about this firm. The tuned model scores 8. That gap is the point: the knowledge is in the weights, and it answers with the corpus offline and no network.",
+    "the_caveat_that_matters": "Refusal accuracy is 0.42, which is not good. The model still invents an answer more often than it declines when asked about something the ledger does not hold. It is a large improvement on run 1 and it is not yet good enough to put in front of somebody without a person checking the answer.",
+    "do_not_quote_alone": "The base model scores 12 of 12 on refusals by refusing EVERYTHING, and 0 on facts for the same reason. Refusal accuracy is meaningless without the fact score beside it.",
+    "probe_size": "36 fact items and 12 refusal items. Small, so treat single item differences as noise.",
+    "arms_not_run": "Gemini with and without the ledger were not measured: the free tier quota was exhausted. They are recorded as omitted rather than reported as zero."
+  }
 }

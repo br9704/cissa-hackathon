@@ -777,25 +777,25 @@ corpus offline. A second adapter, separate from the tagger, which it must not ov
       both split BEFORE training.
 - [x] Train per docs/scoping.md section D: Qwen3.5-2B-MLX-bf16 with a pinned revision SHA,
       mlx_lm.lora, mask-prompt, r=16 bf16, 800 to 1200 iters.
-- [~] Four way eval harness written and the model loads once per arm. Run is the next action. BLOCKED on nothing. on the same 50 questions at temperature 0 with strict scoring: untuned
+- [~] Two of four arms run: untuned base and tuned adapter. Gemini with and without the ledger were NOT run because the free tier quota is exhausted, and the summary records them as omitted rather than reporting a zero nobody measured. BLOCKED on the quota resetting or billing being enabled, which is filed in MANUAL TASKS. on the same 50 questions at temperature 0 with strict scoring: untuned
       base, Gemini with no ledger, Gemini plus retrieval, and the tuned adapter with the
       corpus offline. Row two is the argument: a frontier model also scores near zero
       because these facts are proprietary. Row three is included deliberately even though it
       will score well, because omitting the comparison a sharp judge would ask for is
       dishonest. The claim is not that tuning beats retrieval on accuracy, it is that the
       tuned model answers with the corpus offline and the network down.
-- [ ] Refusal accuracy for all four on the cannot-answer set.
-- [ ] ml/results/firm_model_summary.json with base SHA, adapter sha256, data hashes, iters
+- [x] Refusal accuracy for the two arms run on the cannot-answer set.
+- [x] ml/results/firm_model_summary.json with base SHA, adapter sha256, data hashes, iters
       and wall clock.
-- [ ] mlx_lm.server serving the adapter; the app uses it when the health check answers and
+- [x] mlx_lm.server serving the adapter; the app uses it when the health check answers and
       otherwise falls back to retrieval unchanged.
-- [ ] Generated claims grounded by the existing retrieval. A claim retrieval cannot ground
+- [~] Grounding generated claims against retrieval is carried to the sprint that rebuilds the ask palette, which owns that surface. Not blocked. by the existing retrieval. A claim retrieval cannot ground
       renders struck through with "not found in the record". The model never outranks the
       ledger.
-- [ ] model_trained event appended through the normal event path carrying base SHA, adapter
+- [~] The model_trained ledger anchor is carried. It is one insert plus one row style and it is the best single detail in the ML story, so it should not be rushed at the end of a long session. Not blocked. appended through the normal event path carrying base SHA, adapter
       hash, data hash and both eval scores, so the model's own existence is hash chained.
       Surfaced with a model chip in the ledger and on Verify.
-- [ ] Wifi off toggle in the ask palette footer.
+- [~] The wifi off toggle is carried with the palette rebuild, since that is the surface it lives in. Not blocked. in the ask palette footer.
 
 **Fallback ladder, log which rung shipped:** 1 full, 2 trained but serving pending and only
 if that is literally true, 3 training failed and nothing is claimed.
@@ -804,7 +804,7 @@ if that is literally true, 3 training failed and nothing is claimed.
 in the chain; three held out questions answer correctly live and one cannot-answer question
 is refused.
 
-- **Sprint log:** (open, training complete)
+- **Sprint log:** Logged: 2026-08-23T15:17:38+10:00 · status: partial · actual: 3.1h (budget 4h) · by: claude-opus-5 · note: FALLBACK RUNG 1 with a caveat. The model is trained, serving locally, and measured: 0 of 36 on facts untuned against 8 of 36 tuned, with the citation inside the generated sentence. Refusal accuracy is 0.42, which is a large recovery from run 1's zero and is NOT good enough to put in front of somebody without a person checking. Two eval arms are unmeasured on quota. The ledger anchor, the grounded generation and the wifi off beat are carried to the palette sprint that owns that surface.
 
 **Progress and decisions, recorded as they were made rather than at the close:**
 
@@ -1493,12 +1493,16 @@ Nothing at or below S25 is cuttable. That tier is what answers the actual compla
 
 ## CURRENT SPRINT
 
-**Current sprint:** S14
+**Current sprint:** S21
 
-S12 and S13 are closed, so the P0 and P1 gate that ENGINEERPROMPT2 sets on Mission 2 is
-satisfied. S14 is the Firm Model, and its training run is already going against
-ml/configs/lora_firm.yaml on a separate adapter path. The front end sprints from S15 proceed
-while it trains, which is the whole reason the run was started first.
+S14 is measured and logged at rung 1 with a stated caveat. S15, S16, S17, S18, S19, S20,
+S23, S24, S25, S26, S27 and S29 are delivered. The deadline was missed on 23 August and the
+owner has moved this to a public portfolio project, so the remaining work is judged by whether
+it makes the repository worth reading rather than by what demos well.
+
+S21 is next: the command palette rebuild, which owns three pieces carried out of S14, namely
+grounding generated claims against retrieval, the model_trained ledger anchor, and the wifi
+off beat.
 
 ---
 

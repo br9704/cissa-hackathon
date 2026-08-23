@@ -462,6 +462,59 @@ Several of these earned their place by failing first. A few worth naming:
 
 ---
 
+## The firm model
+
+The ledger, fine tuned into a small model that runs on the machine. The claim is narrow and
+worth stating precisely: **the knowledge ends up in the weights, so it answers with the
+corpus offline and no network.**
+
+| | facts, 36 items | refusals, 12 items |
+|---|---|---|
+| Untuned base (Qwen3.5 2B) | 0 | 12 |
+| Fine tuned on this ledger | 8 | 5 |
+
+Read both columns together, because either one alone is misleading.
+
+The base model scores **zero** on facts about this desk, which is the point: these records
+exist nowhere in public training data. It scores a perfect 12 on refusals by refusing
+everything, which is why refusal accuracy must never be quoted on its own.
+
+The tuned model answers a quarter of the fact probe from weights alone, with the citation
+inside the generated sentence. Its refusal accuracy is **0.42, which is not good enough**. It
+still invents an answer more often than it declines when asked about something the ledger
+does not hold, and that is a real limitation rather than a rough edge.
+
+### The run that failed, and why it is still in the repository
+
+The first training run scored 9 of 36 on facts and **0 of 12 on refusals**. The tuning worked
+and the model still failed: it learned the ledger and it also learned that declining is never
+the answer.
+
+The cause was data design, not training. That run authored 33 refusals against 686 answerable
+pairs, and the expansion step made it worse, because facts had cached paraphrases and refusals
+did not, so what actually reached training was 6.6 percent. The model learned the dominant
+pattern and learned it well.
+
+Rebalancing to 20.1 percent moved refusal accuracy from 0.0 to 0.42 while fact accuracy moved
+from 0.25 to 0.22, which is inside the noise of a 36 item probe. **The share of refusals in
+the training data controls refusal behaviour almost directly and costs very little accuracy.**
+
+Run 1 is kept at `ml/results/firm_model_summary_run1.json`. A negative result that gets
+deleted teaches nobody anything.
+
+### What is not measured
+
+Two planned comparison arms, Gemini with the ledger and Gemini without it, were not run: the
+free tier quota was exhausted. They are recorded as omitted rather than reported as zero. The
+stronger version of this table has a frontier model in the second row also scoring near zero,
+because that is what proves the knowledge is genuinely proprietary rather than merely absent
+from a small model.
+
+Every number above comes from `ml/results/firm_model_summary.json`, and the scoring method
+travels with it in that file.
+
+---
+
 ## Honest limitations
 
 - **All data is synthetic.** The firm, the people, the strategies, the decisions and the
