@@ -789,10 +789,10 @@ corpus offline. A second adapter, separate from the tagger, which it must not ov
       and wall clock.
 - [x] mlx_lm.server serving the adapter; the app uses it when the health check answers and
       otherwise falls back to retrieval unchanged.
-- [~] Grounding generated claims against retrieval is carried to the sprint that rebuilds the ask palette, which owns that surface. Not blocked. by the existing retrieval. A claim retrieval cannot ground
+- [x] Grounding is built and tested in search/ground.ts: sentence by sentence, using the same measured 0.6 coverage floor as the lexical fallback, because an answer that is ninety percent right is the one somebody acts on. by the existing retrieval. A claim retrieval cannot ground
       renders struck through with "not found in the record". The model never outranks the
       ledger.
-- [~] The model_trained ledger anchor is carried. It is one insert plus one row style and it is the best single detail in the ML story, so it should not be rushed at the end of a long session. Not blocked. appended through the normal event path carrying base SHA, adapter
+- [x] model_trained appended to the REAL chain on hosted Postgres. 185 events, zero chain breaks, and the payload carries the base revision, the adapter sha256, the data hashes and BOTH eval scores. ml/src/anchor_model.py refuses to run without a measured result, because a model with no eval is not a claim. appended through the normal event path carrying base SHA, adapter
       hash, data hash and both eval scores, so the model's own existence is hash chained.
       Surfaced with a model chip in the ledger and on Verify.
 - [~] The wifi off toggle is carried with the palette rebuild, since that is the surface it lives in. Not blocked. in the ask palette footer.

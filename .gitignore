@@ -66,3 +66,4 @@ apps/desktop/src-tauri/target/
 target/
 !.env.example
 .continuity-inbox.jsonl
+.continuity-model-events.jsonl
