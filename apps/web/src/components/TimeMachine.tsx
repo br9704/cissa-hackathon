@@ -156,7 +156,7 @@ export function TimeMachine({
             <span className={`${styles.countValue} ${riskCount ? styles.countRisk : ""}`}>
               {riskCount}
             </span>{" "}
-            with nobody left to explain them
+            recorded by somebody who has left
           </span>
         </span>
       </div>
@@ -172,8 +172,8 @@ export function TimeMachine({
             {riskCount > 0 ? (
               <>
                 {" "}
-                and <span className={styles.captionRisk}>{riskCount}</span> of them now have
-                nobody left who can explain them.
+                and <span className={styles.captionRisk}>{riskCount}</span> of them were
+                recorded by somebody who has since left.
               </>
             ) : (
               <>, and every one of them has somebody left who can explain it.</>

@@ -14,6 +14,7 @@ import {
   ComplianceIcon,
   VerifyIcon,
   MyRecordIcon,
+  AcademyIcon,
 } from "./icons";
 
 /*
@@ -35,6 +36,12 @@ const NAV = [
     (D13, let the captured see the ledger) was invisible to anyone who did not think to
     click their own initials. A promise nobody can find is not a promise.
   */
+  {
+    to: "/academy",
+    label: "Academy",
+    hint: "learn the desk from its own record",
+    Icon: AcademyIcon,
+  },
   { to: "/my-record", label: "My record", hint: "what we hold about you", Icon: MyRecordIcon },
 ] as const;
 

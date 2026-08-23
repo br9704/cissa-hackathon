@@ -1137,16 +1137,23 @@ would quietly turn the product from evidence into a log.
 
 Problem 2, built from the corpus.
 
-- [ ] Curriculum modules generated from the corpus, ordered by dependency using the existing
+- [x] Curriculum modules generated from the corpus, ordered by dependency using the existing
       genealogy links.
-- [ ] The syllabus is the open questions plus the highest concentration decisions, so
+- [x] The syllabus is the open questions plus the highest concentration decisions, so
       training targets exactly what the firm is most exposed on.
-- [ ] Assessment: ask a trainee a corpus question, compare against what the desk recorded,
+- [x] Assessment: ask a trainee a corpus question, compare against what the desk recorded,
       using the same grounded extractive retrieval as ask the departed.
-- [ ] State named coverage and gaps. design-audit rule 6 scans identifiers, so memberScore
+- [x] State named coverage and gaps. design-audit rule 6 scans identifiers, so memberScore
       fails, and it should: no member is ever scored or ranked.
 
-- **Sprint log:** (planned)
+- **Sprint log:** Logged: 2026-08-23T14:47:31+10:00 · status: done · actual: 1.1h (budget 3h) · by: claude-opus-5 · note: nothing on this surface is authored. Modules are books, lessons are recorded decisions, the order is topological over the genealogy so a change never appears before the thing it replaced, and the syllabus is the set of unanswered questions. 7 assertions including that a cycle in the links loses no lesson, which a naive walk would hang on.
+
+**A consistency bug worth recording.** Academy counts a lesson as unexplained only when EVERY
+author of that book has gone; the replay counted a decision at risk when ITS author had gone.
+Both are legitimate measures and both were labelled "nobody left to explain them", which is
+how one product ends up quoting two different numbers for the same sentence. The replay now
+says "recorded by somebody who has left", which is what it actually computes, and Academy
+says which measure it is using and why its number is smaller.
 
 ---
 
