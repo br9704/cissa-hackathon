@@ -35,6 +35,8 @@ export const MyRecordIcon = icon("person");
 export const CaptureIcon = icon("inbox");
 /* The daily surface. A person, because the desk is arranged around who is looking. */
 export const DeskIcon = icon("people");
+/* The architecture. A datastore, because the spine is the thing worth drawing. */
+export const SystemIcon = icon("database");
 export const RecordMeetingIcon = icon("mic");
 export const ImportIcon = icon("upload");
 export const NoteIcon = icon("note");

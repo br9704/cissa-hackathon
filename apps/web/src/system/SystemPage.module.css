@@ -1,0 +1,81 @@
+/*
+  The system, drawn.
+
+  A diagram of your own architecture is usually a slide, which means it is out of date the
+  week after it is made. This one reads its own status: every box that CAN be checked is
+  checked, live, so the picture is either true or visibly says which part is not running.
+*/
+.page { max-width: var(--container); margin: 0 auto; padding: 24px var(--gutter) 96px; }
+.lede { color: var(--text-secondary); max-width: var(--container-prose); line-height: 1.65; margin: 0 0 28px; }
+
+.flow { display: flex; flex-direction: column; gap: 0; }
+
+.layer {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-l);
+  background: var(--surface);
+  box-shadow: var(--shadow-pane);
+  padding: 18px;
+}
+
+.layerSpine {
+  border-color: var(--border-strong);
+  background: var(--surface-hover);
+}
+
+.layerHead { display: flex; align-items: baseline; gap: 10px; margin-bottom: 4px; flex-wrap: wrap; }
+.layerName { font-size: 15px; font-weight: 600; }
+.layerWhat { font-size: 12px; color: var(--text-tertiary); }
+.layerNote { font-size: 13px; color: var(--text-secondary); line-height: 1.55; margin: 6px 0 14px; max-width: 78ch; }
+
+.nodes { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 10px; }
+
+.node {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-m);
+  background: var(--surface-recessed);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.nodeHead { display: flex; align-items: center; gap: 8px; }
+.nodeName { font-size: 13px; font-weight: 500; }
+.nodeWhat { font-size: 12px; color: var(--text-tertiary); line-height: 1.5; }
+
+.dot { width: 6px; height: 6px; border-radius: var(--radius-s); flex: none; background: var(--text-chrome); }
+.dot[data-state="up"] { background: var(--accent-verified); }
+.dot[data-state="down"] { background: var(--text-chrome); }
+.dot[data-state="checking"] { background: var(--accent); }
+
+.state { font-size: 11px; font-family: var(--font-mono); color: var(--text-chrome); margin-left: auto; }
+
+/*
+  The arrow between layers. A plain glyph rather than an SVG path: the layers are stacked in
+  one column, so the connection is unambiguous and a routed line would be decoration.
+*/
+.arrow {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-chrome);
+  font-size: 12px;
+  padding: 10px 0;
+}
+
+.arrowLine { width: 1px; height: 18px; background: var(--border-medium); }
+
+.legend {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+  font-size: 12px;
+  color: var(--text-tertiary);
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.legendItem { display: inline-flex; align-items: center; gap: 7px; }

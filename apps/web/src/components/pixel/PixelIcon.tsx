@@ -38,7 +38,8 @@ export type GlyphName =
   | "rewind"
   | "link"
   | "book"
-  | "spark";
+  | "spark"
+  | "database";
 
 const GLYPHS: Record<GlyphName, string[]> = {
   /* The ledger: a bound record, ruled. */
@@ -329,6 +330,21 @@ const GLYPHS: Record<GlyphName, string[]> = {
     ".###.......#",
     "..##########",
     "............",
+  ],
+  /* The spine. Stacked platters, which is the one shape everybody reads as a datastore. */
+  database: [
+    "..########..",
+    ".##########.",
+    "############",
+    ".##########.",
+    "..########..",
+    "..#......#..",
+    "..########..",
+    ".##########.",
+    "..########..",
+    "..#......#..",
+    "..########..",
+    "..########..",
   ],
   spark: [
     ".....##.....",

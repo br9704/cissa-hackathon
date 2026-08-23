@@ -17,6 +17,7 @@ import {
   AcademyIcon,
   DeskIcon,
   CaptureIcon,
+  SystemIcon,
 } from "./icons";
 
 /*
@@ -46,6 +47,7 @@ const NAV = [
     hint: "learn the desk from its own record",
     Icon: AcademyIcon,
   },
+  { to: "/system", label: "The system", hint: "what this is, checked live", Icon: SystemIcon },
   { to: "/my-record", label: "My record", hint: "what we hold about you", Icon: MyRecordIcon },
 ] as const;
 
