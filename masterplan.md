@@ -920,16 +920,27 @@ change to survive, that is a token bug: fix the token.
 
 ## S16 - Elevation, layering and the signature motions (budget 3h)
 
-- [ ] Blur as depth becomes shadow plus blur, per the design law above.
-- [ ] Amend design-audit NAV_LAYER by name, one entry at a time, never to a catch all.
-- [ ] Fix the unconditional body background so the transparent desktop panel still floats.
-- [ ] Absorbs critique P2: capture to ledger flight on approve, verify scanline sweep,
+- [x] Blur as depth becomes shadow plus blur, per the design law above.
+- [x] Amend design-audit NAV_LAYER by name, one entry at a time, never to a catch all.
+- [~] The transparent desktop panel is carried to the next desktop pass. The web shell is unaffected and the panel is still built from the light era CSS, so it needs a Tauri run to check rather than a guess. BLOCKED on nothing. so the transparent desktop panel still floats.
+- [x] Absorbs critique P2: capture to ledger flight on approve, verify scanline sweep,
       departure figure counting up. All behind reduced motion.
 
 **Acceptance:** guard:design green, no-blur kill switch works, quick capture window floats,
 approve visibly flies and verify visibly sweeps.
 
-- **Sprint log:** (planned)
+- **Sprint log:** Logged: 2026-08-23T15:02:11+10:00 · status: partial · actual: 0.4h (budget 3h) · by: claude-opus-5 · note: the exposure figure counts 0 to 362 and was verified doing it, reading 115 mid flight. The verify scanline already existed from S9 and needed nothing.
+
+**The approve flight was half built and therefore invisible.** DecisionCard carried a
+layoutId and nothing else shared it, so the card animated out and landed nowhere: a shared
+layout animation needs BOTH elements. The row that receives the approved draft now carries the
+matching id, so the record physically travels from the review card into the ledger. That is
+the one moment in this product worth animating, because it is the moment a draft becomes
+permanent.
+
+**One rule for CountUp:** it is used for exactly one number, the dollar figure a departure
+puts at risk. A product where every number counts up is a product where none of them mean
+anything.
 
 ---
 

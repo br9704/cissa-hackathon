@@ -7,17 +7,28 @@ import { ago, memberInitials, memberName, strategyName, TYPE_LABEL, type LedgerE
 export function LedgerRow({
   entry,
   fresh = false,
+  layoutId,
   onSelect,
 }: {
   entry: LedgerEntry;
   /* True only for a row that just landed, so the sweep plays once and never again. */
   fresh?: boolean;
+  /*
+    The other half of the capture to ledger flight.
+
+    DecisionCard carried a layoutId and nothing shared it, so the card animated out and
+    landed nowhere: a shared layout animation needs BOTH elements. With this the approved
+    draft physically travels from the review card into its row in the record, which is the
+    one moment in the product worth animating, because it is the moment the thing becomes
+    permanent.
+  */
+  layoutId?: string;
   onSelect?: (entry: LedgerEntry) => void;
 }) {
   const reduced = useReducedMotion();
 
   return (
-    <div className={styles.wrap}>
+    <motion.div className={styles.wrap} layoutId={layoutId}>
       {/*
         A row is a link, not a button.
 
@@ -65,6 +76,6 @@ export function LedgerRow({
           transition={{ duration: reduced ? 0.1 : 0.42, ease: [0.22, 1, 0.36, 1] }}
         />
       ) : null}
-    </div>
+    </motion.div>
   );
 }

@@ -4,6 +4,7 @@ import { motion, useReducedMotion } from "motion/react";
 import styles from "./RiskPage.module.css";
 import { PageHeader } from "../components/PageHeader";
 import { RiskDial } from "../components/RiskDial";
+import { CountUp } from "../components/CountUp";
 import { HeatStrip, type HeatRow } from "../components/HeatStrip";
 import { GenealogyGraph } from "../components/GenealogyGraph";
 import { StatusChip } from "../components/StatusChip";
@@ -185,7 +186,8 @@ export function RiskPage() {
           >
             <div className={styles.exposureFigure}>
               <span className={styles.exposureNumber}>
-                ${exposure.exposedUsdM.toLocaleString("en-US")}M
+                {/* The one number in this product that counts up. See CountUp. */}
+                $<CountUp value={exposure.exposedUsdM} />M
               </span>
               <span className={styles.exposureUnit}>
                 of attributed annual revenue, with no second author

@@ -55,6 +55,9 @@ export function LedgerRail({
                 key={entry.id}
                 entry={entry}
                 fresh={entry.id === freshId}
+                /* Matches the layoutId DecisionCard used, so the approved draft flies into
+                   its row rather than the card fading out into nothing. */
+                layoutId={entry.id === freshId ? `draft-${entry.id}` : undefined}
                 onSelect={onSelect}
               />
             ))}
