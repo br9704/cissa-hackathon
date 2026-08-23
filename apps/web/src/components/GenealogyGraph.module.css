@@ -84,3 +84,18 @@
   border: 1px solid var(--border-medium);
   background: var(--surface-recessed);
 }
+
+/*
+  Node labels.
+
+  Only a handful of nodes carry one, so the type can be small without becoming noise. It is
+  pointer-events none because the label must never intercept a click meant for its node: a
+  target that moves under the cursor is worse than no label.
+*/
+.nodeLabel {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  fill: var(--text-tertiary);
+  pointer-events: none;
+  user-select: none;
+}

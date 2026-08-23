@@ -251,3 +251,31 @@
   font-size: 13px;
   text-align: center;
 }
+
+/*
+  The capture affordance, in the chrome rather than at the bottom of a page.
+
+  This is the single highest value pixel in the product: a ledger is worth exactly what
+  people put into it, and the inputs were previously below 184 rows of output.
+*/
+.captureTrigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  border-radius: var(--radius-s);
+  padding: 6px 10px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color var(--dur-fast) var(--ease-out),
+    background-color var(--dur-fast) var(--ease-out);
+}
+
+.captureTrigger:hover {
+  border-color: var(--border-strong);
+  background: var(--surface-hover);
+}

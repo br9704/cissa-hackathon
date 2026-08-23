@@ -58,3 +58,11 @@ export const VerifyIcon = ({ size = 20 }: P) => (
     <path d="m7.4 9.9 1.9 1.9 3.4-3.9" />
   </svg>
 );
+
+/* My record. A person, and the sheet the system holds on them. */
+export const MyRecordIcon = ({ size = 20 }: P) => (
+  <svg {...base(size)}>
+    <circle cx="10" cy="6.6" r="2.9" />
+    <path d="M4.4 16.4a5.6 5.6 0 0 1 11.2 0" />
+  </svg>
+);

@@ -687,6 +687,501 @@ and find what the system holds about them, without scrolling past instructions.
 
 ---
 
+# STAGE 3: the rebuild, the firm model, and the two problems
+
+Source: ENGINEERPROMPT2.md, docs/critique.md, and the owner direction of 22 and 23 August.
+Written into this file because this file is the source of truth and a plan living anywhere
+else does not exist. Precedence is unchanged: masterplan > claude.md > prd/design.
+
+## The reframe: two problems, not one
+
+**Problem 1, already addressed.** Knowledge disappears when people leave. The intelligence
+layer captures what PMs, traders and analysts do: meetings, trades, model tweaks, reasoning.
+
+**Problem 2, not addressed at all until S29.** The transfer trend. When a PM leaves, the desk
+loses value immediately. The long play is that the proprietary corpus of how this firm's
+people think becomes the foundation of an institution inside the firm that trains the next
+generation, continuously updated from the people currently doing the work. That is the half
+that makes this a company rather than a tool.
+
+## What was actually wrong, measured
+
+- 8 routes, six of them the nav rail. The only navigate() calls in the whole codebase were
+  in the ask bar. Two Links, both in the shell. A ledger row, a graph node, a person, a
+  strategy, an artifact, a debrief and a decision were all dead ends.
+- Capture existed and was buried below 184 ledger rows.
+- No login, no signed in state beyond two letters.
+- The on-prem model was a stat panel rather than something visibly working.
+- The replay moved unlabelled dots with no caption, so nothing could be read from it.
+
+## Design law for Stage 3
+
+- **Black field.** Two radial gradients lit from the top left resolving to pure black.
+- **Depth is three cues, composed.** Inset white rim on the top edge, inset black shade on
+  the bottom edge, outward ambient shadow. Panels are dark tints, never white films: a white
+  film greys content out, a dark tint on a lit field composites as a raised plane. A nested
+  pane goes darker than its parent, never lighter.
+- **Most of the product is elevation 0.** Level 2 reads as "on top" only because level 0 is
+  flat. Three levels, one interactive step, no hand rolled shadow anywhere.
+- **Glass is real and deliberate.** Translucent panes with backdrop blur, at most two blurred
+  layers per view, floating overlays opaque. Blur makes a pane read as glass; the shadow
+  makes its edges legible. Both, doing different jobs.
+- **Borders:** one hue, five rungs of white alpha, one width at 0.5px.
+- **Radius:** three rungs plus the 999px pill literal. The fourth rung is how a system
+  becomes a collection of opinions.
+- **Colour is signal only.** Structure is white alpha. Amber stays knowledge risk (D5).
+- **Pixel idiom.** Glyphs authored as twelve rows of twelve characters, compiled to merged
+  horizontal runs, rendered with crispEdges and currentColor.
+- **Pages are instruments, not documents.** One loud thing per screen, asymmetric splits,
+  varied openers, prose behind a disclosure.
+
+## What survives the rebuild, and must not be rewritten
+
+record/ (recorder, ASR worker, mic worklet, diarisation), search/ (bm25, embeddings, hybrid
+retrieval), components/graphLayout.ts (its determinism is why screenshots reproduce),
+data/ (source, access, live, promote, supabase, tagger, anchors), packages/core entirely,
+api/, tools/claude-bridge, ml/, the Tauri shell.
+
+## Known traps, verified
+
+- tauri.conf.json pins index.html#/quick-capture, and that window is transparent with no
+  shadow. The boot screen and the auth guard must BOTH exempt it, and base.css sets
+  background on body unconditionally, which on black turns the floating panel into a solid
+  black rectangle.
+- The desktop CSP enumerates connect-src hosts. A new fetch host means the web build works
+  and the desktop build is blank.
+- readability.test.ts parses tokens.css directly: it reads four surface names, needs hex
+  stops in the field gradient, requires all four accents at 4.5:1, requires alpha based text
+  tiers so prefers-contrast can raise them, and asserts exactly three radius rungs.
+- shots.ts presses the bare "a" key, selects the replay by the aria label "Replay the ledger
+  over time", uses Meta+k and [role=dialog] input, and throws if focus lands on a hidden
+  element.
+
+---
+
+## S14 - The Firm Model (budget 4h, mostly unattended)
+
+The ledger becomes the weights. Today the ledger answers by retrieval; after this the firm
+has a model whose weights were trained on its own ledger, so the knowledge survives with the
+corpus offline. A second adapter, separate from the tagger, which it must not overwrite.
+
+- [ ] ml/src/make_corpus_qa.py. Chat format jsonl where every answer is fully determined by
+      ledger content and nothing is invented. Four kinds: fact QA from the recorded why,
+      genealogy QA from decision_links plus the superseded record, persona register QA in
+      the member's own voice from their debrief turns with the record reference inside the
+      answer text, and mandatory refusals for questions the ledger cannot answer.
+- [ ] Questions paraphrased by Gemini, answers untouched. The tagger scores 1.0 because it
+      learned templates; templated questions here would inflate the probe the same way and
+      the first judge to rephrase would break it live.
+- [ ] Hold out 150 pairs stratified across the four kinds, plus a 50 question fact probe,
+      both split BEFORE training.
+- [ ] Train per docs/scoping.md section D: Qwen3.5-2B-MLX-bf16 with a pinned revision SHA,
+      mlx_lm.lora, mask-prompt, r=16 bf16, 800 to 1200 iters.
+- [ ] Four way eval on the same 50 questions at temperature 0 with strict scoring: untuned
+      base, Gemini with no ledger, Gemini plus retrieval, and the tuned adapter with the
+      corpus offline. Row two is the argument: a frontier model also scores near zero
+      because these facts are proprietary. Row three is included deliberately even though it
+      will score well, because omitting the comparison a sharp judge would ask for is
+      dishonest. The claim is not that tuning beats retrieval on accuracy, it is that the
+      tuned model answers with the corpus offline and the network down.
+- [ ] Refusal accuracy for all four on the cannot-answer set.
+- [ ] ml/results/firm_model_summary.json with base SHA, adapter sha256, data hashes, iters
+      and wall clock.
+- [ ] mlx_lm.server serving the adapter; the app uses it when the health check answers and
+      otherwise falls back to retrieval unchanged.
+- [ ] Generated claims grounded by the existing retrieval. A claim retrieval cannot ground
+      renders struck through with "not found in the record". The model never outranks the
+      ledger.
+- [ ] model_trained event appended through the normal event path carrying base SHA, adapter
+      hash, data hash and both eval scores, so the model's own existence is hash chained.
+      Surfaced with a model chip in the ledger and on Verify.
+- [ ] Wifi off toggle in the ask palette footer.
+
+**Fallback ladder, log which rung shipped:** 1 full, 2 trained but serving pending and only
+if that is literally true, 3 training failed and nothing is claimed.
+
+**Acceptance:** every number comes from the summary json; the model_trained event verifies
+in the chain; three held out questions answer correctly live and one cannot-answer question
+is refused.
+
+- **Sprint log:** (planned)
+
+---
+
+## S15 - tokens.css goes black, in place (budget 3h)
+
+- [ ] Rewrite values under the SAME token names. Renaming and revaluing at once produces
+      dozens of simultaneous guard offences across 25 CSS modules and the signal is lost.
+- [ ] Re-pick all four accents to clear 4.5:1 on near black. --accent #0a58ca measures about
+      1.9:1 there, so this fails the build on the first commit if skipped.
+- [ ] Composed --elev-* shadow tokens so no component ever writes a shadow literal.
+- [ ] Keep hex stops in --bg-field, alpha based text tiers, and the three a11y media queries.
+- [ ] Pill as the 999px literal, keeping exactly three --radius-* rungs.
+
+**Acceptance:** pnpm check green with ZERO edits to any component CSS. If a component has to
+change to survive, that is a token bug: fix the token.
+
+- **Sprint log:** (planned)
+
+---
+
+## S16 - Elevation, layering and the signature motions (budget 3h)
+
+- [ ] Blur as depth becomes shadow plus blur, per the design law above.
+- [ ] Amend design-audit NAV_LAYER by name, one entry at a time, never to a catch all.
+- [ ] Fix the unconditional body background so the transparent desktop panel still floats.
+- [ ] Absorbs critique P2: capture to ledger flight on approve, verify scanline sweep,
+      departure figure counting up. All behind reduced motion.
+
+**Acceptance:** guard:design green, no-blur kill switch works, quick capture window floats,
+approve visibly flies and verify visibly sweeps.
+
+- **Sprint log:** (planned)
+
+---
+
+## S17 - Pixel system and identity (budget 3h)
+
+- [ ] Grid to merged run compiler with a test asserting exact rect counts and 12x12 glyphs.
+- [ ] Roughly twenty glyphs authored for this product: ledger, chain, link, book, graph,
+      person, people, risk, clock, rewind, mic, waveform, inbox, upload, repo, note, model,
+      chip, shield, seal, search, academy, spark.
+- [ ] Reveal treatment with steps(2, end) opacity, and a deterministic hash hover scatter.
+- [ ] Pixel logo, wordmark lockup, favicon into apps/web/public.
+- [ ] Swap icons.tsx behind its existing export names so AppShell does not change.
+
+**Acceptance:** guard:hex green including the new scan; a test asserts no glyph carries a
+colour other than currentColor.
+
+- **Sprint log:** (planned)
+
+---
+
+## S18 - Boot screen and skeletons (budget 3h)
+
+- [ ] Weighted asset manifest with real per asset progress, monotonic, terminal surge,
+      minimum fill time, hard cap. The mark assembles cell by cell as the chain verifies.
+- [ ] Progress readouts use --dur-live, which reduced motion deliberately does not shorten.
+- [ ] Shape matched skeletons in the real panel gradient, plus the frosted veil for
+      refreshing stale panels rather than blanking them.
+- [ ] Every animating module carries its own prefers-reduced-motion block.
+- [ ] /quick-capture is EXEMPT from the boot screen.
+
+**Acceptance:** boot completes on a cold cache inside the Tauri shell; keyboardPass does not
+throw on a hidden focusable.
+
+- **Sprint log:** (planned)
+
+---
+
+## S19 - Auth (budget 3h)
+
+- [ ] Real hosted Supabase auth, sessions, row level security, account to member mapping.
+- [ ] Login screen on the black field with the pixel mark.
+- [ ] Signed in chrome pinned to the rail footer; per person views throughout.
+- [ ] /quick-capture is EXEMPT from the route guard, or the desktop panel shows a login form.
+- [ ] Root() becomes a small table rather than a fourth string equality branch.
+
+**Acceptance:** reload preserves the session; two accounts disagree in the right direction
+about what each alone holds; the access log records the switch.
+
+- **Sprint log:** (planned)
+
+---
+
+## S20 - Six detail routes and the link components (budget 4h)
+
+The drill down. This is the "nothing is clickable" fix.
+
+- [ ] /decision/$id, /strategy/$id, /person/$id, /artifact/$id, /debrief/$id, /question/$id.
+      All six derived synchronously from the memoised corpus, so defaultPreload intent stays
+      free across a much denser link graph.
+- [ ] PersonLink, StrategyLink, DecisionLink, ArtifactLink with a LITERAL to plus params,
+      never a computed string, or the route literal types that make a rename a compile error
+      are lost exactly when the app finally has links worth checking.
+- [ ] Retrofit every existing surface to use them.
+
+**Acceptance:** pnpm typecheck clean; every corpus id resolves; an unknown id renders a not
+found state; the six hop click path has no dead ends and back unwinds all six.
+
+- **Sprint log:** (planned)
+
+---
+
+## S21 - Command palette and capture bar (budget 2.5h)
+
+- [ ] Built over the existing search, not a new retrieval path. Carries the Firm Model
+      wiring forward from S14.
+- [ ] Persistent capture bar in the chrome with a recording indicator that survives
+      navigation.
+
+**Acceptance:** the ask-bar, ask-bar-no-answer and draft-approved scenes pass UNMODIFIED,
+which proves the capture bar did not eat the bare "a" key.
+
+- **Sprint log:** (planned)
+
+---
+
+## S22 - Desk (budget 3h)
+
+- [ ] The daily surface over the existing live ledger hook: what landed overnight, what is
+      waiting on your approval, what is at risk, what you alone know.
+- [ ] Record whether /desk or / is home in AMENDMENTS. If home moves, update shots.ts and
+      the eight capture-beats pointed at / IN THIS SPRINT, or they shoot the wrong screen
+      while still passing.
+
+- **Sprint log:** (planned)
+
+---
+
+## S23 - Capture (budget 3.5h)
+
+- [ ] The room: record a meeting, drop a transcript, connect a repo, write a note, run the
+      CLI. Mounting the EXISTING recorder and transcript importer, not new ones.
+- [ ] Live unfiled inbox showing source channel, so raw input to filed record is visible on
+      one screen.
+
+**Acceptance:** all four channels produce an inbox item that can be filed into the ledger.
+
+- **Sprint log:** (planned)
+
+---
+
+## S24 - The tagger, visibly running (budget 2h)
+
+- [ ] The model runs on screen over real captured text: text arrives, the chip lights, tags
+      resolve with confidences.
+- [ ] Model status in the chrome: on-prem tagger, bridge, firm model, and which one served
+      the last inference.
+- [ ] Every figure sourced from summary.json with its caveat travelling alongside.
+
+**Acceptance:** guard:claims green and no literal figure anywhere in apps/web/src.
+
+- **Sprint log:** (planned)
+
+---
+
+## S25 - Narrated replay (budget 3h)
+
+- [ ] Keep the existing visible/atRisk/at derivation, including the rule that a decision only
+      turns amber once the author has actually gone. That reasoning is correct.
+- [ ] New presentation only: a caption naming the date, the decision, the author and the
+      strategy; an accumulating feed; the graph node highlighting as it lands; playback
+      controls; a summary at the end of the sweep.
+- [ ] Keep the aria label "Replay the ledger over time" VERBATIM.
+
+**Acceptance:** both time machine scenes pass unmodified; captions are derived from events,
+not authored.
+
+- **Sprint log:** (planned)
+
+---
+
+## S26 - Role based Desk (budget 2.5h)
+
+The corpus already carries desk_head, researcher and compliance. Role orders the surface, it
+does not gate access, which would fight the My Record transparency principle.
+
+- [ ] desk_head opens on the book: exposure, who holds what, approvals.
+- [ ] researcher opens on their work: open questions, recent captures, lineage.
+- [ ] compliance opens on the record: chain state, unapproved model drafts, unattributed work.
+- [ ] A new joiner opens on Academy, which is what ties problem 2 into daily use.
+
+**Acceptance:** different roles produce materially different front pages over the same
+ledger, and no surface is access gated by role.
+
+- **Sprint log:** (planned)
+
+---
+
+## S27 - The MCP server (budget 3h)
+
+The highest value per hour in this plan and the most novel thing in the build.
+
+- [ ] A stdio server over packages/core exposing record_decision, search_ledger and
+      get_decision.
+- [ ] A quant changes a parameter in Claude Code or Cursor and the assistant files the
+      decision record as part of the change, so the why is captured at the moment it exists
+      rather than reconstructed later.
+
+**Acceptance:** from a live session in another repo, a decision is filed and appears in the
+app hash chained and verifiable, and a question about a capped parameter is answered from
+the ledger without leaving the editor.
+
+- **Sprint log:** (planned)
+
+---
+
+## S28 - The desktop listener (budget 3h)
+
+- [ ] Tray started always available listener over the existing ASR and diarisation pipeline.
+- [ ] The consent gate is promoted, not relaxed: ambient capture makes it more important.
+- [ ] System audio capture is a STRETCH. A browser extension that joins Zoom or Meet is
+      explicitly out of scope: store review, platform permissions and third party recording
+      consent are a different project.
+
+- **Sprint log:** (planned)
+
+---
+
+## S29 - Academy (budget 3h)
+
+Problem 2, built from the corpus.
+
+- [ ] Curriculum modules generated from the corpus, ordered by dependency using the existing
+      genealogy links.
+- [ ] The syllabus is the open questions plus the highest concentration decisions, so
+      training targets exactly what the firm is most exposed on.
+- [ ] Assessment: ask a trainee a corpus question, compare against what the desk recorded,
+      using the same grounded extractive retrieval as ask the departed.
+- [ ] State named coverage and gaps. design-audit rule 6 scans identifiers, so memberScore
+      fails, and it should: no member is ever scored or ranked.
+
+- **Sprint log:** (planned)
+
+---
+
+## S30 - Close the loop (budget 3h)
+
+- [ ] README gains a Firm Model section with the four way table and the model on the ledger
+      event.
+- [ ] Regenerate all 44 shots and 15 beats on the black theme.
+- [ ] Re-run the full critique checklist.
+- [ ] Ask the firm model three held out questions live and one cannot-answer question.
+- [ ] Redeploy; close masterplan and MANUAL TASKS.
+- [ ] Final report: what shipped, what was cut, which fallback rung, and the numbers, meaning
+      base score, Gemini without ledger score, tuned score and refusal accuracy.
+
+- **Sprint log:** (planned)
+
+---
+
+## IMPLEMENTATION NOTES (file level, so no sprint has to re-derive this)
+
+### Token contract, binding on S15
+
+apps/web/src/lib/readability.test.ts parses tokens.css directly and runs inside pnpm check.
+These names cannot change: --text, --text-secondary, --text-tertiary, --text-chrome,
+--surface, --surface-hover, --surface-recessed, --surface-solid, --accent,
+--accent-verified, --accent-risk, --accent-danger, --font-sans, --font-mono.
+
+These shapes cannot change either:
+- --bg-field must contain at least two literal hex stops. fieldStops() throws on rgba,
+  oklch or color-mix, so an oklch dark theme fails with a parse error rather than a contrast
+  failure.
+- Every text tier stays rgba with an alpha, because prefers-contrast: more must RAISE
+  --text-secondary's alpha, which is unsatisfiable if both are opaque.
+- Exactly three --radius-* rungs in :root.
+- --text and --text-secondary clear 7:1, --text-tertiary clears 4.5:1, all four accents
+  clear 4.5:1, --text-chrome alpha stays below 0.45.
+
+The contrast maths is polarity agnostic, so light ink on dark measures correctly with no
+change to the test. What does need rethinking is the doctrine comment at the top of that
+file: it says the binding case is the DARKEST pane because dark ink gets harder to read as
+the background darkens. Inverted on a dark theme, the binding case becomes the LIGHTEST
+surface. If that is not updated the test keeps passing while measuring the wrong thing,
+which is the failure mode this whole guard family exists to prevent. Update it in S15.
+
+Motion tokens must be named --dur-fast, --dur-base, --dur-settle, --dur-stagger alongside
+the existing --dur-live. design-audit requires every transition duration to read var(--dur-,
+and a bare var(--dur) does NOT match that prefix, so importing a scale that calls its
+standard duration --dur would let a duration escape the token file and silently survive
+reduced motion. --dur-stagger exists as a token specifically so reduced motion can zero it:
+zeroing duration alone still leaves each item waiting out its delay and the list keeps
+popping in one by one.
+
+### Guard amendments each sprint will need
+
+- S15: none if the names above hold.
+- S16: design-audit NAV_LAYER is a filename allowlist reading
+  AppShell|AskBar|QuickCapture|Toast|DecisionCard|base.css. Every new glassy surface fails on
+  creation. Add by name with the design.md sentence justifying each. Two sub rules stay and
+  will bite: a backdrop-filter may not read a custom property, because that fails silently in
+  the macOS WKWebView which is exactly what Tauri renders in, and the -webkit- prefix is
+  mandatory. Rule 4 iterates cssFiles only, so a .tsx inline backdrop-filter is unchecked:
+  add tsxFiles to that loop in S16.
+- S16: add a rule forbidding hand rolled box-shadow. Every shadow value must be none or
+  begin with var(--. This is the single rule that keeps the elevation model from mud.
+- S17: add a glyph well formedness check. A grid that is not exactly twelve rows of twelve
+  characters fails the build instead of rendering as a smear.
+- S24: design-audit rule 1 counts occurrences of the literal string --accent-risk. If a dark
+  theme renames that token, amberUses drops to zero and line 77 prints "amber used in 0
+  rules, all on risk surfaces", a confident passing falsehood. Assert the token exists in
+  tokens.css and that amberUses is above zero before printing the note.
+- S26 and S29: keep amber in one shared RiskBadge module so the selector test passes on
+  merit rather than by widening RISK_WORDS. The rebuild should end with FEWER amber uses
+  than the sixteen it has now, which is the right direction for a signal colour.
+
+### Screenshot and beat harness fragility, binding on S21 to S25
+
+scripts/shots.ts and scripts/capture-beats.ts drive the real DOM and treat console errors as
+failures, which is how a real infinite render loop was caught in S9. Keep that. Specific
+couplings:
+- draft-approved presses the bare "a" key. A capture bar or palette that swallows it kills
+  the scene. This is the acceptance test for S21.
+- time-machine-mid and time-machine-after select getByLabel("Replay the ledger over time").
+  S25 keeps that string or renames it in both scripts in the same commit.
+- ask-bar uses Meta+k and [role="dialog"] input.
+- strategy-decision uses svg g[transform] circle at nth(4), brittle to any graph change.
+- keyboardPass throws if focus lands on a hidden element and caps at 60 stops, so a boot
+  screen with hidden but focusable children fails the whole run, and a denser link graph
+  silently truncates the tab order record.
+
+### Route work, binding on S20
+
+router.tsx writes each route out by hand deliberately: a helper taking path: string erases
+the literal types, and those literals are what make a renamed route a compile error. The six
+new $id routes follow the same pattern. The Register interface declaration means each new
+route widens the path union globally, so any Link with a computed string becomes a tsc
+error. Run pnpm typecheck after EVERY route addition, not once at the end.
+
+Root() is currently a string equality chain. Login, boot and quick capture make three more
+branches, so it becomes a small table in S19.
+
+Corpus entity counts available for the detail pages: 184 decisions of which 106 carry
+alternatives and 30 cite multiple sources, 160 genealogy links, 188 artifacts across commit,
+notebook, param_file and meeting_transcript, 5 members, 4 strategies, 6 debrief sessions,
+56 turns, 8 open questions. The six routes map one to one onto the Corpus type, which is a
+good sign the route set is right.
+
+### The Firm Model data design, binding on S14
+
+Source of truth is the seeded corpus, never a model. Answers are assembled from recorded
+text; only the question side is paraphrased. Each kind:
+
+- Fact: question about a parameter, answer from the decision's recorded why, written first
+  person, ending with the record reference.
+- Genealogy: what a decision replaced and why the old approach was dropped, from
+  decision_links plus the superseded record.
+- Persona register: a member's decisions answered in that member's voice as captured in
+  their debrief turns, with the reference INSIDE the answer text so citations survive
+  generation rather than living only in chips around it.
+- Refusal: a question the ledger cannot answer, answered "that is not in the record".
+  Mandatory. Without these the model hallucinates and the demo dies in the first hard
+  question.
+
+The eval is four way and all four numbers are reported. Row B, a frontier model with no
+ledger access scoring near zero, is the proof that the knowledge is genuinely proprietary
+and is a better answer to "why not just use ChatGPT" than any assertion. Row C, retrieval
+over the ledger, will probably score well and is included anyway, because the honest claim
+is about the corpus being offline and the network being down, not about beating retrieval on
+accuracy. Because the corpus is synthetic, sending it to a third party API for rows B and C
+is safe here; a real firm could not, which is itself the argument for the on-prem path, and
+the README says so rather than glossing it.
+
+## CUT LADDER (if the deadline bites, in this order)
+
+1. S29 Academy. Newest and least proven, and it degrades to a spoken argument rather than a
+   broken screen.
+2. S28 the desktop listener. Browser recording already demonstrates the capability.
+3. S26 role based Desk. Cheap and high impact, so it should survive most cuts.
+4. S27 the MCP server. Fight to keep this: three hours, the most novel thing here, and the
+   best single demo beat available.
+
+Nothing at or below S25 is cuttable. That tier is what answers the actual complaints.
+
+---
+
 ## CURRENT SPRINT
 
 **Current sprint:** S13

@@ -7,16 +7,41 @@ import { searchDetailed, type Hit } from "../search";
 import { buildIndex } from "../search";
 import { strategyName } from "../data/source";
 
-type Action = { id: string; label: string; hint: string; to: string };
+/*
+  An action either navigates or fires an event. Capture is the second kind: it is a sheet
+  over the current page, not a place, and sending someone to a different route to write a
+  note would lose the thing they were looking at when they thought of it.
+*/
+type Action = { id: string; label: string; hint: string; to?: string; emit?: string };
 
 const ACTIONS: Action[] = [
+  {
+    id: "capture",
+    label: "New record",
+    hint: "note, meeting or transcript",
+    emit: "continuity:open-capture",
+  },
   { id: "ledger", label: "Open the ledger", hint: "every event, newest first", to: "/" },
   { id: "strategies", label: "Open strategies", hint: "decision genealogy", to: "/strategies" },
   { id: "risk", label: "Open knowledge risk", hint: "bus factor and departure simulation", to: "/risk" },
   { id: "debriefs", label: "Open debriefs", hint: "grounded interviews", to: "/debriefs" },
   { id: "compliance", label: "Open compliance", hint: "RTS 6 and SR 11-7 extracts", to: "/compliance" },
   { id: "verify", label: "Verify the chain", hint: "recompute every hash", to: "/verify" },
+  {
+    id: "my-record",
+    label: "What this system holds about me",
+    hint: "every record naming you, and who read it",
+    to: "/my-record",
+  },
 ];
+
+function runAction(action: Action, navigate: (opts: { to: string }) => unknown): void {
+  if (action.emit) {
+    window.dispatchEvent(new CustomEvent(action.emit));
+    return;
+  }
+  if (action.to) void navigate({ to: action.to });
+}
 
 export function AskBar({ open, onClose }: { open: boolean; onClose: () => void }) {
   const navigate = useNavigate();
@@ -133,7 +158,7 @@ export function AskBar({ open, onClose }: { open: boolean; onClose: () => void }
       if (showActions) {
         const action = filteredActions[selected];
         if (action) {
-          void navigate({ to: action.to });
+          runAction(action, navigate as never);
           onClose();
         }
       } else {
@@ -205,7 +230,7 @@ export function AskBar({ open, onClose }: { open: boolean; onClose: () => void }
                       data-selected={i === selected}
                       onMouseEnter={() => setSelected(i)}
                       onClick={() => {
-                        void navigate({ to: a.to });
+                        runAction(a, navigate as never);
                         onClose();
                       }}
                     >

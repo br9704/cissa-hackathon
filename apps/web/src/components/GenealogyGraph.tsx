@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import styles from "./GenealogyGraph.module.css";
 import { computeLayout, type GraphEdge, type GraphNode } from "./graphLayout";
+import { memberName, TYPE_LABEL } from "../data/source";
 
 const WIDTH = 1080;
 const HEIGHT = 440;
@@ -47,6 +48,25 @@ export function GenealogyGraph({
   onSelect?: (id: string) => void;
 }) {
   const reduced = useReducedMotion();
+
+  /*
+    Which nodes get a visible label: highest degree first, plus everything risk flagged.
+    Degree is a decent proxy for "this decision is load bearing", because a node with many
+    parents and children is one the desk kept revisiting.
+  */
+  const labelled = useMemo(() => {
+    const degree = new Map<string, number>();
+    for (const e of edges) {
+      degree.set(e.source, (degree.get(e.source) ?? 0) + 1);
+      degree.set(e.target, (degree.get(e.target) ?? 0) + 1);
+    }
+    const ranked = [...nodes]
+      .sort((a, b) => (degree.get(b.id) ?? 0) - (degree.get(a.id) ?? 0) || a.id.localeCompare(b.id))
+      .slice(0, nodes.length > 40 ? 6 : 10)
+      .map((n) => n.id);
+    const flagged = nodes.filter((n) => n.riskFlag).map((n) => n.id);
+    return new Set([...ranked, ...flagged]);
+  }, [nodes, edges]);
 
   /*
     useMemo is safe here precisely because computeLayout is pure and mutates nothing:
@@ -137,8 +157,34 @@ export function GenealogyGraph({
                     <circle className={styles.riskRing} cx={0} cy={0} r={R + 4} />
                   ) : null}
                   <circle className={styles.nodeBody} cx={0} cy={0} r={R} />
-                  <title>{n.title}</title>
+                  {/*
+                    The tooltip carries who and what, not just the title. A judge hovering a
+                    dot wants to know whose reasoning this was, because the whole argument of
+                    the product is that reasoning belongs to people who leave.
+                  */}
+                  <title>
+                    {n.title}
+                    {"\n"}
+                    {memberName(n.authorMemberId)}
+                    {n.decisionType ? ` · ${TYPE_LABEL[n.decisionType] ?? n.decisionType}` : ""}
+                    {n.riskFlag ? " · flagged" : ""}
+                  </title>
                 </motion.g>
+                {/*
+                  Labels for the handful of nodes that carry the story: the most connected,
+                  and anything flagged. Labelling all 184 is unreadable and labelling none
+                  leaves a judge looking at abstract dots, which was the actual complaint.
+                */}
+                {labelled.has(n.id) ? (
+                  <text
+                    className={`${styles.nodeLabel} ${dim ? styles.dimmed : ""}`}
+                    x={0}
+                    y={-(R + 7)}
+                    textAnchor="middle"
+                  >
+                    {n.title.length > 28 ? `${n.title.slice(0, 27)}...` : n.title}
+                  </text>
+                ) : null}
               </g>
             );
           })}

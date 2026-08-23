@@ -55,3 +55,5 @@ docs/beats/*.png
 ENGINEERPROMPT2.md
 AGENTS.md
 supabase/.temp/
+ml/runs/firm/
+ml/data/firm/paraphrase_cache.json

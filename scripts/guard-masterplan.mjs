@@ -85,7 +85,18 @@ for (let i = 1; i < parts.length; i += 2) {
       rows.push({ id, status: "open", open: (body.match(/^\s*- \[ \]/gm) ?? []).length });
       continue;
     }
-    failures.push(`${id} has no Sprint log line. Every sprint closes with one.`);
+    /*
+      A sprint that is planned but not started has nothing to log yet. It is distinguishable
+      from a forgotten log line by having no ticked and no carried tasks: nobody has touched
+      it. Writing the whole plan down in advance is the point of this file, so the guard has
+      to permit a plan that runs ahead of the work.
+    */
+    const started = /^\s*- \[[x~]\]/m.test(body);
+    if (!started) {
+      rows.push({ id, status: "planned", open: (body.match(/^\s*- \[ \]/gm) ?? []).length });
+      continue;
+    }
+    failures.push(`${id} has started tasks but no Sprint log line. Every sprint closes with one.`);
     rows.push({ id, status: "MISSING", open: 0 });
     continue;
   }

@@ -1,0 +1,74 @@
+# The FIRM MODEL fine-tune. Separate adapter, separate run directory.
+#
+# This is not the tagger. The tagger classifies a decision into a type; this model answers
+# questions about the desk from the ledger it was trained on. They share a base model and a
+# recipe and nothing else, and the tagger adapters must never be overwritten by this run.
+#
+# Read ml/README.md before changing num_layers or removing this comment about keys.
+
+model: "mlx-community/Qwen3.5-2B-MLX-bf16"
+# Pinned. An unpinned base means a rerun months later is a different experiment wearing
+# the same config file, and the provenance block in results/summary.json would be lying.
+revision: "05ce45420036b812fe0be3f72cdc1fb62bae6891"
+
+train: true
+data: "data/firm"
+fine_tune_type: lora
+optimizer: adamw
+
+lora_parameters:
+  rank: 16
+  scale: 20.0
+  dropout: 0.0
+  # `keys` is deliberately absent. With an explicit ["self_attn.q_proj","self_attn.v_proj"]
+  # only the six full_attention layers of twenty four would get adapters, because Qwen3.5
+  # is hybrid with full_attention_interval: 4. Omitting it makes mlx-lm auto-discover
+  # every Linear in each layer, including the GatedDeltaNet in_proj_qkv, in_proj_z and
+  # out_proj.
+
+# Zero or less selects ALL layers: the selector is model.layers[-max(num_layers, 0):].
+num_layers: 0
+
+# Memory, learned the hard way.
+#
+# The first run of this config died with a Metal "Insufficient Memory" out of the GPU
+# command buffer. Adapting ALL layers is 16.8M trainable parameters against the 917K the
+# previous project trained when it was accidentally adapting four, so the optimiser state
+# and the activations are roughly eighteen times heavier and a batch of 8 no longer fits.
+#
+# The fix keeps the layer coverage and pays for it elsewhere: a smaller batch, gradient
+# accumulation to hold the effective batch at 8, gradient checkpointing to trade compute
+# for activation memory, and a sequence length measured from the data rather than guessed:
+# The firm model's rows are longer than the tagger's: a genealogy answer quotes two records
+# and a citation, so the length was re-measured rather than inherited. See the printout from
+# make_corpus_qa.py. Measured on the actual training rows: 540 characters at the median, 840
+# at the 95th percentile, 917 at the longest, which is about 262 tokens. 320 truncates
+# nothing and leaves margin; 512 was paying for headroom that does not exist.
+#
+# Truncating an answer mid citation would train the model to stop before the reference,
+# which is the one part of the answer that has to survive generation.
+# Shrinking num_layers instead would have been easier and would have quietly undone the
+# thing this config exists to fix.
+batch_size: 2
+grad_accumulation_steps: 4
+grad_checkpoint: true
+# Longer than the tagger, and for a different reason. The tagger learns seven labels from
+# 1700 near identical rows and converges almost immediately. This model has to hold roughly
+# 700 distinct facts, each seen a handful of times in different phrasings, so it needs more
+# passes over a smaller set.
+iters: 1200
+learning_rate: 1e-5
+max_seq_length: 320
+mask_prompt: true
+
+steps_per_report: 10
+steps_per_eval: 100
+val_batches: 20
+
+# Low enough that select_checkpoint.py has something to choose from. mlx-lm ships the
+# final weights, and the final weights were 8 macro F1 points worse than the best ones
+# last time this recipe ran.
+save_every: 100
+
+adapter_path: "runs/firm/adapters"
+seed: 20260823

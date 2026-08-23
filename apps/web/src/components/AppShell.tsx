@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { Link, Outlet, useRouterState } from "@tanstack/react-router";
 import styles from "./AppShell.module.css";
 import { AskBar } from "./AskBar";
+import { CaptureSheet } from "./CaptureSheet";
+import { LivenessStrip } from "./LivenessStrip";
 import {
   LedgerIcon,
   StrategyIcon,
@@ -9,6 +11,7 @@ import {
   DebriefIcon,
   ComplianceIcon,
   VerifyIcon,
+  MyRecordIcon,
 } from "./icons";
 
 /*
@@ -25,11 +28,18 @@ const NAV = [
   { to: "/debriefs", label: "Debriefs", hint: "capture reasoning, ask leavers", Icon: DebriefIcon },
   { to: "/compliance", label: "Reports", hint: "handover and regulator packs", Icon: ComplianceIcon },
   { to: "/verify", label: "Verify", hint: "check nothing was altered", Icon: VerifyIcon },
+  /*
+    My Record was reachable only from the avatar, which meant the transparency principle
+    (D13, let the captured see the ledger) was invisible to anyone who did not think to
+    click their own initials. A promise nobody can find is not a promise.
+  */
+  { to: "/my-record", label: "My record", hint: "what this system holds about you", Icon: MyRecordIcon },
 ] as const;
 
 export function AppShell() {
   const path = useRouterState({ select: (s) => s.location.pathname });
   const [askOpen, setAskOpen] = useState(false);
+  const [captureOpen, setCaptureOpen] = useState(false);
 
   /*
     Cmd+K opens the palette from anywhere. Bound on the window rather than on a focused
@@ -39,13 +49,36 @@ export function AppShell() {
   */
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
-      if (e.key.toLowerCase() === "k" && (e.metaKey || e.ctrlKey)) {
+      if (e.defaultPrevented) return;
+      const key = e.key.toLowerCase();
+      if (key === "k" && (e.metaKey || e.ctrlKey)) {
         e.preventDefault();
         setAskOpen((v) => !v);
       }
+      /*
+        Capture on the same reflex as the palette. The desktop shell already binds a global
+        hotkey for this; the web had no way in at all.
+      */
+      if (key === "n" && (e.metaKey || e.ctrlKey) && !e.shiftKey) {
+        e.preventDefault();
+        setCaptureOpen(true);
+      }
+    }
+    /*
+      The palette asks for capture by event rather than by prop, so a command can open a
+      sheet the palette does not own without the two components having to know about each
+      other.
+    */
+    function onOpenCapture() {
+      setAskOpen(false);
+      setCaptureOpen(true);
     }
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    window.addEventListener("continuity:open-capture", onOpenCapture);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      window.removeEventListener("continuity:open-capture", onOpenCapture);
+    };
   }, []);
 
   return (
@@ -89,7 +122,17 @@ export function AppShell() {
             <span>Ask the ledger</span>
             <kbd className={styles.kbd}>Cmd K</kbd>
           </button>
+          <button
+            className={styles.captureTrigger}
+            type="button"
+            onClick={() => setCaptureOpen(true)}
+          >
+            <span aria-hidden="true">+</span>
+            <span>New record</span>
+            <kbd className={styles.kbd}>Cmd N</kbd>
+          </button>
           <span className={styles.spacer} />
+          <LivenessStrip />
           {/*
             My Record lives behind the avatar rather than in the rail. It is the screen
             about YOU, and putting it where a profile menu would be is where people look
@@ -112,6 +155,7 @@ export function AppShell() {
       </div>
 
       <AskBar open={askOpen} onClose={() => setAskOpen(false)} />
+      <CaptureSheet open={captureOpen} onClose={() => setCaptureOpen(false)} />
     </div>
   );
 }

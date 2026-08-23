@@ -131,7 +131,19 @@ for (const file of cssFiles) {
   is opaque. This is the rule that keeps depth meaning something rather than becoming
   texture.
 */
-const NAV_LAYER = /AppShell|AskBar|QuickCapture|Toast|DecisionCard|base\.css/;
+/*
+  The navigation and overlay layer, by name.
+
+  Extended one entry at a time, each with the reason it belongs, because the value of this
+  rule is entirely in the fact that widening it is a visible act in a diff. A catch all here
+  would keep the audit green while glass spread across the product as texture, which is the
+  thing design.md forbids.
+
+    CaptureSheet   a modal over the whole app, the same class of surface as AskBar. It exists
+                   because the capture inputs were reachable only by scrolling past 184
+                   ledger rows, and an input you have to hunt for is an input nobody uses.
+*/
+const NAV_LAYER = /AppShell|AskBar|QuickCapture|CaptureSheet|Toast|DecisionCard|base\.css/;
 for (const file of cssFiles) {
   const text = stripComments(readFileSync(file, "utf8"));
   if (!/backdrop-filter/.test(text)) continue;

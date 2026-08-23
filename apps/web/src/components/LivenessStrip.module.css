@@ -1,0 +1,43 @@
+/*
+  Proof that the system is running, not a static page.
+
+  The critique's finding was that the record page reads as a list somebody typed once. The
+  pitch is ambient capture, so the chrome has to show a pulse: what came in last, whether
+  the on-prem model is up, and when the chain was last checked.
+*/
+.strip {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 12px;
+  color: var(--text-tertiary);
+  white-space: nowrap;
+}
+
+.item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-s);
+  background: var(--accent-verified);
+  flex: none;
+}
+
+.dot[data-state="local"] {
+  background: var(--text-chrome);
+}
+
+.value {
+  color: var(--text-secondary);
+}
+
+@media (max-width: 1100px) {
+  .strip {
+    display: none;
+  }
+}

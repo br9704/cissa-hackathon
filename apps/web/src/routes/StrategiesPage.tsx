@@ -172,6 +172,19 @@ export function StrategiesPage() {
           </span>
         </header>
 
+        {/*
+          The replay sits ABOVE the graph it drives.
+
+          It was below, which meant the control and the thing it controls were never both in
+          view: you dragged a scrubber and the movement happened off screen. A control you
+          cannot watch working is a control nobody believes does anything.
+        */}
+        <TimeMachine
+          items={replayItems}
+          resignation={resignation}
+          onChange={onReplay}
+        />
+
         <GenealogyGraph
           nodes={graph.nodes}
           edges={graph.edges}
@@ -181,12 +194,6 @@ export function StrategiesPage() {
           highlighted={replay && replay.atRisk.size > 0 ? replay.atRisk : null}
           selectedId={selectedDecision}
           onSelect={setSelectedDecision}
-        />
-
-        <TimeMachine
-          items={replayItems}
-          resignation={resignation}
-          onChange={onReplay}
         />
 
         {decision ? (

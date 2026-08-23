@@ -1,0 +1,172 @@
+/*
+  The capture sheet.
+
+  It is a dialog rather than a section on a page because the whole finding it answers is
+  that the inputs were reachable only by scrolling past 184 ledger rows. An input you have
+  to hunt for is an input nobody uses, and a ledger nobody writes to is an empty ledger.
+*/
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--scrim);
+  -webkit-backdrop-filter: blur(2px);
+  backdrop-filter: blur(2px);
+  z-index: 100;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 8vh 24px 24px;
+  overflow-y: auto;
+}
+
+.sheet {
+  width: min(720px, 100%);
+  background: var(--surface-solid);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-l);
+  box-shadow: var(--shadow-float);
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 18px 20px 0;
+}
+
+.title {
+  font-size: 1.0625rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.subtitle {
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+}
+
+.spacer {
+  flex: 1;
+}
+
+.close {
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-secondary);
+  border-radius: var(--radius-s);
+  padding: 4px 8px;
+  cursor: pointer;
+  font-size: 0.8125rem;
+  transition: border-color var(--dur-fast) var(--ease-out);
+}
+
+.close:hover {
+  border-color: var(--border-strong);
+  color: var(--text);
+}
+
+.tabs {
+  display: flex;
+  gap: 4px;
+  padding: 14px 20px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.tab {
+  border: 1px solid transparent;
+  border-bottom: none;
+  background: transparent;
+  color: var(--text-secondary);
+  padding: 8px 12px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: var(--radius-s) var(--radius-s) 0 0;
+  transition: color var(--dur-fast) var(--ease-out), background-color var(--dur-fast) var(--ease-out);
+}
+
+.tab:hover {
+  color: var(--text);
+}
+
+.tab[data-active="true"] {
+  color: var(--text);
+  background: var(--surface);
+  border-color: var(--border);
+  margin-bottom: -1px;
+}
+
+.body {
+  padding: 20px;
+}
+
+.field {
+  display: block;
+  margin-bottom: 14px;
+}
+
+.label {
+  display: block;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+
+.input,
+.textarea,
+.select {
+  width: 100%;
+  background: var(--surface-recessed);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-s);
+  padding: 9px 11px;
+  color: var(--text);
+  font: inherit;
+  font-size: 0.9375rem;
+}
+
+.textarea {
+  min-height: 96px;
+  resize: vertical;
+}
+
+.input:focus-visible,
+.textarea:focus-visible,
+.select:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.primary {
+  background: var(--accent);
+  color: var(--surface-solid);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-s);
+  padding: 8px 14px;
+  font-weight: 500;
+  cursor: pointer;
+  font-size: 0.8125rem;
+}
+
+.primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.hint {
+  font-size: 0.8125rem;
+  color: var(--text-tertiary);
+}
+
+.filed {
+  font-size: 0.8125rem;
+  color: var(--accent-verified);
+}
