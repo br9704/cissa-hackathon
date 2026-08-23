@@ -5,14 +5,22 @@
 .grid { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 24px; align-items: start; }
 @media (max-width: 980px) { .grid { grid-template-columns: minmax(0, 1fr); } }
 
-.channels { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+/* One surface, divided. See .slab in base.css. */
+.channels {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
 @media (max-width: 640px) { .channels { grid-template-columns: minmax(0, 1fr); } }
 
 .channel {
   text-align: left;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-m);
+  background: transparent;
+  border: none;
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
   padding: 16px;
   color: var(--text);
   font: inherit;
@@ -23,10 +31,10 @@
   transition: border-color var(--dur-fast) var(--ease-out), background-color var(--dur-fast) var(--ease-out);
 }
 
-.channel:hover { border-color: var(--border-strong); background: var(--surface-hover); }
+.channel:hover { background: var(--surface-hover); }
 .channel:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .channel[data-passive="true"] { cursor: default; }
-.channel[data-passive="true"]:hover { border-color: var(--border); background: var(--surface); }
+.channel[data-passive="true"]:hover { background: transparent; }
 
 .channelHead { display: flex; align-items: center; gap: 9px; }
 .channelName { font-weight: 560; }
@@ -36,8 +44,6 @@
 .panel {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius-l);
-  box-shadow: var(--shadow-pane);
   padding: 20px;
 }
 

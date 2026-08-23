@@ -92,11 +92,11 @@
 .section {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius-l);
-  box-shadow: var(--shadow-pane);
   padding: 20px;
-  margin-bottom: 20px;
 }
+
+/* Stacked sections share an edge, so a column reads as one panel rather than a pile. */
+.section + .section { border-top: none; }
 
 .sectionHead {
   display: flex;

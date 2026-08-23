@@ -13,9 +13,7 @@
 
 .layer {
   border: 1px solid var(--border);
-  border-radius: var(--radius-l);
   background: var(--surface);
-  box-shadow: var(--shadow-pane);
   padding: 18px;
 }
 
@@ -33,7 +31,6 @@
 
 .node {
   border: 1px solid var(--border);
-  border-radius: var(--radius-m);
   background: var(--surface-recessed);
   padding: 12px;
   display: flex;

@@ -188,3 +188,22 @@ main > * {
     animation: none;
   }
 }
+
+/*
+  One surface, divided. Not a tray of floating cards.
+
+  The bento pattern (a rounded, shadowed card per idea, floating on a field with gaps between
+  them) is the default dashboard look and it costs more than it gives here. Every card is a
+  separate object with its own edge, so the eye spends effort deciding what belongs with what,
+  and a screen of eight of them reads as eight unrelated widgets rather than as one
+  instrument.
+
+  So: sections sit edge to edge on a single continuous surface, separated by hairlines, with
+  square corners. That is how a terminal, a spreadsheet and a trading screen are built, and it
+  is what this product actually is.
+
+  The shape itself is enforced by the radius ladder in tokens.css being zero, which means it
+  is a property of the design system rather than a habit each page has to remember. The
+  divisions are per page, because which edge divides from which neighbour depends on the grid
+  that page uses, and a global rule guessing at that produced double hairlines.
+*/

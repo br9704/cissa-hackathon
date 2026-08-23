@@ -22,18 +22,21 @@
   .grid { grid-template-columns: minmax(0, 1fr); }
 }
 
+/* A list on one surface, divided by hairlines, rather than a stack of cards. */
 .modules {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
 }
 
 .module {
   text-align: left;
   width: 100%;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-m);
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border);
   padding: 14px 16px;
   cursor: pointer;
   color: var(--text);
@@ -42,10 +45,10 @@
     background-color var(--dur-fast) var(--ease-out);
 }
 
-.module:hover { border-color: var(--border-strong); }
+.module:hover { background: var(--surface-hover); }
+.module:last-child { border-bottom: none; }
 
 .module[data-active="true"] {
-  border-color: var(--accent);
   background: var(--surface-hover);
   box-shadow: inset 3px 0 0 0 var(--accent);
 }
@@ -90,11 +93,11 @@
 .panel {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius-l);
-  box-shadow: var(--shadow-pane);
   padding: 20px;
-  margin-bottom: 20px;
 }
+
+/* Stacked panels share an edge rather than floating apart. */
+.panel + .panel { border-top: none; }
 
 .panelHead { display: flex; align-items: baseline; gap: 10px; margin-bottom: 12px; }
 .panelTitle { font-size: 15px; font-weight: 600; }

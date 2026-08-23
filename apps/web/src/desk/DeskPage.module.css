@@ -33,21 +33,19 @@
 }
 
 /*
-  A grid, not a stack.
+  One surface, divided by hairlines. See .slab in base.css for why.
 
-  Every panel in one column meant a wide screen showed three things and a lot of nothing,
-  and it read as a document rather than as a desk. auto-fit with a sensible minimum lets the
-  layout decide: three across on a wide monitor, two on a laptop, one on a narrow window,
-  without a media query per breakpoint guessing at widths it cannot know.
-
-  The first panel spans two columns because it is the one thing the role opens on, and
-  design.md's rhythm rule is that every screen has exactly one loud thing.
+  auto-fit with a sensible minimum lets the layout decide how many columns fit rather than a
+  media query guessing at widths it cannot know: three across on a wide monitor, two on a
+  laptop, one on a narrow window.
 */
 .sections {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-  gap: 20px;
-  align-items: start;
+  gap: 0;
+  align-items: stretch;
+  background: var(--surface);
+  border: 1px solid var(--border);
 }
 
 /*
@@ -62,12 +60,27 @@
   min-width: 0;
 }
 
+/*
+  A region of the surface, not a card on it. No radius, no shadow, no background of its own:
+  it is divided from its neighbours by a hairline and nothing else.
+*/
 .panel {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-l);
-  box-shadow: var(--shadow-pane);
   padding: 20px;
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  min-width: 0;
+}
+
+.panel:last-child {
+  border-right: none;
+}
+
+/*
+  The bottom row has nothing under it. :last-child alone is not enough, because the last cell
+  of a full row is not the last cell overall, so the rule keys off the row instead.
+*/
+.sections > .panel:nth-last-child(-n + 1) {
+  border-bottom: none;
 }
 
 .panelHead { display: flex; align-items: baseline; gap: 10px; margin-bottom: 12px; }

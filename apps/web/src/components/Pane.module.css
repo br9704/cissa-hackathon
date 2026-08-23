@@ -9,7 +9,6 @@
   background: var(--surface-solid);
   border: 1px solid var(--border);
   border-radius: var(--radius-l);
-  box-shadow: var(--shadow-pane);
   /* 4px padding on a 16px outer radius gives a concentric 12px inner radius. */
   padding: 20px;
   display: flex;

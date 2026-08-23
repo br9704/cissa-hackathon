@@ -1523,6 +1523,37 @@ zero console errors.
 
 ---
 
+## S32 - One surface, square (budget 1h)
+
+Owner direction: one big container rather than split ones, and no rounded edges.
+
+- [x] The radius ladder is zero. Set at the TOKEN rather than at ninety two call sites, so
+      the shape is a property of the design system rather than a habit each page has to
+      remember, and going back is one line.
+- [x] Three rungs kept even though they now share a value: they mean different things
+      (control, card, panel), the distinction will matter if this changes again, and
+      readability.test.ts asserts there are exactly three.
+- [x] 999px pills survive as literals where a shape genuinely IS a capsule: the heat bar, the
+      level meter, a graph node. A square progress bar is not a stylistic choice, it is a
+      worse progress bar.
+- [x] Desk, Capture, Academy, the system diagram and the six detail routes converted from a
+      tray of floating cards to one continuous surface divided by hairlines.
+- [x] Panel shadows removed. A shadow exists to lift a card off a field, and there is no
+      longer a gap for it to lift across.
+
+**Why, recorded because it is a taste decision and taste decisions get reversed by whoever
+comes next.** The bento pattern is the default dashboard look, and it costs more than it
+gives here: every card is a separate object with its own edge, so the eye spends effort
+deciding what belongs with what, and a screen of eight reads as eight unrelated widgets
+rather than as one instrument. A terminal, a spreadsheet and a trading screen are all built
+the other way, and that is what this product actually is.
+
+**Acceptance:** verified live after deploy. Demo path works, 184 records, zero console errors.
+
+- **Sprint log:** Logged: 2026-08-23T16:34:46+10:00 · status: done · actual: 0.4h (budget 1h) · by: claude-opus-5 · note: the divisions stayed per page rather than becoming global classes, because which edge divides from which neighbour depends on that page's grid, and a global rule guessing at it produced double hairlines. The unused shared classes were deleted rather than left as dead CSS.
+
+---
+
 ## STAGE 3 CLOSING REPORT (2026-08-23)
 
 **What shipped.** The three P0 bugs that made the app feel broken to type in. The P1 tier
