@@ -284,6 +284,20 @@ const SCENES: {
   },
 ];
 
+
+/*
+  Navigate, and wait for the app rather than for the network.
+
+  The boot screen made networkidle insufficient: the document settles while a progress screen
+  is still on top, so a scene that pressed Cmd+K immediately was typing at a loader. Waiting
+  for the nav rail waits for the actual application, which is what every scene means by
+  "loaded".
+*/
+async function open(page: Page, path: string): Promise<void> {
+  await page.goto(`${BASE}${path}`, { waitUntil: "networkidle" });
+  await page.waitForSelector("nav", { timeout: 30_000 }).catch(() => {});
+}
+
 async function main() {
   await mkdir(OUT, { recursive: true });
   const browser = await chromium.launch();
@@ -309,7 +323,7 @@ async function main() {
       });
 
       for (const route of ROUTES) {
-        await page.goto(`${BASE}${route.path}`, { waitUntil: "networkidle" });
+        await open(page, route.path);
         /* Let the entrance motion settle so the shot is the resting state. */
         await page.waitForTimeout(500);
         const suffix = state.label === "default" ? "" : `-${state.label}`;
@@ -320,7 +334,7 @@ async function main() {
       }
 
       if (state.label === "default" && vp.label === "1440x900") {
-        await page.goto(`${BASE}/`, { waitUntil: "networkidle" });
+        await open(page, "/");
         const order = await keyboardPass(page);
         /* The count and the first few stops. Printing all sixty is noise that buries the
            scene failures underneath it. */
@@ -365,7 +379,7 @@ async function main() {
     */
     {
       const warmStart = Date.now();
-      await page.goto(`${BASE}/`, { waitUntil: "networkidle" });
+      await open(page, "/");
       await page.keyboard.press("Meta+k");
       await page.locator('[role="dialog"] input').waitFor();
       await page.locator('[role="dialog"] input').fill("warming the retrieval index");
@@ -377,7 +391,7 @@ async function main() {
     }
 
     for (const scene of SCENES) {
-      await page.goto(`${BASE}${scene.path}`, { waitUntil: "networkidle" });
+      await open(page, scene.path);
       await page.waitForTimeout(400);
       try {
         await scene.act(page);
