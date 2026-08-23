@@ -1,7 +1,15 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import styles from "./TimeMachine.module.css";
 
-export type ReplayItem = { id: string; occurredAt: string; authorMemberId: string; riskFlag: boolean };
+export type ReplayItem = {
+  id: string;
+  occurredAt: string;
+  authorMemberId: string;
+  riskFlag: boolean;
+  /* What actually happened, in words. Without these the replay is dots moving. */
+  title: string;
+  authorName: string;
+};
 
 /*
   Replays the firm's memory.
@@ -107,6 +115,29 @@ export function TimeMachine({
 
   const visibleCount = state.visible.size;
   const riskCount = state.atRisk.size;
+
+  /*
+    The narration.
+
+    Dragging this scrubber used to make unlabelled dots appear in a force graph, with a date
+    and two counters above it and nothing saying what had just happened. It read as abstract
+    motion, and a replay of a firm's memory that a reader cannot follow is worse than no
+    replay: it looks like the product is doing something impressive and declines to say what.
+
+    So: the most recent record that has landed is named, and the ones behind it accumulate
+    underneath. Everything here is derived from the events, never authored, which is the same
+    rule the rest of the product follows.
+  */
+  const landed = useMemo(
+    () => ordered.filter((i) => Date.parse(i.occurredAt) <= at).reverse(),
+    [ordered, at],
+  );
+  const latest = landed[0];
+  const finished = at >= last && ordered.length > 0;
+  const authors = useMemo(
+    () => new Set(landed.map((i) => i.authorName)).size,
+    [landed],
+  );
   const dateLabel = new Date(at).toLocaleDateString("en-AU", {
     day: "numeric",
     month: "long",
@@ -128,6 +159,43 @@ export function TimeMachine({
             with nobody left to explain them
           </span>
         </span>
+      </div>
+
+      {/*
+        The caption sits between the counters and the scrubber, so the eye lands on what
+        happened before it reaches the control that made it happen.
+      */}
+      <div className={styles.caption} aria-live="polite">
+        {finished ? (
+          <span>
+            The whole period, replayed. {visibleCount} records from {authors} people
+            {riskCount > 0 ? (
+              <>
+                {" "}
+                and <span className={styles.captionRisk}>{riskCount}</span> of them now have
+                nobody left who can explain them.
+              </>
+            ) : (
+              <>, and every one of them has somebody left who can explain it.</>
+            )}
+          </span>
+        ) : latest ? (
+          <span>
+            <span className={styles.captionWhen}>
+              {new Date(latest.occurredAt).toLocaleDateString("en-AU", {
+                day: "numeric",
+                month: "short",
+              })}
+            </span>{" "}
+            {latest.authorName} recorded{" "}
+            <span className={styles.captionTitle}>{latest.title}</span>
+            {state.atRisk.has(latest.id) ? (
+              <span className={styles.captionRisk}> and has since left</span>
+            ) : null}
+          </span>
+        ) : (
+          <span>Before anything on this book was written down.</span>
+        )}
       </div>
 
       <div className={styles.trackRow}>
@@ -183,6 +251,32 @@ export function TimeMachine({
         do this at all unless it decided to keep the old ones, which is a decision this
         schema made once, at the start, for everything.
       </p>
+
+      {/*
+        The feed accumulates rather than resetting, because the point being made is that a
+        record builds up over time and then a person leaves. A list that redrew from scratch
+        at every scrubber position would show the state and hide the accumulation.
+      */}
+      {landed.length > 0 ? (
+        <ol className={styles.feed}>
+          {landed.slice(0, 6).map((item) => (
+            <li
+              key={item.id}
+              className={styles.feedItem}
+              data-risk={state.atRisk.has(item.id) ? "true" : undefined}
+            >
+              <span className={styles.feedWhen}>
+                {new Date(item.occurredAt).toLocaleDateString("en-AU", {
+                  day: "numeric",
+                  month: "short",
+                })}
+              </span>
+              <span className={styles.feedTitle}>{item.title}</span>
+              <span className={styles.feedWho}>{item.authorName}</span>
+            </li>
+          ))}
+        </ol>
+      ) : null}
     </div>
   );
 }

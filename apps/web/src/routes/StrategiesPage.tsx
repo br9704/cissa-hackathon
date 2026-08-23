@@ -77,6 +77,10 @@ export function StrategiesPage() {
           occurredAt: d.occurredAt,
           authorMemberId: d.authorMemberId,
           riskFlag: d.riskFlag,
+          /* The narration needs words, not just ids. Derived here rather than inside the
+             replay so the component stays a pure function of what it is given. */
+          title: d.title,
+          authorName: memberName(d.authorMemberId),
         })),
     [c.decisions, activeId],
   );

@@ -1056,17 +1056,17 @@ which proves the capture bar did not eat the bare "a" key.
 
 ## S25 - Narrated replay (budget 3h)
 
-- [ ] Keep the existing visible/atRisk/at derivation, including the rule that a decision only
+- [x] Keep the existing visible/atRisk/at derivation, including the rule that a decision only
       turns amber once the author has actually gone. That reasoning is correct.
-- [ ] New presentation only: a caption naming the date, the decision, the author and the
+- [x] New presentation only: a caption naming the date, the decision, the author and the
       strategy; an accumulating feed; the graph node highlighting as it lands; playback
       controls; a summary at the end of the sweep.
-- [ ] Keep the aria label "Replay the ledger over time" VERBATIM.
+- [x] Keep the aria label "Replay the ledger over time" VERBATIM.
 
 **Acceptance:** both time machine scenes pass unmodified; captions are derived from events,
 not authored.
 
-- **Sprint log:** (planned)
+- **Sprint log:** Logged: 2026-08-23T14:32:17+10:00 · status: done · actual: 0.5h (budget 3h) · by: claude-opus-5 · note: verified by driving the scrubber. Caption changes with the scrubber, the feed accumulates rather than resetting, and the end of sweep reads "53 records from 2 people and 48 of them now have nobody left who can explain them", which is the pitch in one derived sentence. The aria label survived verbatim so both screenshot scenes still select it.
 
 ---
 
