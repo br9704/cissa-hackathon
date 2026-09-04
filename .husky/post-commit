@@ -1,0 +1,10 @@
+#!/bin/sh
+# This repo sets core.hooksPath=.husky, which hides the machine-wide hook in
+# ~/.config/git/hooks that pushes each commit to the control plane (hq.commit).
+# So the same call lives here. Background, so the commit returns at once;
+# failures land in ~/.claude/hq-commit-hook.log.
+pusher="$HOME/Desktop/control-plane/scripts/push-commits.mjs"
+if [ -f "$pusher" ] && command -v node >/dev/null 2>&1; then
+  ( node "$pusher" --repo "$(git rev-parse --show-toplevel)" --quiet >/dev/null 2>&1 & )
+fi
+exit 0
